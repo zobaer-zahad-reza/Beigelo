@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* font */
+
+.playfair-display-navlogo {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: bolder;
+  font-style: normal;
+}
+
 a.active hr{
     display: block;
 }

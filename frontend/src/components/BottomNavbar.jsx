@@ -24,7 +24,7 @@ export default function BottomNavbar() {
     <nav className="fixed bottom-0 left-0 right-0 bg-[#faf0e6] text-white shadow-lg">
       <div className="flex justify-around items-center p-2">
         {navItems.map((item) => (
-          <Link to={`/${item.id}`}>
+          <Link key={item.id} to={`/${item.id}`}>
             <button
               key={item.id}
               className={`flex flex-col items-center justify-center w-16 py-2 rounded-lg transition-colors ${
