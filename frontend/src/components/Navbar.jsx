@@ -24,14 +24,14 @@ const Navbar = () => {
     setCartItems({});
   };
 
-    const sidebarRef = useClickOutside(() => {
+  const sidebarRef = useClickOutside(() => {
     setVisible(false);
   });
 
   // Active styles for desktop NavLink
   const navLinkStyles = ({ isActive }) => ({
-    color: isActive ? '#000000' : '#4B5563', // Black for active, gray for others
-    fontWeight: isActive ? '600' : '500',   // Bolder for active
+    color: isActive ? "#000000" : "#4B5563", // Black for active, gray for others
+    fontWeight: isActive ? "600" : "500", // Bolder for active
   });
 
   return (
@@ -42,10 +42,18 @@ const Navbar = () => {
 
       {/* Menu Links - Desktop */}
       <ul className="hidden sm:flex items-center gap-5 text-sm text-gray-700">
-        <NavLink to="/" style={navLinkStyles}>HOME</NavLink>
-        <NavLink to="/collection" style={navLinkStyles}>COLLECTION</NavLink>
-        <NavLink to="/about" style={navLinkStyles}>ABOUT</NavLink>
-        <NavLink to="/contact" style={navLinkStyles}>CONTACT</NavLink>
+        <NavLink to="/" style={navLinkStyles}>
+          HOME
+        </NavLink>
+        <NavLink to="/collection" style={navLinkStyles}>
+          COLLECTION
+        </NavLink>
+        <NavLink to="/about" style={navLinkStyles}>
+          ABOUT
+        </NavLink>
+        <NavLink to="/contact" style={navLinkStyles}>
+          CONTACT
+        </NavLink>
       </ul>
 
       {/* Right Side Icons */}
@@ -67,9 +75,21 @@ const Navbar = () => {
           {token && (
             <div className="group-hover:block hidden absolute right-0 pt-4 z-20">
               <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded shadow-lg">
-                <p onClick={() => navigate("/userprofile")} className="cursor-pointer hover:text-black">My Profile</p>
-                <p onClick={() => navigate("/orders")} className="cursor-pointer hover:text-black">Orders</p>
-                <p onClick={logout} className="cursor-pointer hover:text-black">Logout</p>
+                <p
+                  onClick={() => navigate("/userprofile")}
+                  className="cursor-pointer hover:text-black"
+                >
+                  My Profile
+                </p>
+                <p
+                  onClick={() => navigate("/orders")}
+                  className="cursor-pointer hover:text-black"
+                >
+                  Orders
+                </p>
+                <p onClick={logout} className="cursor-pointer hover:text-black">
+                  Logout
+                </p>
               </div>
             </div>
           )}
@@ -91,11 +111,10 @@ const Navbar = () => {
           alt="Menu"
         />
       </div>
-      
 
       {/* Sidebar for Mobile */}
       <div
-      ref={sidebarRef}
+        ref={sidebarRef}
         className={`fixed top-0 right-0 h-full z-30 overflow-hidden bg-white shadow-xl transition-all duration-300 ${
           visible ? "w-3/4" : "w-0"
         }`}
@@ -105,17 +124,41 @@ const Navbar = () => {
             onClick={() => setVisible(false)}
             className="flex items-center gap-4 p-4 cursor-pointer"
           >
-            <img className="h-4 rotate-180" src={assets.dropdown_icon} alt="Back" />
+            <img
+              className="h-4 rotate-180"
+              src={assets.dropdown_icon}
+              alt="Back"
+            />
             <p>Back</p>
           </div>
-          
-          <div onClick={() => handleSideNavbar('/')} className="py-3 pl-6 border-t cursor-pointer hover:bg-gray-100">HOME</div>
-          <div onClick={() => handleSideNavbar('/collection')} className="py-3 pl-6 border-t cursor-pointer hover:bg-gray-100">COLLECTION</div>
-          <div onClick={() => handleSideNavbar('/about')} className="py-3 pl-6 border-t cursor-pointer hover:bg-gray-100">ABOUT</div>
-          <div onClick={() => handleSideNavbar('/contact')} className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100">CONTACT</div>
+
+          <div
+            onClick={() => handleSideNavbar("/")}
+            className="py-3 pl-6 border-t cursor-pointer hover:bg-gray-100"
+          >
+            HOME
+          </div>
+          <div
+            onClick={() => handleSideNavbar("/collection")}
+            className="py-3 pl-6 border-t cursor-pointer hover:bg-gray-100"
+          >
+            COLLECTION
+          </div>
+          <div
+            onClick={() => handleSideNavbar("/about")}
+            className="py-3 pl-6 border-t cursor-pointer hover:bg-gray-100"
+          >
+            ABOUT
+          </div>
+          <div
+            onClick={() => handleSideNavbar("/contact")}
+            className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
+          >
+            CONTACT
+          </div>
         </div>
       </div>
-      
+
       {/* This renders the BottomNavbar on smaller screens */}
       <div className="block md:hidden">
         <BottomNavbar />
