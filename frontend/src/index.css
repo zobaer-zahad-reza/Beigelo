@@ -15,6 +15,11 @@
   font-style: normal;
 }
 
+
+html {
+  scroll-behavior: smooth;
+}
+
 a.active hr{
     display: block;
 }

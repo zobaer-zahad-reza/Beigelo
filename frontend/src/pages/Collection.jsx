@@ -3,6 +3,8 @@ import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import Title from "../components/Title";
 import ProductItem from "../components/ProductItem";
+import { Link } from "react-router-dom";
+import { TbFaceIdError } from "react-icons/tb";
 
 const Collection = () => {
   const { products, search, showSearch } = useContext(ShopContext);
@@ -91,9 +93,8 @@ const Collection = () => {
         </p>
         {/* Category Filter */}
         <div
-          className={`border border-gray-300 pl-5 py-3 mt-6 ${
-            showFilter ? "" : "hidden"
-          } sm:block`}
+          className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? "" : "hidden"
+            } sm:block`}
         >
           <p className="mb-3 text-sm font-medium">CATEGORIES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
@@ -128,9 +129,8 @@ const Collection = () => {
         </div>
         {/* Sub-Category Filter */}
         <div
-          className={`border border-gray-300 pl-5 py-3 my-5 ${
-            showFilter ? "" : "hidden"
-          } sm:block`}
+          className={`border border-gray-300 pl-5 py-3 my-5 ${showFilter ? "" : "hidden"
+            } sm:block`}
         >
           <p className="mb-3 text-sm font-medium">TYPE</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
@@ -179,17 +179,28 @@ const Collection = () => {
           </select>
         </div>
         {/* Map Products */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
-          {filterProducts.map((item, index) => (
-            <ProductItem
-              key={index}
-              name={item.name}
-              id={item._id}
-              price={item.price}
-              image={item.image}
-            />
-          ))}
-        </div>
+        {
+          filterProducts.length > 0 ? <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
+            {filterProducts.map((item, index) => (
+              <ProductItem
+                key={index}
+                name={item.name}
+                id={item._id}
+                price={item.price}
+                image={item.image}
+              />
+            ))}
+          </div> : <div className="text-center min-h-screen my-auto">
+            <h1 className="text-black font-bold text-3xl">Not Found</h1>
+            <h3 className="text-gray-500 font-semibold text-xl mt-4">
+              If you need this product you can{' '}
+              <Link to={'/contact'} className="border-b-2 hover:text-black hover:border-black">
+                contact us
+              </Link>
+              . We can try to help you.
+            </h3>
+          </div>
+        }
       </div>
     </div>
   );
