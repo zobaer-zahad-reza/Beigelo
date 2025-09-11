@@ -30,8 +30,10 @@ const Navbar = () => {
 
   // Active styles for desktop NavLink
   const navLinkStyles = ({ isActive }) => ({
-    color: isActive ? "#000000" : "#4B5563", // Black for active, gray for others
-    fontWeight: isActive ? "600" : "500", // Bolder for active
+    color: isActive ? "#000000" : "#4B5563",
+    fontWeight: isActive ? "600" : "500",
+    // borderBottom: isActive ? '2px solid black' : 'none',
+     borderBottom: isActive ? '2px solid black' : '2px solid transparent',
   });
 
   return (
@@ -41,17 +43,17 @@ const Navbar = () => {
       </Link>
 
       {/* Menu Links - Desktop */}
-      <ul className="hidden sm:flex items-center gap-5 text-sm text-gray-700">
-        <NavLink to="/" style={navLinkStyles}>
+      <ul className="hidden sm:flex items-center gap-5 text-sm text-gray-700 ">
+        <NavLink to="/" style={navLinkStyles} className="transition-all duration-200">
           HOME
         </NavLink>
-        <NavLink to="/collection" style={navLinkStyles}>
+        <NavLink to="/collection" style={navLinkStyles} className="transition-all duration-200">
           COLLECTION
         </NavLink>
-        <NavLink to="/about" style={navLinkStyles}>
+        <NavLink to="/about" style={navLinkStyles} className="transition-all duration-200">
           ABOUT
         </NavLink>
-        <NavLink to="/contact" style={navLinkStyles}>
+        <NavLink to="/contact" style={navLinkStyles} className="transition-all duration-200">
           CONTACT
         </NavLink>
       </ul>

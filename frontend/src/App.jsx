@@ -15,11 +15,13 @@ import SearchBar from "./components/SearchBar";
 import { ToastContainer, toast } from "react-toastify";
 import Verify from "./pages/Verify";
 import UserProfile from "./pages/UserProfile";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App = () => {
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <ToastContainer />
+      <ScrollToTop />
       <Navbar />
       <SearchBar />
       <div className="min-h-[60vh]">

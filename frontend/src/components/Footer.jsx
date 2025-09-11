@@ -1,5 +1,5 @@
 import React from "react";
-import { assets } from "../assets/assets";
+// import { assets } from "../assets/assets";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
@@ -20,10 +20,10 @@ const Footer = () => {
         <div>
           <p className="text-xl font-medium md-5">COMPANY</p>
           <ul className="flex flex-col gap-1 text-gray-600">
-            <li>Home</li>
-            <li>About Us</li>
-            <li>Delivery</li>
-            <li>Privacy Policy</li>
+            <Link to={'/'}>Home</Link>
+            <Link to={'about'}>About Us</Link>
+            <Link>Delivery</Link>
+            <Link>Privacy Policy</Link>
           </ul>
         </div>
         <div>
