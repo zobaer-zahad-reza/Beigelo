@@ -37,7 +37,7 @@ const Navbar = () => {
   });
 
   return (
-    <div className="flex items-center justify-between py-5 font-medium bg-white sticky top-0 z-10 bg-opacity-70 backdrop-blur-sm">
+    <div className="flex items-center justify-between py-5 font-medium bg-white md:sticky md:top-0 md:z-10 md:bg-opacity-70 md:backdrop-blur-sm">
       <Link to="/">
         <h1 className="text-5xl playfair-display-navlogo">Beigelo</h1>
       </Link>
@@ -63,7 +63,7 @@ const Navbar = () => {
         <img
           onClick={() => setShowSearch(true)}
           src={assets.search_icon}
-          className="w-5 cursor-pointer"
+          className="w-5 cursor-pointer hidden md:flex"
           alt="Search"
         />
 
@@ -98,7 +98,7 @@ const Navbar = () => {
         </div>
 
         <Link to="/cart" className="relative">
-          <img src={assets.cart_icon} className="w-5 min-w-5" alt="Cart" />
+          <img src={assets.cart_icon} className="w-5 min-w-5 hidden md:flex" alt="Cart" />
           {getCartCount() > 0 && (
             <p className="absolute right-[-8px] top-[-8px] w-4 h-4 flex items-center justify-center bg-black text-white rounded-full text-[9px]">
               {getCartCount()}
@@ -157,6 +157,25 @@ const Navbar = () => {
           >
             CONTACT
           </div>
+          {token && (
+            <div className="flex flex-col text-gray-600">
+              <div
+                  onClick={() => navigate("/userprofile")}
+                  className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
+                >
+                  My Profile
+                </div>
+                <div
+                  onClick={() => token ? null : navigate("/orders")}
+                  className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
+                >
+                  Orders
+                </div>
+                <div onClick={logout} className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100">
+                  Logout
+                </div>
+            </div>
+          )}
         </div>
       </div>
 
