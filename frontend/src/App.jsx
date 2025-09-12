@@ -16,6 +16,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Verify from "./pages/Verify";
 import UserProfile from "./pages/UserProfile";
 import ScrollToTop from "./components/ScrollToTop";
+import ErrorPage from "./pages/ErrorPage";
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
           <Route path="/orders" element={<Orders />} />
           <Route path="/verify" element={<Verify />} />
           <Route path="/userprofile" element={<UserProfile />} />
+          <Route path="/:error" element={<ErrorPage />} />
         </Routes>
       </div>
       <Footer />

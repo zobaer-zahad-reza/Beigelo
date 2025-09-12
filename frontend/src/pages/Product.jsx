@@ -85,12 +85,19 @@ const Product = () => {
               ))}
             </div>
           </div> */}
-          <button
+          <div className="space-x-4">
+            <button
             onClick={() => addToCart(productData._id)}
             className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
           >
             ADD TO CART
           </button>
+          <button
+            className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
+          >
+            BUY NOW
+          </button>
+          </div>
           <div className="text-sm text-gray-600 mt-6 flex flex-col gap-1">
             <p>100% original Product</p>
             <p>cash on delivery is available on this product</p>

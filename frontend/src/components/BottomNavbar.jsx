@@ -28,9 +28,9 @@ export default function BottomNavbar() {
     <nav className="fixed bottom-0 left-0 right-0 bg-[#faf0e6] text-white shadow-lg">
       <div className="flex justify-around items-center p-2">
         {navItems.map((item) => (
-          <Link key={item.id} to={`/${item.id}`}>
+          <Link key={item.label} to={`/${item.id}`}>
             <button
-              key={item.id}
+              key={item.label}
               className={`flex flex-col items-center justify-center w-16 py-2 rounded-lg transition-colors ${activeTab === item.label
                   ? "text-[#d9b99b]"
                   : "text-gray-400"
@@ -38,7 +38,8 @@ export default function BottomNavbar() {
               onClick={() => setActiveTab(item.label)}
             >
               <div className="text-xl">{item.icon}</div>
-              {item.label && <span className="text-xs mt-1">{item.label}</span>}
+              {/* {item.label && <span className="text-xs mt-1">{item.label}</span>} */}
+              <span className="text-xs mt-1">{item.label}</span>
             </button>
           </Link>
         ))}

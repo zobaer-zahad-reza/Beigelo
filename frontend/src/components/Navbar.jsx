@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import BottomNavbar from "./BottomNavbar";
 import useClickOutside from "../Hook/useClickOutside";
@@ -10,6 +10,7 @@ const Navbar = () => {
   const { setShowSearch, getCartCount, token, setToken, setCartItems } =
     useContext(ShopContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Helper function for mobile navigation
   const handleSideNavbar = (path) => {
@@ -60,12 +61,14 @@ const Navbar = () => {
 
       {/* Right Side Icons */}
       <div className="flex items-center gap-6">
-        <img
+        {
+          location.pathname === '/collection' ? <img
           onClick={() => setShowSearch(true)}
           src={assets.search_icon}
           className="w-5 cursor-pointer hidden md:flex"
           alt="Search"
-        />
+        /> : null
+        }
 
         <div className="group relative">
           <img

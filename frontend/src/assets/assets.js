@@ -72,6 +72,7 @@ import about_img from './about_img.png'
 import contact_img from './contact_img.png'
 import razorpay_logo from './razorpay_logo.png'
 import stripe_logo from './stripe_logo.png'
+import bkash_logo from  './bkash_logo.png'
 import cross_icon from './cross_icon.png'
 
 export const assets = {
@@ -92,6 +93,7 @@ export const assets = {
     contact_img,
     razorpay_logo,
     stripe_logo,
+    bkash_logo,
     cross_icon
 }
 
