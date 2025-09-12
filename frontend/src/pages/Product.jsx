@@ -9,7 +9,9 @@ const Product = () => {
   const { products, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
-  const [size, setSize] = useState("S");
+
+  // when we need product size just comment it offf
+  // const [size, setSize] = useState("S");
 
   const fetchProductData = async () => {
     products.map((item) => {
@@ -64,7 +66,10 @@ const Product = () => {
           <p className="mt-3 text-gray-400 md:w-4/5">
             {productData.description}
           </p>
-          <div className="flex flex-col gap-2 my-3">
+
+          {/* size section off it when we need size */}
+
+          {/* <div className="flex flex-col gap-2 my-3">
             <p>Select-Size</p>
             <div className="flex gap-2">
               {productData.sizes.map((item, index) => (
@@ -79,9 +84,9 @@ const Product = () => {
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
           <button
-            onClick={() => addToCart(productData._id, size)}
+            onClick={() => addToCart(productData._id)}
             className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
           >
             ADD TO CART

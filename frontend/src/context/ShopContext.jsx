@@ -16,10 +16,12 @@ const ShopContextProvider = (props) => {
   const [token, setToken] = useState("");
   const navigate = useNavigate();
   const addToCart = async (itemId, size) => {
-    if (!size) {
-      toast.error("Select Product Size");
-      return;
-    }
+
+    //comment it off when we use size
+    // if (!size) {
+    //   toast.error("Select Product Size");
+    //   return;
+    // }
 
     let cartData = structuredClone(cartItems);
 
