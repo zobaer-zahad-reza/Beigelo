@@ -38,7 +38,7 @@ const Navbar = () => {
   });
 
   return (
-    <div className="flex items-center justify-between py-5 font-medium bg-white md:sticky md:top-0 md:z-10 md:bg-opacity-70 md:backdrop-blur-sm">
+    <div className="flex items-center justify-between py-4 font-medium bg-white md:sticky md:top-0 md:z-10 md:bg-opacity-70 md:backdrop-blur-sm">
       <Link to="/">
         <h1 className="text-5xl playfair-display-navlogo">Beigelo</h1>
       </Link>
@@ -73,7 +73,7 @@ const Navbar = () => {
         <div className="group relative">
           <img
             onClick={() => (token ? null : navigate("/login"))}
-            className="w-5 cursor-pointer"
+            className="hidden md:block w-5 cursor-pointer"
             src={assets.profile_icon}
             alt="Profile"
           />
@@ -112,7 +112,7 @@ const Navbar = () => {
         <img
           onClick={() => setVisible(true)}
           src={assets.menu_icon}
-          className="w-5 cursor-pointer sm:hidden"
+          className="w-5 cursor-pointer sm:hidden "
           alt="Menu"
         />
       </div>
