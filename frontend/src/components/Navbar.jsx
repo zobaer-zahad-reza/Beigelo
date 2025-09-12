@@ -33,11 +33,11 @@ const Navbar = () => {
     color: isActive ? "#000000" : "#4B5563",
     fontWeight: isActive ? "600" : "500",
     // borderBottom: isActive ? '2px solid black' : 'none',
-     borderBottom: isActive ? '2px solid black' : '2px solid transparent',
+    borderBottom: isActive ? '2px solid black' : '2px solid transparent',
   });
 
   return (
-    <div className="flex items-center justify-between py-5 font-medium">
+    <div className="flex items-center justify-between py-5 font-medium bg-white sticky top-0 z-10 bg-opacity-70 backdrop-blur-sm">
       <Link to="/">
         <h1 className="text-5xl playfair-display-navlogo">Beigelo</h1>
       </Link>
@@ -117,9 +117,8 @@ const Navbar = () => {
       {/* Sidebar for Mobile */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 right-0 h-full z-30 overflow-hidden bg-white shadow-xl transition-all duration-300 ${
-          visible ? "w-3/4" : "w-0"
-        }`}
+        className={`fixed top-0 right-0 h-full z-30 overflow-hidden bg-white shadow-xl transition-all duration-300 ${visible ? "w-3/4" : "w-0"
+          }`}
       >
         <div className="flex flex-col text-gray-600">
           <div
