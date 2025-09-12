@@ -2,6 +2,7 @@ import React from "react";
 import Title from "../components/Title";
 import { assets } from "../assets/assets";
 import NewsletterBox from "../components/NewsletterBox";
+import LocationMap from "../components/LocationMap";
 
 const About = () => {
   return (
@@ -69,6 +70,11 @@ const About = () => {
           </p>
         </div>
       </div>
+
+      <div className="my-4">
+        <LocationMap />
+      </div>
+
       <NewsletterBox />
     </div>
   );
