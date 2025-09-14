@@ -17,6 +17,7 @@ const Add = ({ token }) => {
   const [subCategory, setSubCategory] = useState("Man");
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
+  const [showSize, setShowSize] = useState(false);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -180,7 +181,16 @@ const Add = ({ token }) => {
         </div>
       </div>
 
-      <div>
+      <div className="flex space-x-4 mt-2">
+        <h4>Have product Size?</h4>
+        <input
+          type="checkbox"
+          onClick={() => setShowSize(!showSize)}
+          className="toggle toggle-success"
+        />
+      </div>
+
+      <div className={`${showSize ? "block" : "hidden"}`}>
         <p className="mb-0.5">Product Sizes</p>
         <div className="flex gap-3">
           <div
