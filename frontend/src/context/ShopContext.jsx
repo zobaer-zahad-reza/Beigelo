@@ -14,9 +14,13 @@ const ShopContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
   const [token, setToken] = useState("");
+  //for userProfile and login pages
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [avatar, setAvatar] = useState("");
+
   const navigate = useNavigate();
   const addToCart = async (itemId, size) => {
-
     //comment it off when we use size
     // if (!size) {
     //   toast.error("Select Product Size");
@@ -161,6 +165,12 @@ const ShopContextProvider = (props) => {
     backendUrl,
     setToken,
     token,
+    name,
+    setName,
+    email,
+    setEmail,
+    avatar,
+    setAvatar,
   };
   return (
     <ShopContext.Provider value={value}>{props.children}</ShopContext.Provider>

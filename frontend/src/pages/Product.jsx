@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import RelatedProduct from "../components/RelatedProduct";
@@ -9,6 +9,7 @@ const Product = () => {
   const { products, currency, addToCart } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
+  const navigate = useNavigate();
 
   // when we need product size just comment it offf
   // const [size, setSize] = useState("S");
@@ -87,16 +88,17 @@ const Product = () => {
           </div> */}
           <div className="space-x-4">
             <button
-            onClick={() => addToCart(productData._id)}
-            className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
-          >
-            ADD TO CART
-          </button>
-          <button
-            className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
-          >
-            BUY NOW
-          </button>
+              onClick={() => addToCart(productData._id)}
+              className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
+            >
+              ADD TO CART
+            </button>
+            <button
+              onClick={() => navigate("/place-order")}
+              className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
+            >
+              BUY NOW
+            </button>
           </div>
           <div className="text-sm text-gray-600 mt-6 flex flex-col gap-1">
             <p>100% original Product</p>

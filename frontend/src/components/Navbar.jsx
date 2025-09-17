@@ -190,7 +190,7 @@ const Navbar = () => {
                 My Profile
               </div>
               <div
-                onClick={() => (token ? null : navigate("/orders"))}
+                onClick={() => (token ? navigate("/orders") : null)}
                 className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
               >
                 Orders

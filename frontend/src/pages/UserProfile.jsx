@@ -1,15 +1,22 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { ShopContext } from "../context/ShopContext";
 
 const UserProfile = () => {
+  const { name, setName, email, setEmail, avatar, setAvatar } =
+    useContext(ShopContext);
+
   // Mock user data
   const [user, setUser] = useState({
-    name: "Rahim Ahmed",
-    email: "rahim.ahmed@email.com",
-    phone: "+880 1712-345678",
-    joinDate: "Jan 15, 2022",
+    // name: "Rahim Ahmed",
+    // email: "rahim.ahmed@email.com",
+    // phone: "+880 1712-345678",
+    // joinDate: "Jan 15, 2022",
+    // membership: "Gold Member",
+    // points: 1250,
+    name,
     avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    membership: "Gold Member",
-    points: 1250,
+
+    email,
   });
 
   // Mock order history
