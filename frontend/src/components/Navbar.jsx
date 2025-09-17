@@ -34,7 +34,7 @@ const Navbar = () => {
     color: isActive ? "#000000" : "#4B5563",
     fontWeight: isActive ? "600" : "500",
     // borderBottom: isActive ? '2px solid black' : 'none',
-    borderBottom: isActive ? '2px solid black' : '2px solid transparent',
+    borderBottom: isActive ? "2px solid black" : "2px solid transparent",
   });
 
   return (
@@ -45,32 +45,48 @@ const Navbar = () => {
 
       {/* Menu Links - Desktop */}
       <ul className="hidden sm:flex items-center gap-5 text-sm text-gray-700 ">
-        <NavLink to="/" style={navLinkStyles} className="transition-all duration-200">
+        <NavLink
+          to="/"
+          style={navLinkStyles}
+          className="transition-all duration-200"
+        >
           HOME
         </NavLink>
-        <NavLink to="/collection" style={navLinkStyles} className="transition-all duration-200">
+        <NavLink
+          to="/collection"
+          style={navLinkStyles}
+          className="transition-all duration-200"
+        >
           COLLECTION
         </NavLink>
-        <NavLink to="/about" style={navLinkStyles} className="transition-all duration-200">
+        <NavLink
+          to="/about"
+          style={navLinkStyles}
+          className="transition-all duration-200"
+        >
           ABOUT
         </NavLink>
-        <NavLink to="/contact" style={navLinkStyles} className="transition-all duration-200">
+        <NavLink
+          to="/contact"
+          style={navLinkStyles}
+          className="transition-all duration-200"
+        >
           CONTACT
         </NavLink>
       </ul>
 
       {/* Right Side Icons */}
       <div className="flex items-center gap-6">
-        {
-          location.pathname === '/collection' ? <img
-          onClick={() => setShowSearch(true)}
-          src={assets.search_icon}
-          className="w-5 cursor-pointer hidden md:flex"
-          alt="Search"
-        /> : null
-        }
+        {location.pathname === "/collection" ? (
+          <img
+            onClick={() => setShowSearch(true)}
+            src={assets.search_icon}
+            className="w-5 cursor-pointer hidden md:flex"
+            alt="Search"
+          />
+        ) : null}
 
-        <div className="group relative">
+        <div className="group relative hidden md:flex">
           <img
             onClick={() => (token ? null : navigate("/login"))}
             className="hidden md:block w-5 cursor-pointer"
@@ -100,8 +116,12 @@ const Navbar = () => {
           )}
         </div>
 
-        <Link to="/cart" className="relative">
-          <img src={assets.cart_icon} className="w-5 min-w-5 hidden md:flex" alt="Cart" />
+        <Link to="/cart" className="relative hidden md:block">
+          <img
+            src={assets.cart_icon}
+            className="w-5 min-w-5 hidden md:flex"
+            alt="Cart"
+          />
           {getCartCount() > 0 && (
             <p className="absolute right-[-8px] top-[-8px] w-4 h-4 flex items-center justify-center bg-black text-white rounded-full text-[9px]">
               {getCartCount()}
@@ -112,7 +132,7 @@ const Navbar = () => {
         <img
           onClick={() => setVisible(true)}
           src={assets.menu_icon}
-          className="w-5 cursor-pointer sm:hidden "
+          className="w-6 cursor-pointer sm:hidden ml-52"
           alt="Menu"
         />
       </div>
@@ -120,8 +140,9 @@ const Navbar = () => {
       {/* Sidebar for Mobile */}
       <div
         ref={sidebarRef}
-        className={`fixed top-0 right-0 h-full z-30 overflow-hidden bg-white shadow-xl transition-all duration-300 ${visible ? "w-3/4" : "w-0"
-          }`}
+        className={`fixed top-0 right-0 h-full z-30 overflow-hidden bg-white shadow-xl transition-all duration-300 ${
+          visible ? "w-3/4" : "w-0"
+        }`}
       >
         <div className="flex flex-col text-gray-600">
           <div
@@ -163,20 +184,23 @@ const Navbar = () => {
           {token && (
             <div className="flex flex-col text-gray-600">
               <div
-                  onClick={() => navigate("/userprofile")}
-                  className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
-                >
-                  My Profile
-                </div>
-                <div
-                  onClick={() => token ? null : navigate("/orders")}
-                  className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
-                >
-                  Orders
-                </div>
-                <div onClick={logout} className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100">
-                  Logout
-                </div>
+                onClick={() => navigate("/userprofile")}
+                className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
+              >
+                My Profile
+              </div>
+              <div
+                onClick={() => (token ? null : navigate("/orders"))}
+                className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
+              >
+                Orders
+              </div>
+              <div
+                onClick={logout}
+                className="py-3 pl-6 border-t border-b cursor-pointer hover:bg-gray-100"
+              >
+                Logout
+              </div>
             </div>
           )}
         </div>
