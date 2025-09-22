@@ -14,16 +14,22 @@ const port = process.env.PORT || 4000;
 
 // Middlewares
 app.use(express.json());
+app.use(cors());
 
 // CORS Setup
 const allowedOrigins = [
-  "http://localhost:5173", // React dev server
+  'http://localhost:5174',       // Your React development server
+  'http://localhost:5173',
 ];
 
+// 2. CONFIGURE AND USE THE CORS MIDDLEWARE
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow non-browser requests like Postman
+      console.log("Request's Origin: ", origin);
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+
       if (allowedOrigins.indexOf(origin) === -1) {
         const msg =
           "The CORS policy for this site does not allow access from the specified Origin.";
@@ -31,7 +37,7 @@ app.use(
       }
       return callback(null, true);
     },
-    credentials: true, // if you use cookies or auth headers
+    credentials: true, // Allow cookies to be sent
   })
 );
 
