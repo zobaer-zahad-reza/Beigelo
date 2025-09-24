@@ -128,13 +128,6 @@ const Navbar = () => {
             </p>
           )}
         </Link>
-
-        <img
-          onClick={() => setVisible(true)}
-          src={assets.menu_icon}
-          className="w-6 cursor-pointer sm:hidden ml-52"
-          alt="Menu"
-        />
       </div>
 
       {/* Sidebar for Mobile */}
@@ -210,6 +203,12 @@ const Navbar = () => {
       <div className="block md:hidden">
         <BottomNavbar />
       </div>
+      <img
+        onClick={() => setVisible(true)}
+        src={assets.menu_icon}
+        className="w-6 cursor-pointer sm:hidden"
+        alt="Menu"
+      />
     </div>
   );
 };
