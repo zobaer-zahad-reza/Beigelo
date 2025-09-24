@@ -1,5 +1,5 @@
 # Workflow-এর নাম
-name: Deploy to VPS
+name: Deploy Website to VPS
 
 on:
   push:
@@ -8,34 +8,49 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest # GitHub একটি ভার্চুয়াল মেশিন ব্যবহার করবে
+    name: Deploy to Server
+    runs-on: ubuntu-latest # GitHub একটি ভার্চুয়াল মেশিন ব্যবহার করবে
 
     steps:
-      - name: Checkout code
+      - name: Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Deploy to Server
+      - name: Execute deployment script on server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Frontend Deployment
-            echo "Starting Frontend Deployment..."
-            cd /var/www/
+            # Step 1: Go to the project root and pull the latest code
+            echo "==== Pulling latest code from GitHub... ===="
+            cd /var/www/Beigelo
             git pull origin main
-            cd /var/www/Beigelo/frontend
-            npm install
-            npm run build
-            echo "Frontend Deployment Complete!"
 
-            # Backend Deployment
-            echo "Starting Backend Deployment..."
-            cd /var/www/
-            git pull origin main
-            cd /var/www/Beigelo/backend
+            # Step 2: Deploy Frontend
+            echo "==== Starting Frontend Deployment... ===="
+            cd frontend
+            echo "Installing dependencies for Frontend..."
             npm install
-            # PM2 দিয়ে সার্ভার রিস্টার্ট করা
+            echo "Building Frontend..."
+            npm run build
+            echo "✅ Frontend Deployment Complete!"
+
+            # Step 3: Deploy Admin Panel
+            echo "==== Starting Admin Deployment... ===="
+            cd ../admin  # Go back from frontend and into admin
+            echo "Installing dependencies for Admin..."
+            npm install
+            echo "Building Admin..."
+            npm run build
+            echo "✅ Admin Deployment Complete!"
+
+            # Step 4: Deploy Backend
+            echo "==== Starting Backend Deployment... ===="
+            cd ../backend # Go back from admin and into backend
+            echo "Installing dependencies for Backend..."
+            npm install
+            echo "Restarting server with PM2..."
             pm2 restart beigelo_server
-            echo "Backend Deployment Complete!"
+            echo "✅ Backend Deployment Complete!"
+            echo "🚀 Deployment Successful!"
