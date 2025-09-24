@@ -23,16 +23,18 @@ jobs:
           script: |
             # Frontend Deployment
             echo "Starting Frontend Deployment..."
-            cd /var/www/Beigelo/frontend
+            cd /var/www/
             git pull origin main
+            cd /var/www/Beigelo/frontend
             npm install
             npm run build
             echo "Frontend Deployment Complete!"
 
             # Backend Deployment
             echo "Starting Backend Deployment..."
-            cd /var/www/Beigelo/backend
+            cd /var/www/
             git pull origin main
+            cd /var/www/Beigelo/backend
             npm install
             # PM2 দিয়ে সার্ভার রিস্টার্ট করা
             pm2 restart beigelo_server
