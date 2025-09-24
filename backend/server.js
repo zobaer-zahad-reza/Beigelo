@@ -22,6 +22,7 @@ const allowedOrigins = [
   'https://beigelo.com',
   'https://www.beigelo.com',
   'https://iamadmin.beigelo.com',
+  'https://api.beigelo.com',
   
   'http://localhost:5174',       // Your React development server
   'http://localhost:5173',
