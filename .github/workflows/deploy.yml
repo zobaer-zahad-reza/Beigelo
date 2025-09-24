@@ -21,16 +21,17 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Step 1: Go to the project root and pull the latest code
-            echo "==== Pulling latest code from GitHub... ===="
+            # Step 1: Forcefully update the code to match the GitHub repository
+            echo "==== Forcefully pulling latest code from GitHub... ===="
             cd /var/www/Beigelo
-            git pull origin main
+            git fetch --all
+            git reset --hard origin/main
 
             # Step 2: Deploy Frontend
             echo "==== Starting Frontend Deployment... ===="
             cd frontend
-            echo "Removing old build folder..."
-            rm -rf dist  # <-- পুরোনো dist ফোল্ডার মুছে ফেলা হচ্ছে
+            echo "Removing old build folder and node_modules..."
+            rm -rf dist node_modules
             echo "Installing dependencies for Frontend..."
             npm install
             echo "Building Frontend..."
@@ -40,8 +41,8 @@ jobs:
             # Step 3: Deploy Admin Panel
             echo "==== Starting Admin Deployment... ===="
             cd ../admin
-            echo "Removing old build folder..."
-            rm -rf dist  # <-- পুরোনো dist ফোল্ডার মুছে ফেলা হচ্ছে
+            echo "Removing old build folder and node_modules..."
+            rm -rf dist node_modules
             echo "Installing dependencies for Admin..."
             npm install
             echo "Building Admin..."
@@ -51,6 +52,8 @@ jobs:
             # Step 4: Deploy Backend
             echo "==== Starting Backend Deployment... ===="
             cd ../backend
+            echo "Removing old node_modules..."
+            rm -rf node_modules
             echo "Installing dependencies for Backend..."
             npm install
             echo "Restarting server with PM2..."
