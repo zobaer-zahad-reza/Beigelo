@@ -1,0 +1,39 @@
+# Workflow-এর নাম
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main # শুধুমাত্র main ব্রাঞ্চে পুশ করলেই এটি রান হবে
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest # GitHub একটি ভার্চুয়াল মেশিন ব্যবহার করবে
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Frontend Deployment
+            echo "Starting Frontend Deployment..."
+            cd /var/www/Beigelo/frontend
+            git pull origin main
+            npm install
+            npm run build
+            echo "Frontend Deployment Complete!"
+
+            # Backend Deployment
+            echo "Starting Backend Deployment..."
+            cd /var/www/Beigelo/backend
+            git pull origin main
+            npm install
+            # PM2 দিয়ে সার্ভার রিস্টার্ট করা
+            pm2 restart beigelo_server
+            echo "Backend Deployment Complete!"
