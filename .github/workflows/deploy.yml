@@ -1,15 +1,14 @@
-# Workflow-এর নাম
 name: Deploy Website to VPS
 
 on:
   push:
     branches:
-      - main # শুধুমাত্র main ব্রাঞ্চে পুশ করলেই এটি রান হবে
+      - main
 
 jobs:
   deploy:
     name: Deploy to Server
-    runs-on: ubuntu-latest # GitHub একটি ভার্চুয়াল মেশিন ব্যবহার করবে
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout the repository
@@ -30,6 +29,8 @@ jobs:
             # Step 2: Deploy Frontend
             echo "==== Starting Frontend Deployment... ===="
             cd frontend
+            echo "Removing old build folder..."
+            rm -rf dist  # <-- পুরোনো dist ফোল্ডার মুছে ফেলা হচ্ছে
             echo "Installing dependencies for Frontend..."
             npm install
             echo "Building Frontend..."
@@ -38,7 +39,9 @@ jobs:
 
             # Step 3: Deploy Admin Panel
             echo "==== Starting Admin Deployment... ===="
-            cd ../admin  # Go back from frontend and into admin
+            cd ../admin
+            echo "Removing old build folder..."
+            rm -rf dist  # <-- পুরোনো dist ফোল্ডার মুছে ফেলা হচ্ছে
             echo "Installing dependencies for Admin..."
             npm install
             echo "Building Admin..."
@@ -47,7 +50,7 @@ jobs:
 
             # Step 4: Deploy Backend
             echo "==== Starting Backend Deployment... ===="
-            cd ../backend # Go back from admin and into backend
+            cd ../backend
             echo "Installing dependencies for Backend..."
             npm install
             echo "Restarting server with PM2..."
