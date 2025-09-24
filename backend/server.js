@@ -18,6 +18,11 @@ app.use(cors());
 
 // CORS Setup
 const allowedOrigins = [
+// Live Domains
+  'https://beigelo.com',
+  'https://www.beigelo.com',
+  'https://iamadmin.beigelo.com',
+  
   'http://localhost:5174',       // Your React development server
   'http://localhost:5173',
 ];
