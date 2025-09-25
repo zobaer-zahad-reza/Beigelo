@@ -40,11 +40,11 @@ const Navbar = () => {
   return (
     <div className="flex items-center justify-between py-4 font-medium bg-white md:sticky md:top-0 md:z-10 md:bg-opacity-70 md:backdrop-blur-sm">
       <Link to="/">
-        <h1 className="text-5xl playfair-display-navlogo">Bgelo</h1>
+        <h1 className="text-5xl playfair-display-navlogo">Beigelo</h1>
       </Link>
 
       {/* Menu Links - Desktop */}
-      <ul className="hidden sm:flex items-center gap-5 text-sm text-gray-700 ">
+      <ul className="hidden md:flex items-center gap-5 text-sm text-gray-700 ">
         <NavLink
           to="/"
           style={navLinkStyles}
