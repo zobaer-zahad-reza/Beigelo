@@ -1,161 +1,140 @@
 import orderModel from "../models/orderModel.js";
 import userModel from "../models/userModel.js";
-import Stripe from 'stripe'
+import Stripe from 'stripe';
 
-//Global Variables
-const currency = 'usd'
-const deliveryCharge = 10
-//Gateway Initialize
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+// Stripe Initialize
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-//Placing Orders Using COD Method
-const placeOrder = async(req,res) =>{
-
+const placeOrder = async (req, res) => {
     try {
-
-        const {userId, items, amount, address} = req.body;
-
-        const orderData = {
-            userId,
-            items,
-            address,
-            amount,
+        const newOrder = new orderModel({
+            userId: req.userId,
+            items: req.body.items,
+            amount: req.body.amount,
+            address: req.body.address,
             paymentMethod: "COD",
-            payment: false,
-            date : Date.now()
-        }
+            date: new Date(Date.now())
+        });
+        await newOrder.save();
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
+        // Clear user's cart after placing order
+        await userModel.findByIdAndUpdate(req.userId, { cartData: {} });
 
-        await userModel.findByIdAndUpdate(userId,{cartData:{}})
-        res.json({success: true, message: "Order Placed"})
+        res.json({ success: true, message: "Order Placed Successfully" });
     } catch (error) {
-        console.log(error)
-        res.json({success: false, message: error.message})
+        console.log("COD Order Error:", error);
+        res.status(500).json({ success: false, message: "Error placing order" });
     }
+};
 
-}
 
-//Placing Orders Using Stripe Method
-const placeOrderStripe = async(req,res) =>{
+const placeOrderStripe = async (req, res) => {
+    
     try {
-         const {userId, items, amount, address} = req.body;
-         const {origin} = req.headers;
-          const orderData = {
-            userId,
-            items,
-            address,
-            amount,
-            paymentMethod: "Stripe",
-            payment: false,
-            date : Date.now()
-        }
+        const { items, amount, address } = req.body;
+        const { origin } = req.headers;
 
-         const newOrder = new orderModel(orderData)
-         await newOrder.save()
-
-         const line_items = items.map((item)=>({
-            price_data:{
-                currency: currency,
-                product_data: {
-                name: item.name
+        const line_items = items.map((item) => ({
+            price_data: {
+                currency: "usd",
+                product_data: { name: item.name },
+                unit_amount: Math.round(item.price * 100)
             },
-            unit_amount : item.price * 100
-        },
             quantity: item.quantity
-         }))
-         line_items.push({
+        }));
 
-           price_data:{
-                currency: currency,
-                product_data: {
-                name: 'Delivery Charges'
+        line_items.push({
+            price_data: {
+                currency: "usd",
+                product_data: { name: 'Delivery Charges' },
+                unit_amount: 80 * 100
             },
-            unit_amount : deliveryCharge * 100
-        },
             quantity: 1
+        });
 
-         })
-
-         const session = await stripe.checkout.sessions.create({
-            success_url :`${origin}/verify?/success=true&orderId=${newOrder._id}`,
-            cancel_url :`${origin}/verify?/success=false&orderId=${newOrder._id}`,
-            line_items,
+        const session = await stripe.checkout.sessions.create({
+            line_items: line_items,
             mode: 'payment',
-
-         })
-         res.json({success:true,session_url:session.url})
+            success_url: `${origin}/verify?success=true&orderId={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${origin}/verify?success=false&orderId={CHECKOUT_SESSION_ID}`,
+            metadata: {
+                userId: req.userId,
+                address: JSON.stringify(address),
+                items: JSON.stringify(items),
+                amount: String(amount)
+            }
+        });
+        
+        res.json({ success: true, session_url: session.url });
 
     } catch (error) {
-          console.log(error)
-          res.json({success: false, message: error.message})
+        console.log("Stripe Session Error:", error);
+        res.status(500).json({ success: false, message: "Error creating Stripe session" });
     }
-}
+};
 
-//Placing Orders Using Razorpay Method
-const placeOrderRazorpay = async(req,res) =>{
 
-}
-// Verify Stripe
-const verifyStripe = async (req,res) =>{
-    const {orderId, success, userId} = req.body
+const placeOrderRazorpay = async (req, res) => {
+    res.json({ success: false, message: "Razorpay is not yet implemented." });
+};
+
+
+const verifyStripe = async (req, res) => {
+    const { orderId, success } = req.body;
     try {
         if (success === "true") {
-            await orderModel.findByIdAndUpdate(orderId, {payment:true});
-            await userModel.findByIdAndUpdate(userId, {cartData: {}})
-            res.json({success:true});
-        } else{
-             await orderModel.findByIdAndDelete(orderId)
-            res.json({success:false});
+            await userModel.findByIdAndUpdate(req.userId, { cartData: {} });
+            res.json({ success: true, message: "Payment Successful" });
+        } else {
+            res.json({ success: false, message: "Payment Failed or Cancelled" });
         }
     } catch (error) {
-        console.log(error)
-        res.json({success: false, message: error.message})
+        console.log("Stripe Verification Error:", error);
+        res.status(500).json({ success: false, message: "Error verifying payment" });
     }
-}
+};
 
 
-//All Orders Data for Admin Panel
-const allOrders = async(req,res) =>{
-        try {
-            const orders = await orderModel.find({})
-            res.json({success:true, orders })
-        } catch (error) {
-             console.log(error)
-             res.json({success: false, message: error.message})
-        }
-}
+const userOrders = async (req, res) => {
+    try {
+        const orders = await orderModel.find({ userId: req.userId }).sort({ date: -1 });
+        res.json({ success: true, orders });
+    } catch (error) {
+        console.log("Fetch User Orders Error:", error);
+        res.status(500).json({ success: false, message: "Error fetching orders" });
+    }
+};
 
-//User Order Data For FrontEnd
-const userOrders = async(req,res) =>{
-        try {
-            const {userId} = req.body
+// --- Admin Panel Functions ---
 
-            const orders = await orderModel.find({userId})
-            res.json({success: true,orders})
+const allOrders = async (req, res) => {
+    try {
+        const orders = await orderModel.find({}).sort({ date: -1 });
+        res.json({ success: true, orders });
+    } catch (error) {
+        console.log("Fetch All Orders Error:", error);
+        res.status(500).json({ success: false, message: "Error fetching all orders" });
+    }
+};
 
 
-        } catch (error) {
-             console.log(error)
-             res.json({success: false, message: error.message})
-        }
-}
+const updateStatus = async (req, res) => {
+    try {
+        const { orderId, status } = req.body;
+        await orderModel.findByIdAndUpdate(orderId, { status });
+        res.json({ success: true, message: 'Status Updated' });
+    } catch (error) {
+        console.log("Update Status Error:", error);
+        res.status(500).json({ success: false, message: "Error updating status" });
+    }
+};
 
-//Update Order Status From Admin Panel
-const updateStatus = async(req,res) =>{
-        try {
-            
-            const {orderId, status} = req.body
-
-            await orderModel.findByIdAndUpdate(orderId, {status})
-
-            res.json({success: true, message: 'Status Updated'})
-
-        } catch (error) {
-             console.log(error)
-             res.json({success: false, message: error.message})
-        }
-}
-
-export {verifyStripe, placeOrder, placeOrderStripe, placeOrderRazorpay,allOrders,userOrders,updateStatus }
+export { 
+    placeOrder, 
+    placeOrderStripe, 
+    placeOrderRazorpay,
+    verifyStripe, 
+    userOrders, 
+    allOrders, 
+    updateStatus 
+};
