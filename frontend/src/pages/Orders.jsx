@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { ShopContext } from "../context/ShopContext";
 import Title from "../components/Title";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const Orders = () => {
   const { backendUrl, token, currency } = useContext(ShopContext);
@@ -11,14 +12,14 @@ const Orders = () => {
   const loadOrderData = async () => {
     try {
       if (!token) {
-        return null;
+        return;
       }
 
-      const response = await axios.post(
-        backendUrl + "/api/order/userorders",
-        {},
+      const response = await axios.get(
+        `${backendUrl}/api/order/userorders`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       if (response.data.success) {
         let allOrdersItem = [];
         response.data.orders.map((order) => {
@@ -32,7 +33,10 @@ const Orders = () => {
         });
         setorderData(allOrdersItem.reverse());
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Failed to load orders:", error);
+      toast.error("Could not load your order history.");
+    }
   };
 
   useEffect(() => {

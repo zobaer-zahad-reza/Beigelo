@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import axios from "axios";
-import { backendUrl } from "../App";
 import { toast } from "react-toastify";
 
-const Add = ({ token }) => {
+const Add = ({ token, backendUrl }) => {
   const [image1, setImage1] = useState(false);
   const [image2, setImage2] = useState(false);
   const [image3, setImage3] = useState(false);
@@ -39,10 +38,11 @@ const Add = ({ token }) => {
       image4 && formData.append("image4", image4);
 
       const response = await axios.post(
-        backendUrl + "/api/product/add",
+        `${backendUrl}/api/product/add`,
         formData,
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+
       if (response.data.success) {
         toast.success(response.data.message);
         setDescription("");
@@ -51,12 +51,13 @@ const Add = ({ token }) => {
         setImage3(false);
         setImage4(false);
         setPrice("");
+        setName("");
       } else {
-        toast.success(response.data.message);
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   };
 

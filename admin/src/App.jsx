@@ -24,7 +24,7 @@ const App = () => {
     <div className="bg-gray-50 min-h-screen">
       <ToastContainer />
       {token === "" ? (
-        <Login setToken={setToken} />
+        <Login setToken={setToken} backendUrl={backendUrl} />
       ) : (
         <>
           <Navbar setToken={setToken} />
@@ -35,9 +35,10 @@ const App = () => {
               <Routes>
                 {/* Default Route */}
 
-                <Route path="/add" element={<Add token={token} />} />
-                <Route path="/list" element={<List token={token} />} />
-                <Route path="/orders" element={<Orders token={token} />} />
+                <Route path="/add" element={<Add token={token} backendUrl={backendUrl} currency={currency}/>} />
+                <Route path="/list" element={<List token={token} backendUrl={backendUrl} currency={currency}/>} />
+                <Route path="/orders" element={<Orders token={token} backendUrl={backendUrl}
+                  currency={currency} />} />
               </Routes>
             </div>
           </div>
