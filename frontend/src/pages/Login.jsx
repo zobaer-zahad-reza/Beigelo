@@ -1,60 +1,44 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Login");
-  const {
-    token,
-    setToken,
-    navigate,
-    backendUrl,
-    name,
-    setName,
-    email,
-    setEmail,
-  } = useContext(ShopContext);
+
+  const { backendUrl, name, setName, email, setEmail } = useContext(ShopContext);
   const [password, setPassword] = useState("");
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+
+    
+    const url = `${backendUrl}/api/user/${currentState === "Login" ? "login" : "register"}`;
+
+    
+    const payload = { email, password };
+    if (currentState === "Sign Up") {
+      payload.name = name;
+    }
+
     try {
-      if (currentState === "Sign Up") {
-        const response = await axios.post(backendUrl + "/api/user/register", {
-          name,
-          email,
-          password,
-        });
-        if (response.data.success) {
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
-        } else {
-          toast.error(response.data.message);
-        }
+      const response = await axios.post(url, payload);
+
+      if (response.data.success) {
+        // On success, save the token to local storage
+        localStorage.setItem("token", response.data.token);
+        // Force a full page reload to ensure the entire app state is synced
+        window.location.href = "/";
       } else {
-        const response = await axios.post(backendUrl + "/api/user/login", {
-          email,
-          password,
-        });
-        if (response.data.success) {
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
-        } else {
-          toast.error(response.data.message);
-        }
+        // Show error message from the backend if success is false
+        toast.error(response.data.message);
       }
     } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      // Show a user-friendly error message on network or other failures
+      toast.error(error.response?.data?.message || "An error occurred. Please try again.");
+      console.error("Login/Register Error:", error);
     }
   };
-
-  useEffect(() => {
-    if (token) {
-      navigate("/");
-    }
-  }, [token]);
 
   return (
     <form
@@ -65,9 +49,8 @@ const Login = () => {
         <p className="prata-regular text-3xl">{currentState}</p>
         <hr className="border-none h-[1.5px] w-8 bg-gray-800" />
       </div>
-      {currentState === "Login" ? (
-        ""
-      ) : (
+
+      {currentState === "Sign Up" && (
         <input
           onChange={(e) => setName(e.target.value)}
           value={name}
@@ -77,6 +60,7 @@ const Login = () => {
           required
         />
       )}
+
       <input
         onChange={(e) => setEmail(e.target.value)}
         value={email}
@@ -93,6 +77,7 @@ const Login = () => {
         placeholder="Password"
         required
       />
+
       <div className="w-full flex justify-between text-sm mt-[-8px]">
         <p className="cursor-pointer">Forgot Your Password</p>
         {currentState === "Login" ? (
@@ -111,6 +96,7 @@ const Login = () => {
           </p>
         )}
       </div>
+
       <button className="bg-black text-white font-light px-8 py-2 mt-4">
         {currentState === "Login" ? "Sign In" : "Sign Up"}
       </button>

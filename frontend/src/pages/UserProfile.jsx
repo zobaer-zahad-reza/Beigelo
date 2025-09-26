@@ -14,6 +14,7 @@ export default function UserProfile() {
     avatar,
     setAvatar,
     setToken,
+    getCartCount,
     getUserCart,
     cartItems,
     totalCount,
@@ -208,7 +209,7 @@ export default function UserProfile() {
                 {user.points || 0} points
               </span>
               <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">
-                Cart Items: {totalCount || 0}
+                Cart Items: {getCartCount() || 0}
               </span>
             </div>
           </div>
