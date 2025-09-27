@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -133,7 +133,7 @@ export default function UserProfile() {
           <div className="bg-white rounded-lg shadow-sm p-5">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-gray-800">Order History</h2>
-              <button className="text-orange-600 hover:text-orange-800 font-medium text-sm">View All</button>
+              <Link to={'/orders'} className="text-orange-600 hover:text-orange-800 font-medium text-sm">View All</Link>
             </div>
             <div className="space-y-4">
               {orders.length > 0 ? (
