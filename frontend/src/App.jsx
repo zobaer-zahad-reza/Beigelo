@@ -7,7 +7,6 @@ import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
 import Spinner from "./components/Spinner";
 
-
 const Home = lazy(() => import("./pages/Home"));
 const Collection = lazy(() => import("./pages/Collection"));
 const About = lazy(() => import("./pages/About"));

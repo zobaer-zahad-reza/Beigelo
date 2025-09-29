@@ -32,14 +32,14 @@ export default function BottomNavbar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#faf0e6] text-white shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#000000] text-white shadow-lg">
       <div className="flex justify-around items-center p-2">
         {navItems.map((item) => (
           <Link key={item.label} to={`/${item.id}`}>
             <button
               key={item.label}
               className={`flex flex-col items-center justify-center w-16 py-2 rounded-lg transition-colors ${
-                activeTab === item.label ? "text-[#d9b99b]" : "text-gray-400"
+                activeTab === item.label ? "text-[#FBECD3]" : "text-gray-400"
               }`}
               onClick={() => setActiveTab(item.label)}
             >
