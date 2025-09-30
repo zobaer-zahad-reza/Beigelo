@@ -4,6 +4,7 @@ import { assets } from "../assets/assets";
 import NewsletterBox from "../components/NewsletterBox";
 import LocationMap from "../components/LocationMap";
 import { ShopContext } from "../context/ShopContext";
+import Swal from "sweetalert2";
 
 const Contact = () => {
   const { backendUrl } = useContext(ShopContext);
@@ -14,7 +15,8 @@ const Contact = () => {
     message: "",
   });
 
-  const [status, setStatus] = useState("");
+  // The old 'status' state is no longer needed
+  // const [status, setStatus] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,7 +25,16 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("Sending...");
+
+    Swal.fire({
+      title: "Sending your message...",
+      text: "Please wait.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
       const response = await fetch(`${backendUrl}/api/send-email-contactpage`, {
         method: "POST",
@@ -36,16 +47,26 @@ const Contact = () => {
       const result = await response.json();
 
       if (response.ok) {
-        setStatus(result.message);
+        Swal.fire({
+          icon: "success",
+          title: "Message Sent!",
+          text: result.message,
+        });
         setFormData({ name: "", email: "", message: "" });
       } else {
-        setStatus(
-          result.message || "Failed to send message. Please try again."
-        );
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: result.message || "Something went wrong. Please try again.",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      setStatus("An error occurred. Please try again later.");
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Could not connect to the server. Please try again later.",
+      });
     }
   };
 
@@ -57,7 +78,7 @@ const Contact = () => {
 
       <div className="bg-white font-sans text-gray-800 py-12 md:py-16">
         <div className="">
-          {/* Page Header */}
+          {/* ... Page Header ... */}
           <div className="text-center mb-12 md:mb-16">
             <p className="text-gray-500 mt-3 max-w-2xl mx-auto">
               We'd love to hear from you. Whether you have a question about our
@@ -66,14 +87,12 @@ const Contact = () => {
             </p>
           </div>
 
-          {/* Main Content Grid: Form on the left, Info on the right */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-            {/* Column 1: Contact Form */}
             <div className="bg-gray-50 p-8 rounded-lg border border-gray-200">
               <h2 className="text-2xl font-semibold text-black mb-6">
                 Send us a Message
               </h2>
-              <form onSubmit={handleSubmit} method="POST" className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label
                     htmlFor="name"
@@ -136,13 +155,9 @@ const Contact = () => {
                     Send Message
                   </button>
                 </div>
-                {status && (
-                  <p className="text-center mt-4 text-gray-600">{status}</p>
-                )}
               </form>
             </div>
 
-            {/* Column 2: Store & Career Info */}
             <div className="flex flex-col justify-center items-start gap-10">
               <div className="w-full">
                 <img
