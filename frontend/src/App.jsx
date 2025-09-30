@@ -6,6 +6,7 @@ import SearchBar from "./components/SearchBar";
 import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
 import Spinner from "./components/Spinner";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const Home = lazy(() => import("./pages/Home"));
 const Collection = lazy(() => import("./pages/Collection"));
@@ -41,6 +42,7 @@ const App = () => {
             <Route path="/orders" element={<Orders />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/userprofile" element={<UserProfile />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/:error" element={<ErrorPage />} />
           </Routes>
         </Suspense>

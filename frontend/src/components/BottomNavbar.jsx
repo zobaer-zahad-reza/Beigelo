@@ -32,7 +32,7 @@ export default function BottomNavbar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[#000000] text-white shadow-lg">
+    <nav className="fixed bottom-0 left-0 right-0 bg-[#000000] text-white shadow-lg z-50">
       <div className="flex justify-around items-center p-2">
         {navItems.map((item) => (
           <Link key={item.label} to={`/${item.id}`}>
