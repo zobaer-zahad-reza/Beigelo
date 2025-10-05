@@ -63,8 +63,6 @@ const Product = () => {
               <OptimizedImage
                 publicId={getPublicIdFromUrl(image)}
                 name={productData.name}
-                width={800} 
-                height={900}
               />
             )}
           </div>
