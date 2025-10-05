@@ -3,50 +3,70 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import RelatedProduct from "../components/RelatedProduct";
+import OptimizedImage from "../components/OptimizedImage";
+
+
+// <<< ধাপ ২: URL থেকে publicId বের করার জন্য একটি হেল্পার ফাংশন
+const getPublicIdFromUrl = (url) => {
+  // URL থেকে publicId বের করার জন্য এই অংশটুকু যথেষ্ট
+  const parts = url.split("/");
+  const publicIdWithFormat = parts[parts.length - 1];
+  const publicId = publicIdWithFormat.split(".")[0];
+  return publicId;
+};
 
 const Product = () => {
   const { productId } = useParams();
   const { products, currency, addToCart } = useContext(ShopContext);
-  const [productData, setProductData] = useState(false);
+  const [productData, setProductData] = useState(null); // 초기값을 null로 변경
   const [image, setImage] = useState("");
   const navigate = useNavigate();
 
-  // when we need product size just comment it offf
-  // const [size, setSize] = useState("S");
-
-  const fetchProductData = async () => {
-    products.map((item) => {
-      if (item._id === productId) {
-        setProductData(item);
-        setImage(item.image[0]);
-        return null;
-      }
-    });
-  };
-
   useEffect(() => {
-    fetchProductData();
+    const currentProduct = products.find((item) => item._id === productId);
+    if (currentProduct) {
+      setProductData(currentProduct);
+      setImage(currentProduct.image[0]); // এখানে সম্পূর্ণ URL সেট হবে
+    }
   }, [productId, products]);
 
-  return productData ? (
+  // productData লোড না হওয়া পর্যন্ত কিছু রেন্ডার না করা ভালো
+  if (!productData) {
+    return <div>Loading...</div>; // অথবা একটি স্পিনার দেখাতে পারেন
+  }
+
+  return (
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
       {/* Product Data */}
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
         {/* Product Images */}
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
-            {productData.image.map((item, index) => (
-              <img
-                onClick={() => setImage(item)}
-                src={item}
+            {productData.image.map((itemUrl, index) => (
+
+              <div
                 key={index}
+                onClick={() => setImage(itemUrl)}
                 className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
-                alt=""
-              />
+              >
+                <OptimizedImage
+                  publicId={getPublicIdFromUrl(itemUrl)}
+                  name={productData.name}
+                  width={390}
+                  height={450}
+                />
+              </div>
             ))}
           </div>
           <div className="w-full sm:w-[80%]">
-            <img className="w-full h-auto" src={image} alt="" />
+            {image && (
+              <OptimizedImage
+                publicId={getPublicIdFromUrl(image)}
+                name={productData.name}
+                width={800} 
+                height={900}
+              />
+            )}
           </div>
         </div>
         {/* Product Information */}
@@ -68,24 +88,6 @@ const Product = () => {
             {productData.description}
           </p>
 
-          {/* size section off it when we need size */}
-
-          {/* <div className="flex flex-col gap-2 my-3">
-            <p>Select-Size</p>
-            <div className="flex gap-2">
-              {productData.sizes.map((item, index) => (
-                <button
-                  onClick={() => setSize(item)}
-                  className={`border py-2 px-4  bg-gray-100 ${
-                    item === size ? "border-orange-500" : ""
-                  }`}
-                  key={index}
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div> */}
           <div className="space-x-4">
             <button
               onClick={() => addToCart(productData._id)}
@@ -136,8 +138,6 @@ const Product = () => {
         subCategory={productData.subCategory}
       />
     </div>
-  ) : (
-    <div className="opacity-0"></div>
   );
 };
 
