@@ -1,0 +1,12 @@
+# Allow all search engine bots
+User-agent: *
+Allow: /
+
+# Disallow bots from crawling specific user-centric pages
+Disallow: /cart
+Disallow: /checkout
+Disallow: /order
+Disallow: /profile
+Disallow: /admin # যদি অ্যাডমিন প্যানেলের কোনো অংশ থাকে
+
+# Point bots to your sitemap
