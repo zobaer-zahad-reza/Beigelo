@@ -29,32 +29,32 @@ const Collection = () => {
     }
   };
 
-  // <<< Combined useEffect for both filtering and sorting
+
   useEffect(() => {
     let processedProducts = [...products];
 
-    // Step 1: Apply Search Filter
+
     if (showSearch && search) {
       processedProducts = processedProducts.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
     }
 
-    // Step 2: Apply Category Filter
+
     if (category.length > 0) {
       processedProducts = processedProducts.filter((item) =>
         category.includes(item.category)
       );
     }
     
-    // Step 3: Apply Sub-Category Filter
+
     if (subCategory.length > 0) {
       processedProducts = processedProducts.filter((item) =>
         subCategory.includes(item.subCategory)
       );
     }
 
-    // Step 4: Apply Sorting on the filtered products
+
     switch (sortType) {
       case "low-high":
         processedProducts.sort((a, b) => a.price - b.price);
@@ -63,14 +63,12 @@ const Collection = () => {
         processedProducts.sort((a, b) => b.price - a.price);
         break;
       default:
-        // For "relavent", no specific sort is needed, it uses the default order.
         break;
     }
 
-    // Step 5: Set the final processed list to state
     setFilterProducts(processedProducts);
 
-  }, [category, subCategory, search, showSearch, products, sortType]); // <<< All dependencies in one place
+  }, [category, subCategory, search, showSearch, products, sortType]);
 
 
   return (

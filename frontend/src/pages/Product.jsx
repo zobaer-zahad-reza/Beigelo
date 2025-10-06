@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import RelatedProduct from "../components/RelatedProduct";
-import OptimizedImage from "../components/OptimizedImage";
+import OptimizedProductImage from "../components/OptimizedProductImage";
+import Spinner from "../components/Spinner";
 
 
 const getPublicIdFromUrl = (url) => {
@@ -30,7 +31,7 @@ const Product = () => {
   }, [productId, products]);
 
   if (!productData) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
 
   return (
@@ -47,7 +48,7 @@ const Product = () => {
                 onClick={() => setImage(itemUrl)}
                 className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
               >
-                <OptimizedImage
+                <OptimizedProductImage
                   publicId={getPublicIdFromUrl(itemUrl)}
                   name={productData.name}
                   width={390}
@@ -58,7 +59,7 @@ const Product = () => {
           </div>
           <div className="w-full sm:w-[80%]">
             {image && (
-              <OptimizedImage
+              <OptimizedProductImage
                 publicId={getPublicIdFromUrl(image)}
                 name={productData.name}
               />
