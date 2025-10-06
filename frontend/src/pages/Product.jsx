@@ -6,9 +6,8 @@ import RelatedProduct from "../components/RelatedProduct";
 import OptimizedImage from "../components/OptimizedImage";
 
 
-// <<< ধাপ ২: URL থেকে publicId বের করার জন্য একটি হেল্পার ফাংশন
 const getPublicIdFromUrl = (url) => {
-  // URL থেকে publicId বের করার জন্য এই অংশটুকু যথেষ্ট
+
   const parts = url.split("/");
   const publicIdWithFormat = parts[parts.length - 1];
   const publicId = publicIdWithFormat.split(".")[0];
@@ -18,7 +17,7 @@ const getPublicIdFromUrl = (url) => {
 const Product = () => {
   const { productId } = useParams();
   const { products, currency, addToCart } = useContext(ShopContext);
-  const [productData, setProductData] = useState(null); // 초기값을 null로 변경
+  const [productData, setProductData] = useState(null);
   const [image, setImage] = useState("");
   const navigate = useNavigate();
 
@@ -26,13 +25,12 @@ const Product = () => {
     const currentProduct = products.find((item) => item._id === productId);
     if (currentProduct) {
       setProductData(currentProduct);
-      setImage(currentProduct.image[0]); // এখানে সম্পূর্ণ URL সেট হবে
+      setImage(currentProduct.image[0]);
     }
   }, [productId, products]);
 
-  // productData লোড না হওয়া পর্যন্ত কিছু রেন্ডার না করা ভালো
   if (!productData) {
-    return <div>Loading...</div>; // অথবা একটি স্পিনার দেখাতে পারেন
+    return <div>Loading...</div>;
   }
 
   return (
@@ -63,6 +61,8 @@ const Product = () => {
               <OptimizedImage
                 publicId={getPublicIdFromUrl(image)}
                 name={productData.name}
+                width={900}
+                height={800}
               />
             )}
           </div>
