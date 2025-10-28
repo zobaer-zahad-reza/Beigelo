@@ -5,11 +5,12 @@ import { assets } from '../assets/assets'
 import { ShopContext } from '../context/ShopContext'
 import axios from 'axios';
 import { toast } from "react-toastify";
+import Swal from 'sweetalert2'
 
 const PlaceOrder = () => {
     const [method, setMethod] = useState('cod');
     const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
-    
+
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -55,7 +56,7 @@ const PlaceOrder = () => {
                 }
             }
         }
-        
+
         const orderData = {
             address: formData,
             items: orderItems,
@@ -75,10 +76,19 @@ const PlaceOrder = () => {
                     const response = await axios.post(backendUrl + '/api/order/place', orderData, headers);
                     if (response.data.success) {
                         setCartItems({});
-                        toast.success("Order Placed Successfully!");
+                        Swal.fire({
+                            title: "Order Placed Successfully!",
+                            icon: "success",
+                            draggable: false
+                        });
                         navigate('/orders');
                     } else {
-                        toast.error(response.data.message);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: `${response.data.message}`,
+                        });
+                        // toast.error(response.data.message);
                     }
                     break;
                 }
@@ -99,7 +109,12 @@ const PlaceOrder = () => {
                         const { session_url } = responseBkash.data;
                         window.location.replace(session_url);
                     } else {
-                        toast.error(responseBkash.data.message);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: `${responseBkash.data.message}`,
+                        });
+                        // toast.error(responseBkash.data.message);
                     }
                     break;
                 }

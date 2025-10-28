@@ -2,6 +2,7 @@ import { createContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from 'sweetalert2';
 
 export const ShopContext = createContext(null);
 
@@ -51,7 +52,12 @@ const ShopContextProvider = (props) => {
 
   const addToCart = async (itemId, size = "default") => {
     if (!token) {
-      toast.error("Please login to add items to the cart");
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please login to add items to the cart!",
+      });
+      // toast.error("Please login to add items to the cart");
       navigate("/login");
       return;
     }
@@ -68,9 +74,17 @@ const ShopContextProvider = (props) => {
       );
     } catch (err) {
       console.error("Error adding to cart:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to update cart!",
+      });
       toast.error("Failed to update cart");
     }
   };
+
+  // Buy Now
+  const buyNow =() => {}
 
   const updateQuantity = async (itemId, size, quantity) => {
     if (!token) return;
@@ -177,6 +191,7 @@ const ShopContextProvider = (props) => {
     setShowSearch,
     navigate,
     getUserCart,
+    buyNow,
   };
 
   return (

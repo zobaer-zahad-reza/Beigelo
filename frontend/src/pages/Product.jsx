@@ -17,7 +17,7 @@ const getPublicIdFromUrl = (url) => {
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const { products, currency, addToCart, buyNow } = useContext(ShopContext);
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState("");
   const navigate = useNavigate();
@@ -93,7 +93,7 @@ const Product = () => {
               ADD TO CART
             </button>
             <button
-              onClick={() => navigate("/place-order")}
+              onClick={() => buyNow(productData._id)} //navigate("/place-order")
               className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
             >
               BUY NOW
