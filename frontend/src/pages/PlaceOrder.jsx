@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import Title from '../components/Title'
-import CartTotal from '../components/CartTotal'
 import { assets } from '../assets/assets'
 import { ShopContext } from '../context/ShopContext'
 import axios from 'axios';
@@ -9,7 +8,18 @@ import Swal from 'sweetalert2'
 
 const PlaceOrder = () => {
     const [method, setMethod] = useState('cod');
-    const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+    const {
+        navigate,
+        backendUrl,
+        token,
+        cartItems,
+        setCartItems,
+        getCartAmount,
+        products,
+        currency,
+        buyNowItem,
+        setBuyNowItem
+    } = useContext(ShopContext);
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -23,6 +33,43 @@ const PlaceOrder = () => {
         phone: '',
     });
 
+    const delivery_fee = formData.city === "" ? 0 : formData.city === "Dhaka" ? 80 : 120;
+    const [isOrdering, setIsOrdering] = useState(false);
+
+    const isBuyNowMode = buyNowItem !== null;
+
+    const subtotal = isBuyNowMode
+        ? buyNowItem.price * buyNowItem.quantity
+        : getCartAmount();
+    // (subtotal > 0 ? delivery_fee : 0)
+    const total = subtotal + delivery_fee;
+
+    useEffect(() => {
+        if (!isBuyNowMode && getCartAmount() === 0 && !isOrdering) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `Your cart is empty.`,
+            });
+            navigate('/cart');
+        }
+    }, [isBuyNowMode, getCartAmount, isOrdering, navigate]);
+
+
+    const cartItemsList = Object.entries(cartItems).flatMap(([itemId, sizes]) => {
+        const productData = products.find(p => p._id === itemId);
+        if (!productData) return [];
+        return Object.entries(sizes).map(([size, quantity]) => {
+            if (quantity <= 0) return null;
+            return {
+                productData: productData,
+                size: size,
+                quantity: quantity,
+                _id: itemId
+            };
+        }).filter(Boolean);
+    });
+
     const onChangeHandler = (event) => {
         const name = event.target.name;
         const value = event.target.value;
@@ -31,81 +78,99 @@ const PlaceOrder = () => {
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
-
-        // Check if token exists before proceeding
-        if (!token) {
-            toast.error("You must be logged in to place an order.");
-            navigate("/login");
-            return;
-        }
+        setIsOrdering(true);
 
         let orderItems = [];
-        for (const items in cartItems) {
-            for (const item in cartItems[items]) {
-                if (cartItems[items][item] > 0) {
-                    const itemInfo = products.find(product => product._id === items);
-                    if (itemInfo) {
-                        // Create a new object to avoid mutating the original product from context
-                        const orderItem = {
-                            ...itemInfo,
-                            quantity: cartItems[items][item],
-                            size: item
-                        };
-                        orderItems.push(orderItem);
-                    }
-                }
+        if (isBuyNowMode) {
+            orderItems.push(buyNowItem);
+        } else {
+            if (!token) {
+                toast.error("You must be logged in to order from cart.");
+                setIsOrdering(false);
+                navigate("/login");
+                return;
             }
+            orderItems = cartItemsList.map(item => ({
+                ...item.productData,
+                quantity: item.quantity,
+                size: item.size
+            }));
+        }
+
+        if (orderItems.length === 0) {
+            toast.error("There are no items to order.");
+            setIsOrdering(false);
+            navigate('/');
+            return;
         }
 
         const orderData = {
             address: formData,
             items: orderItems,
-            amount: getCartAmount() + delivery_fee
+            amount: total
         };
 
-        // Define the headers correctly once
-        const headers = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        };
+        const headersConfig = { headers: {} };
+        if (token) {
+            headersConfig.headers['Authorization'] = `Bearer ${token}`;
+        }
 
         try {
             switch (method) {
                 case 'cod': {
-                    const response = await axios.post(backendUrl + '/api/order/place', orderData, headers);
+                    const response = await axios.post(backendUrl + '/api/order/place', orderData, headersConfig);
                     if (response.data.success) {
-                        setCartItems({});
+                        if (isBuyNowMode) {
+                            setBuyNowItem(null);
+                        } else {
+                            setCartItems({});
+                        }
                         Swal.fire({
                             title: "Order Placed Successfully!",
                             icon: "success",
                             draggable: false
                         });
-                        navigate('/orders');
+
+                        if (token) {
+                            navigate('/orders');
+                        } else {
+                            navigate('/');
+                        }
+
                     } else {
                         Swal.fire({
                             icon: "error",
                             title: "Oops...",
                             text: `${response.data.message}`,
                         });
-                        // toast.error(response.data.message);
+                        setIsOrdering(false);
                     }
                     break;
                 }
                 case 'stripe': {
-                    const responseStripe = await axios.post(backendUrl + '/api/order/stripe', orderData, headers);
+                    const responseStripe = await axios.post(backendUrl + '/api/order/stripe', orderData, headersConfig);
                     if (responseStripe.data.success) {
+                        if (isBuyNowMode) {
+                            setBuyNowItem(null);
+                        } else {
+                            setCartItems({});
+                        }
                         const { session_url } = responseStripe.data;
                         window.location.replace(session_url);
                     } else {
                         toast.error(responseStripe.data.message);
+                        setIsOrdering(false);
                     }
                     break;
                 }
                 case 'bkash': {
-                    // Assuming bkash also returns a session_url like stripe
-                    const responseBkash = await axios.post(backendUrl + '/api/order/bkash', orderData, headers);
+                    const responseBkash = await axios.post(backendUrl + '/api/order/bkash', orderData, headersConfig);
                     if (responseBkash.data.success) {
+                        if (isBuyNowMode) {
+                            setBuyNowItem(null);
+                        } else {
+                            setCartItems({});
+                        }
                         const { session_url } = responseBkash.data;
                         window.location.replace(session_url);
                     } else {
@@ -114,21 +179,24 @@ const PlaceOrder = () => {
                             title: "Oops...",
                             text: `${responseBkash.data.message}`,
                         });
-                        // toast.error(responseBkash.data.message);
+                        setIsOrdering(false);
                     }
                     break;
                 }
                 default:
+                    setIsOrdering(false);
                     break;
             }
         } catch (error) {
             console.error("Order placement error:", error);
             toast.error(error.response?.data?.message || "Something went wrong.");
+            setIsOrdering(false);
         }
     };
 
     return (
         <form onSubmit={onSubmitHandler} className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t'>
+
             {/*-------Left Side-------*/}
             <div className='flex flex-col gap-4 w-full sm:max-w-[480px]'>
                 <div className='text-xl sm:text-2xl my-3'>
@@ -150,10 +218,71 @@ const PlaceOrder = () => {
                 </div>
                 <input required onChange={onChangeHandler} name='phone' value={formData.phone} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="text" placeholder='Phone' />
             </div>
+
             {/*-------Right Side-------*/}
             <div className='mt-8'>
                 <div className='mt-8 min-w-80'>
-                    <CartTotal />
+                    <Title text1={'REVIEW YOUR'} text2={'ITEMS'} />
+                    <div className='flex flex-col gap-2 my-4 max-h-60 overflow-y-auto pr-2'>
+                        {isBuyNowMode && buyNowItem ? (
+                            <div className="py-4 border-t border-b text-gray-700 flex items-center gap-4">
+                                <img
+                                    className="w-16 sm:w-20 rounded"
+                                    src={buyNowItem.image[0]}
+                                    alt={buyNowItem.name}
+                                />
+                                <div className="flex-1">
+                                    <p className="text-lg font-bold">
+                                        {buyNowItem.name}
+                                    </p>
+                                    <div className="flex items-center gap-5 mt-2 text-sm">
+                                        <p>{currency}{buyNowItem.price}</p>
+                                        <p className="px-2 py-1 border bg-slate-50 rounded">{buyNowItem.size}</p>
+                                    </div>
+                                </div>
+                                <p className="font-bold text-gray-600">Qty: {buyNowItem.quantity}</p>
+                            </div>
+                        ) : (
+                            cartItemsList.map((item, index) => (
+                                <div key={index} className="py-4 border-t border-b text-gray-700 flex items-center gap-4">
+                                    <img
+                                        className="w-16 sm:w-20 rounded"
+                                        src={item.productData.image[0]}
+                                        alt={item.productData.name}
+                                    />
+                                    <div className="flex-1">
+                                        <p className="text-lg font-bold">
+                                            {item.productData.name}
+                                        </p>
+                                        <div className="flex items-center gap-5 mt-2 text-sm">
+                                            <p>{currency}{item.productData.price}</p>
+                                            <p className="px-2 py-1 border bg-slate-50 rounded">{item.size}</p>
+                                        </div>
+                                    </div>
+                                    <p className="font-bold text-gray-600">Qty: {item.quantity}</p>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    <div className='flex flex-col gap-4 mt-8'>
+                        <Title text1={'ORDER'} text2={'SUMMARY'} />
+                        <hr className='mt-2' />
+                        <div className='flex justify-between'>
+                            <p>Subtotal</p>
+                            <p>{currency}{subtotal}</p>
+                        </div>
+                        <hr />
+                        <div className='flex justify-between'>
+                            <p>Delivery Fee</p>
+                            <p>{currency}{subtotal > 0 ? delivery_fee : 0}</p>
+                        </div>
+                        <hr />
+                        <div className='flex justify-between font-bold text-lg'>
+                            <p>Total</p>
+                            <p>{currency}{total}</p>
+                        </div>
+                    </div>
                 </div>
                 <div className='mt-12'>
                     <Title text1={'PAYMENT'} text2={'METHOD'} />

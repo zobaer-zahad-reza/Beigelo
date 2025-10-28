@@ -93,7 +93,7 @@ const Product = () => {
               ADD TO CART
             </button>
             <button
-              onClick={() => buyNow(productData._id)} //navigate("/place-order")
+              onClick={() => buyNow(productData._id)}
               className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
             >
               BUY NOW

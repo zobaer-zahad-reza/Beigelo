@@ -20,8 +20,29 @@ const ShopContextProvider = (props) => {
   const [avatar, setAvatar] = useState("");
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(true);
+  
+  const [buyNowItem, setBuyNowItem] = useState(() => {
+    const storedItem = sessionStorage.getItem('buyNowItem');
+    try {
+        return storedItem ? JSON.parse(storedItem) : null;
+    } catch (error) {
+        console.error("Failed to parse buyNowItem from sessionStorage", error);
+        sessionStorage.removeItem('buyNowItem');
+        return null;
+    }
+  });
 
   const navigate = useNavigate();
+
+  const updateBuyNowItem = (item) => {
+      if (item) {
+          sessionStorage.setItem('buyNowItem', JSON.stringify(item));
+          setBuyNowItem(item);
+      } else {
+          sessionStorage.removeItem('buyNowItem');
+          setBuyNowItem(null);
+      }
+  };
 
   const getProductsData = async () => {
     try {
@@ -57,7 +78,6 @@ const ShopContextProvider = (props) => {
         title: "Oops...",
         text: "Please login to add items to the cart!",
       });
-      // toast.error("Please login to add items to the cart");
       navigate("/login");
       return;
     }
@@ -83,8 +103,22 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  // Buy Now
-  const buyNow =() => {}
+
+  const buyNow = (itemId, size = "default") => {
+    const product = products.find((p) => p._id === itemId);
+    if (product) {
+        const itemToBuy = {
+            ...product,
+            quantity: 1,
+            size: size,
+        };
+        updateBuyNowItem(itemToBuy);
+        navigate('/place-order');
+    } else {
+      console.error("Product not found for Buy Now:", itemId);
+      toast.error("Product not found.");
+    }
+  };
 
   const updateQuantity = async (itemId, size, quantity) => {
     if (!token) return;
@@ -144,7 +178,7 @@ const ShopContextProvider = (props) => {
           if (res.data.success) {
             const fetchedUser = res.data.user;
             setUser(fetchedUser);
-            setName(fetchedUser.name);
+setName(fetchedUser.name);
             setEmail(fetchedUser.email);
             setAvatar(fetchedUser.avatar);
             await getUserCart(token);
@@ -192,6 +226,8 @@ const ShopContextProvider = (props) => {
     navigate,
     getUserCart,
     buyNow,
+    buyNowItem,
+    setBuyNowItem: updateBuyNowItem,
   };
 
   return (

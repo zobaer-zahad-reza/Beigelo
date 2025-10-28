@@ -15,11 +15,11 @@ const Cart = () => {
     addToCart,
     navigate,
     user,
+    setBuyNowItem,
   } = useContext(ShopContext);
 
   const [cartData, setCartData] = useState([]);
 
-  // Convert cartItems object to array for easier rendering
   useEffect(() => {
     const tempData = [];
     for (const itemId in cartItems) {
@@ -36,7 +36,6 @@ const Cart = () => {
     setCartData(tempData);
   }, [cartItems]);
 
-  // Handle quantity change
   const handleQuantityChange = (itemId, size, value) => {
     const quantity = Number(value);
     if (quantity <= 0) {
@@ -116,11 +115,18 @@ const Cart = () => {
             <button
               className="bg-black text-white text-sm my-8 px-8 py-3"
               onClick={() => {
-                if (cartData.length > 0 && user) {
-                  navigate("/place-order");
-                } else {
-                  toast.error("Add some products");
+                if (cartData.length === 0) {
+                  toast.error("Your cart is empty. Please add some products.");
+                  return;
                 }
+                if (!user) {
+                  toast.error("Please log in to proceed to checkout.");
+                  navigate("/login"); 
+                  return;
+                }
+                
+                setBuyNowItem(null);
+                navigate("/place-order");
               }}
             >
               PROCEED TO CHECKOUT

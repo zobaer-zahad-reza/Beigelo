@@ -1,46 +1,71 @@
-import React from "react";
-import { useContext, useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { ShopContext } from "../context/ShopContext";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 const Verify = () => {
-  const { navigate, token, setCartItems, backendUrl } = useContext(ShopContext);
-  const [searchParams, setSearchParams] = useSearchParams();
+
+  const { navigate, token, setCartItems, backendUrl, setBuyNowItem } = useContext(ShopContext);
+  const [searchParams] = useSearchParams();
 
   const success = searchParams.get("success");
   const orderId = searchParams.get("orderId");
 
   const verifyPayment = async () => {
     try {
-      if (!token) {
-        return null;
+
+      const headersConfig = { headers: {} };
+      if (token) {
+
+        headersConfig.headers['Authorization'] = `Bearer ${token}`; 
       }
 
       const response = await axios.post(
         backendUrl + "/api/order/verifyStripe",
         { success, orderId },
-        { headers: { token } }
+        headersConfig
       );
 
       if (response.data.success) {
+        toast.success(response.data.message || "Payment Verified!");
+        
         setCartItems({});
-        navigate("/orders");
+        setBuyNowItem(null);
+        
+
+        if (token) {
+          navigate("/orders");
+        } else {
+          navigate("/");
+        }
+
       } else {
-        navigate("/cart");
+        toast.error(response.data.message || "Payment Failed");
+        
+        if (token) {
+          navigate("/cart");
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       console.log(error);
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || "Verification Failed");
+      navigate("/");
     }
   };
 
   useEffect(() => {
     verifyPayment();
-  }, [token]);
+  }, []);
 
-  return <div></div>;
+  return (
+    <div className='min-h-[80vh] flex flex-col justify-center items-center gap-4'>
+        <div className='w-16 h-16 border-4 border-dashed border-gray-400 rounded-full animate-spin'></div>
+        <p className='text-gray-600'>Verifying your payment, please wait...</p>
+    </div>
+  );
 };
 
 export default Verify;
