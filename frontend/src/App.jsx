@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
 import Spinner from "./components/Spinner";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import SocialSideNav from "./components/SocialSideNav";
 
 const Home = lazy(() => import("./pages/Home"));
 const Collection = lazy(() => import("./pages/Collection"));
@@ -29,6 +30,7 @@ const App = () => {
       <Navbar />
       <SearchBar />
       <div className="min-h-[60vh]">
+        <SocialSideNav />
         <Suspense fallback={<Spinner />}>
           <Routes>
             <Route path="/" element={<Home />} />
