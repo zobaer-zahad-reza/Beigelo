@@ -43,6 +43,9 @@ a.active hr{
   }
 }
 
+.no-border-icon {
+    border: none !important;
+}
 
 
 

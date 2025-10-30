@@ -5,7 +5,6 @@ import { assets } from "../assets/assets";
 import CartTotal from "../components/CartTotal";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Player } from "@lordicon/react";
 
 const Cart = () => {
   const {
@@ -55,14 +54,6 @@ const Cart = () => {
         {cartData.length === 0 && (
           <div className="flex justify-center text-center py-10 flex-col">
             <p className="py-10">Your cart is empty.</p>
-            <div className="">
-              <lord-icon
-                src="https://cdn.lordicon.com/uisoczqi.json"
-                trigger="hover"
-                stroke="bold"
-                style={{ width: "250px", height: "250px" }}
-              ></lord-icon>
-            </div>
           </div>
         )}
         {cartData.map((item, index) => {
