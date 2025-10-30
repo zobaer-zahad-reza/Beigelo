@@ -29,6 +29,7 @@ const BestSeller = () => {
             image={item.image}
             price={item.price}
             categoryName={item.category}
+            subCategory={item.subCategory}
           />
         ))}
       </div>

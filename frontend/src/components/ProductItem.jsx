@@ -11,7 +11,7 @@ const getPublicIdFromUrl = (url) => {
   return match ? match[1] : null;
 };
 
-const ProductItem = ({ id, image, name, price, categoryName }) => {
+const ProductItem = ({ id, image, name, price, categoryName, subCategory }) => {
   const { currency } = useContext(ShopContext);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -25,9 +25,13 @@ const ProductItem = ({ id, image, name, price, categoryName }) => {
     lower: true,
     strict: true,
   });
+  const subCategorySlug = slugify(subCategory || "subcategory", {
+    lower: true,
+    strict: true,
+  });
   const productSlug = slugify(name || "product", { lower: true, strict: true });
 
-  const productUrl = `/product/${categorySlug}/${productSlug}/${id}`;
+  const productUrl = `/product/${categorySlug}/${subCategorySlug}/${productSlug}/${id}`;
 
   return (
     <Link

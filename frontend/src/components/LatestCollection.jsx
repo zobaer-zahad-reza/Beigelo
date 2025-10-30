@@ -28,6 +28,7 @@ const LatestCollection = () => {
             name={item.name}
             price={item.price}
             categoryName={item.category}
+            subCategory={item.subCategory}
           />
         ))}
       </div>
