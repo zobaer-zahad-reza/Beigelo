@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
 import { Link } from "react-router-dom";
 import OptimizedProductImage from "./OptimizedProductImage";
+import slugify from "slugify";
 
 const getPublicIdFromUrl = (url) => {
   if (!url) return null;
@@ -10,23 +11,28 @@ const getPublicIdFromUrl = (url) => {
   return match ? match[1] : null;
 };
 
-const ProductItem = ({ id, image, name, price }) => {
+const ProductItem = ({ id, image, name, price, categoryName }) => {
   const { currency } = useContext(ShopContext);
   const [isHovered, setIsHovered] = useState(false);
 
   const publicId1 = getPublicIdFromUrl(image[0]);
   const publicId2 = getPublicIdFromUrl(image[1]);
-
   const publicIdToShow = isHovered && publicId2 ? publicId2 : publicId1;
-
   const imageClassName = `transition-transform duration-300 ease-in-out ${
     isHovered ? "scale-110" : "scale-100"
   }`;
+  const categorySlug = slugify(categoryName || "item", {
+    lower: true,
+    strict: true,
+  });
+  const productSlug = slugify(name || "product", { lower: true, strict: true });
+
+  const productUrl = `/product/${categorySlug}/${productSlug}/${id}`;
 
   return (
     <Link
       className="text-gray-700 cursor-pointer"
-      to={`/product/${id}`}
+      to={productUrl}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

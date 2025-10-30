@@ -6,7 +6,7 @@ import SearchBar from "./components/SearchBar";
 import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
 import Spinner from "./components/Spinner";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
+// import PrivacyPolicy from "./pages/PrivacyPolicy"; // 1. Static import remove kora holo
 import SocialSideNav from "./components/SocialSideNav";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -21,6 +21,7 @@ const Orders = lazy(() => import("./pages/Orders"));
 const Verify = lazy(() => import("./pages/Verify"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const ErrorPage = lazy(() => import("./pages/ErrorPage"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy")); // 2. Ekhane lazy load kora holo
 
 const App = () => {
   return (
@@ -37,7 +38,10 @@ const App = () => {
             <Route path="/collection" element={<Collection />} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/product/:productId" element={<Product />} />
+            <Route
+              path="/product/:categorySlug/:productSlug/:productId"
+              element={<Product />}
+            />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/place-order" element={<PlaceOrder />} />
@@ -45,7 +49,7 @@ const App = () => {
             <Route path="/verify" element={<Verify />} />
             <Route path="/userprofile" element={<UserProfile />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/:error" element={<ErrorPage />} />
+            <Route path="*" element={<ErrorPage />} />
           </Routes>
         </Suspense>
       </div>
