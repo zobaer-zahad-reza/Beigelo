@@ -12,6 +12,7 @@ const Add = ({ token, backendUrl }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [quantity, setQuantity] = useState(""); // <-- ১. Quantity এর জন্য নতুন state
   const [category, setCategory] = useState("Watch");
   const [subCategory, setSubCategory] = useState("Man");
   const [bestseller, setBestseller] = useState(false);
@@ -27,6 +28,7 @@ const Add = ({ token, backendUrl }) => {
       formData.append("name", name);
       formData.append("description", description);
       formData.append("price", price);
+      formData.append("quantity", quantity); // <-- ২. FormData তে quantity যোগ করুন
       formData.append("category", category);
       formData.append("subCategory", subCategory);
       formData.append("bestseller", bestseller);
@@ -51,6 +53,7 @@ const Add = ({ token, backendUrl }) => {
         setImage3(false);
         setImage4(false);
         setPrice("");
+        setQuantity(""); // <-- ৩. সফলভাবে সাবমিট হলে quantity রিসেট করুন
         setName("");
       } else {
         toast.error(response.data.message);
@@ -66,6 +69,7 @@ const Add = ({ token, backendUrl }) => {
       onSubmit={onSubmitHandler}
       className="flex flex-col w-full items-start gap-3"
     >
+      {/* ... আপনার অন্যান্য ইনপুট (Image, Name, Description) ... */}
       <div>
         <p className="mb-0.2">Upload Image</p>
         <div className="flex gap-2">
@@ -180,8 +184,22 @@ const Add = ({ token, backendUrl }) => {
             placeholder="25"
           />
         </div>
+
+        {/* <-- ৪. Quantity ইনপুট ফিল্ড (নতুন) --> */}
+        <div>
+          <p className="mb-0.5">Product Quantity</p>
+          <input
+            onChange={(e) => setQuantity(e.target.value)}
+            value={quantity}
+            className="w-full px-3 py-2 sm:w-[100px]"
+            type="Number"
+            placeholder="10"
+            required
+          />
+        </div>
       </div>
 
+      {/* ... আপনার বাকি কোড (Size, Bestseller, Button) ... */}
       <div className="flex space-x-4 mt-2">
         <h4>Have product Size?</h4>
         <input
