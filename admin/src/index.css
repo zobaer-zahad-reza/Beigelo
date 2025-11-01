@@ -7,6 +7,12 @@
     font-family: Outfit;
 }
 
+.playfair-display-navlogo {
+  font-family: "Playfair Display", serif;
+  font-optical-sizing: auto;
+  font-weight: bolder;
+  font-style: normal;
+}
 select,input,textarea{
     border: 1px solid #c2c2c2;
     outline-color: #C586A5;

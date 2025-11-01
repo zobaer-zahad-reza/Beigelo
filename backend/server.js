@@ -14,8 +14,8 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // Middlewares
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // CORS Setup
 const allowedOrigins = [
@@ -25,7 +25,7 @@ const allowedOrigins = [
   "https://iamadmin.beigelo.com",
   "https://api.beigelo.com",
 
-  "http://localhost:5174", // Your React development server
+  "http://localhost:5174",
   "http://localhost:5173",
 ];
 
@@ -33,7 +33,6 @@ app.use(
   cors({
     origin: function (origin, callback) {
       console.log("Request's Origin: ", origin);
-      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) === -1) {
@@ -43,7 +42,7 @@ app.use(
       }
       return callback(null, true);
     },
-    credentials: true, // Allow cookies to be sent
+    credentials: true,
   })
 );
 
