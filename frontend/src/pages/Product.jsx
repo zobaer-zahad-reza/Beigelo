@@ -6,9 +6,7 @@ import RelatedProduct from "../components/RelatedProduct";
 import OptimizedProductImage from "../components/OptimizedProductImage";
 import Spinner from "../components/Spinner";
 
-
 const getPublicIdFromUrl = (url) => {
-
   const parts = url.split("/");
   const publicIdWithFormat = parts[parts.length - 1];
   const publicId = publicIdWithFormat.split(".")[0];
@@ -42,7 +40,6 @@ const Product = () => {
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
             {productData.image.map((itemUrl, index) => (
-
               <div
                 key={index}
                 onClick={() => setImage(itemUrl)}
@@ -85,7 +82,7 @@ const Product = () => {
             {productData.description}
           </p>
 
-          <div className="space-x-4">
+          <div className="space-x-4 mt-5">
             <button
               onClick={() => addToCart(productData._id)}
               className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
@@ -99,33 +96,34 @@ const Product = () => {
               BUY NOW
             </button>
           </div>
-          <div className="text-sm text-gray-600 mt-6 flex flex-col gap-1">
+          {/* <div className="text-sm text-gray-600 mt-6 flex flex-col gap-1">
             <p>100% original Product</p>
             <p>cash on delivery is available on this product</p>
             <p>Easy return and exchange policy within 7 days</p>
-          </div>
+          </div> */}
         </div>
       </div>
       {/* Description and Review Section */}
       <div className="mt-20">
         <div className="flex">
           <b className="border px-5 py-3 text-sm">Description</b>
-          <p className="border px-5 py-3 text-sm">Reviews(122)</p>
+          {/* <p className="border px-5 py-3 text-sm">Reviews(122)</p> */}
         </div>
         <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
           <p>
-            Lorem Ipsum has been the industry's standard dummy text ever since
-            the 1500s, when an unknown printer took a galley of type and
-            scrambled it to make a type specimen book. It has survived not only
-            five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged.{" "}
+            Experience the assurance of 100% original and authentic products,
+            crafted to meet the highest standards of quality.{" "}
           </p>
           <p>
-            It has survived not only five centuries, but also the leap into
-            electronic typesetting, remaining essentially unchanged. It was
-            popularised in the 1960s with the release of Letraset sheets
-            containing Lorem
+            Enjoy the convenience of Cash on Delivery, giving you full
+            confidence in every purchase.{" "}
           </p>
+          <p>
+            We value your satisfaction above all — that’s why we offer a simple
+            7-day return and exchange policy, ensuring a smooth and worry-free
+            shopping experience.{" "}
+          </p>
+          <p>Shop smart. Shop genuine. Shop with trust and comfort.</p>
         </div>
       </div>
       {/* Description and Review Section */}
