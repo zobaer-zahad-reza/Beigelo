@@ -22,11 +22,24 @@ const Product = () => {
 
   useEffect(() => {
     const currentProduct = products.find((item) => item._id === productId);
+
     if (currentProduct) {
       setProductData(currentProduct);
       setImage(currentProduct.image[0]);
+
+      window.dataLayer = window.dataLayer || [];
+
+      window.dataLayer.push({
+        event: "view_item",
+
+        content_name: currentProduct.name,
+        content_ids: [currentProduct._id],
+        content_category: currentProduct.category,
+        value: currentProduct.price,
+        currency: currency,
+      });
     }
-  }, [productId, products]);
+  }, [productId, products, currency]);
 
   if (!productData) {
     return <Spinner />;
