@@ -308,8 +308,11 @@ const Add = ({ token, backendUrl }) => {
           Add to bestseller
         </label>
       </div>
-      <button type="submit" className="w-28 py-3 mt-0.5 bg-black text-white">
-        ADD
+      <button
+        type="submit"
+        className="px-4 py-3 mt-0.5 rounded-lg bg-black text-white"
+      >
+        Upload Product
       </button>
     </form>
   );
