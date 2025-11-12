@@ -18,9 +18,11 @@ const Add = ({ token, backendUrl }) => {
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
   const [showSize, setShowSize] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -61,6 +63,8 @@ const Add = ({ token, backendUrl }) => {
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -308,11 +312,13 @@ const Add = ({ token, backendUrl }) => {
           Add to bestseller
         </label>
       </div>
+
       <button
         type="submit"
-        className="px-4 py-3 mt-0.5 rounded-lg bg-black text-white"
+        disabled={isLoading}
+        className="px-4 py-3 mt-0.5 rounded-lg bg-black text-white disabled:bg-gray-500 disabled:cursor-not-allowed"
       >
-        Upload Product
+        {isLoading ? "Uploading..." : "Upload Product"}
       </button>
     </form>
   );
