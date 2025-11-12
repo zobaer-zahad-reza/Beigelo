@@ -11,12 +11,12 @@ import { Link } from "react-router-dom";
 const imageArr = [
   {
     imgLink: "https://i.ibb.co.com/hxb67wSz/Frank-Muller.jpg",
-    name:"Frank_Muller"
+    name: "Frank_Muller",
   },
   {
     imgLink: "https://i.ibb.co.com/0RvwqCCD/Tissot-Fina.jpg",
-    name:"Tissot"
-  }
+    name: "Tissot",
+  },
 ];
 
 const BrandMarquee = () => (
@@ -27,7 +27,10 @@ const BrandMarquee = () => (
       <MarqueeContent>
         {imageArr.map((image, index) => (
           <Link to={image.name}>
-            <MarqueeItem className="w-44 flex flex-col justify-center align-middle" key={index}>
+            <MarqueeItem
+              className="w-20 md:w-44 flex flex-col justify-center align-middle "
+              key={index}
+            >
               <img
                 alt={`Placeholder ${index}`}
                 className="overflow-hidden rounded-full"
@@ -36,7 +39,6 @@ const BrandMarquee = () => (
             </MarqueeItem>
           </Link>
         ))}
-
       </MarqueeContent>
     </Marquee>
   </div>

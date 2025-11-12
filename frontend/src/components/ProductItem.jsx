@@ -19,7 +19,6 @@ const ProductItem = ({ id, image, name, price, categoryName, subCategory }) => {
   const publicId2 = getPublicIdFromUrl(image[1]);
   const publicIdToShow = isHovered && publicId2 ? publicId2 : publicId1;
 
-  // এখানে পরিবর্তন করা হয়েছে: 'transition-all' যোগ করা হয়েছে এবং 'duration-500' করা হয়েছে।
   const imageClassName = `transition-all duration-500 ease-in-out ${
     isHovered ? "scale-110" : "scale-100"
   }`;
