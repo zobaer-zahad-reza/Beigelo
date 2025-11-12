@@ -21,7 +21,6 @@ const List = ({ token, backendUrl, currency }) => {
   };
 
   const removeProduct = async (id) => {
-    // ... আপনার removeProduct কোড এখানে অপরিবর্তিত আছে ...
     try {
       const response = await axios.post(
         `${backendUrl}/api/product/remove`,
@@ -40,28 +39,24 @@ const List = ({ token, backendUrl, currency }) => {
     }
   };
 
-  // <-- ১. কোয়ান্টিটি আপডেট করার জন্য নতুন ফাংশন -->
   const updateQuantity = async (productId, currentQuantity, action) => {
-    // ইউজারের অ্যাকশন অনুযায়ী নতুন কোয়ান্টিটি হিসাব করি
     let newQuantity =
       action === "increment" ? currentQuantity + 1 : currentQuantity - 1;
 
-    // কোয়ান্টিটি যেন ০ এর নিচে না যায়
     if (newQuantity < 0) {
       newQuantity = 0;
     }
 
     try {
-      // এই নতুন API এন্ডপয়েন্টটি আপনাকে ব্যাকএন্ডে তৈরি করতে হবে
       const response = await axios.post(
         `${backendUrl}/api/product/update-quantity`,
-        { id: productId, quantity: newQuantity }, // ডেটাবেসে পাঠানোর জন্য আইডি এবং নতুন কোয়ান্টিটি
+        { id: productId, quantity: newQuantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data.success) {
         toast.success(response.data.message || "Quantity updated");
-        await fetchList(); // সফলভাবে আপডেট হলে লিস্টটি রি-ফেচ (refresh) করি
+        await fetchList();
       } else {
         toast.error(response.data.message);
       }
@@ -74,8 +69,6 @@ const List = ({ token, backendUrl, currency }) => {
   useEffect(() => {
     fetchList();
   }, []);
-
-  // ফিল্টার লজিকে Quantity যোগ করা হয়েছে
   const filteredList = list.filter((item) => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
     const quantityString = item.quantity ? item.quantity.toString() : "";
@@ -105,19 +98,17 @@ const List = ({ token, backendUrl, currency }) => {
 
       <div className="flex flex-col gap-2">
         {/*-------List Table Title----*/}
-        {/* <-- ২. টেবিলের হেডার ৫ কলাম থেকে ৬ কলাম করা হয়েছে --> */}
         <div className="hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] items-center py-1 px-3 border bg-gray-100 text-sm">
           <b>Image</b>
           <b>Name</b>
           <b>Category</b>
           <b>Price</b>
-          <b className="text-center">Quantity</b> {/* <-- নতুন কলাম হেডার */}
+          <b className="text-center">Quantity</b>
           <b className="text-center">Action</b>
         </div>
 
         {/*-------Product List-------*/}
         {filteredList.map((item, index) => (
-          // <-- ৩. টেবিলের রো ৫ কলাম থেকে ৬ কলাম করা হয়েছে -->
           <div
             className="grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm"
             key={index}
@@ -130,8 +121,7 @@ const List = ({ token, backendUrl, currency }) => {
               {item.price}
             </p>
 
-            {/* <-- ৪. নতুন কোয়ান্টিটি কলাম (+/- বাটন সহ) --> */}
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 text-black text-lg">
               <button
                 onClick={() =>
                   updateQuantity(item._id, item.quantity, "decrement")
