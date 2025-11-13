@@ -47,26 +47,22 @@ const socialLinks = [
       "hover:bg-gradient-to-br hover:from-[#FF3333] hover:to-[#FF0000]",
     shadow: "hover:shadow-[0_0_15px_rgba(255,0,0,0.7)]",
   },
-  // আপনি চাইলে এখানে LinkedIn, GitHub ইত্যাদি যোগ করতে পারেন যদি প্রয়োজন হয়
 ];
 
-// --- The Component ---
 const SocialSideNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check screen size on mount and resize
   useEffect(() => {
     const checkIsMobile = () => {
-      // আপনি আপনার Tailwind এর 'sm' বা 'md' ব্রেকপয়েন্টের সাথে ম্যাচ করে এই মান পরিবর্তন করতে পারেন
-      setIsMobile(window.innerWidth < 768); // 768px এর নিচে মোবাইল ভিউ
+      setIsMobile(window.innerWidth < 768);
     };
 
-    checkIsMobile(); // Initial check
-    window.addEventListener("resize", checkIsMobile); // Add resize listener
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
 
     return () => {
-      window.removeEventListener("resize", checkIsMobile); // Cleanup
+      window.removeEventListener("resize", checkIsMobile);
     };
   }, []);
 
@@ -74,7 +70,6 @@ const SocialSideNav = () => {
     setIsOpen(!isOpen);
   };
 
-  // মোবাইল ভিউ এর জন্য চ্যাট বাবল UI
   if (isMobile) {
     return (
       <div className="fixed bottom-16 right-6 z-[999]">
@@ -91,7 +86,6 @@ const SocialSideNav = () => {
           )}
         </button>
 
-        {/* Social Icons - Shown when isOpen is true */}
         <div
           className={`absolute bottom-full right-0 mb-4 flex flex-col items-end space-y-3 transition-all duration-300 ease-in-out ${
             isOpen
@@ -111,7 +105,7 @@ const SocialSideNav = () => {
                 ${link.bgColor} ${link.hoverBgColor} ${link.shadow}
                 ${isOpen ? "scale-100" : "scale-0"}
                 `}
-              style={{ transitionDelay: isOpen ? `${index * 0.05}s` : "0s" }} // Staggered animation
+              style={{ transitionDelay: isOpen ? `${index * 0.05}s` : "0s" }}
             >
               <link.icon className="text-xl z-[2]" />
             </a>
@@ -121,7 +115,6 @@ const SocialSideNav = () => {
     );
   }
 
-  // ডেস্কটপ ভিউ এর জন্য সাইড নেভিগেশন UI (আপনার বর্তমান কোড)
   return (
     <nav className="fixed top-1/2 right-0 -translate-y-1/2 z-[999]">
       <ul className="list-none m-0 p-0">

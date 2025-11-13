@@ -11,7 +11,15 @@ const getPublicIdFromUrl = (url) => {
   return match ? match[1] : null;
 };
 
-const ProductItem = ({ id, image, name, price, categoryName, subCategory }) => {
+const ProductItem = ({
+  id,
+  image,
+  name,
+  brand,
+  price,
+  categoryName,
+  subCategory,
+}) => {
   const { currency } = useContext(ShopContext);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -59,10 +67,18 @@ const ProductItem = ({ id, image, name, price, categoryName, subCategory }) => {
           />
         )}
       </div>
-      <p className="pt-3 pb-1 text-sm">{name}</p>
-      <p className="text-sm font-medium">
-        {currency} {price}
-      </p>
+
+      <div className="pt-3 px-1 flex flex-col gap-0.5">
+        {brand && (
+          <p className="text-sm text-gray-500">{brand}</p>
+        )}
+        <p className="pt-0.5 pr-2 pb-0 text-base font-medium text-gray-800 ">
+          {name}
+        </p>
+        <p className="text-base font-bold text-black">
+          {currency} {price}
+        </p>
+      </div>
     </Link>
   );
 };

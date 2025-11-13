@@ -5,6 +5,7 @@ import { assets } from "../assets/assets";
 import RelatedProduct from "../components/RelatedProduct";
 import OptimizedProductImage from "../components/OptimizedProductImage";
 import Spinner from "../components/Spinner";
+import ProdRating from "../components/ProdRating";
 
 const getPublicIdFromUrl = (url) => {
   const parts = url.split("/");
@@ -56,7 +57,7 @@ const Product = () => {
               <div
                 key={index}
                 onClick={() => setImage(itemUrl)}
-                className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer"
+                className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border border-transparent hover:border-gray-300"
               >
                 <OptimizedProductImage
                   publicId={getPublicIdFromUrl(itemUrl)}
@@ -67,7 +68,7 @@ const Product = () => {
               </div>
             ))}
           </div>
-          <div className="w-full sm:w-[80%]">
+          <div className="w-full sm:w-[65%]">
             {image && (
               <OptimizedProductImage
                 publicId={getPublicIdFromUrl(image)}
@@ -81,72 +82,81 @@ const Product = () => {
           <h1 className="font-medium text-3xl">{productData.name}</h1>
 
           {productData.brand && (
-            <h2 className="text-xl text-gray-600 font-medium mt-1">
+            <h2 className="text-lg text-gray-700 font-semibold mt-1">
               {productData.brand}
             </h2>
           )}
 
           <div className="flex items-center gap-1 mt-2">
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_icon} alt="" className="w-3 5" />
-            <img src={assets.star_dull_icon} alt="" className="w-3 5" />
-            <p className="pl-2">{122}</p>
+            <ProdRating />
+            <p className="pl-2 text-sm text-gray-500">({138} reviews)</p>
           </div>
-          <p className="mt-3 text-2xl font-medium">
+          
+          <p className="mt-4 text-3xl font-bold text-black">
             {currency}
             {productData.price}
           </p>
-          <p className="mt-3 text-gray-400 md:w-4/5">
+
+          <p className="mt-4 text-gray-600 md:w-4/5">
             {productData.description}
           </p>
 
-          <div className="space-x-4 mt-5">
+          {/* --- Button Section--- */}
+          <div className="flex flex-col gap-3 mt-6 max-w-xs">
             <button
               onClick={() => addToCart(productData._id)}
-              className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
+              className="w-full bg-white text-black border border-black py-3 text-sm font-medium active:bg-gray-200 hover:bg-gray-100 transition-colors"
             >
               ADD TO CART
             </button>
             <button
               onClick={() => buyNow(productData._id)}
-              className="bg-black text-white px-8 py-3 mt-3 text-sm active:bg-gray-700"
+              className="w-full bg-black text-white py-3 text-sm font-medium active:bg-gray-700 hover:bg-gray-800 transition-colors"
             >
               BUY NOW
             </button>
           </div>
-          {/* <div className="text-sm text-gray-600 mt-6 flex flex-col gap-1">
-            <p>100% original Product</p>
-            <p>cash on delivery is available on this product</p>
-            <p>Easy return and exchange policy within 7 days</p>
-          </div> */}
+
         </div>
       </div>
+
       {/* Description and Review Section */}
       <div className="mt-20">
         <div className="flex">
-          <b className="border px-5 py-3 text-sm">Description</b>
+          <b className="border px-5 py-3 text-sm bg-gray-50">Description</b>
           {/* <p className="border px-5 py-3 text-sm">Reviews(122)</p> */}
         </div>
-        <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500">
-          <p>
-            Experience the assurance of 100% original and authentic products,
-            crafted to meet the highest standards of quality.{" "}
+        
+        {/* --- Description Box --- */}
+        <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-600">
+          <p className="flex items-center gap-2">
+            <span>🛡️</span>
+            <span>
+              Experience the assurance of 100% original and authentic products,
+              crafted to meet the highest standards of quality.
+            </span>
           </p>
-          <p>
-            Enjoy the convenience of Cash on Delivery, giving you full
-            confidence in every purchase.{" "}
+          <p className="flex items-center gap-2">
+            <span>🚚</span>
+            <span>
+              Enjoy the convenience of Cash on Delivery, giving you full
+              confidence in every purchase.
+            </span>
           </p>
-          <p>
-            We value your satisfaction above all — that’s why we offer a simple
-            7-day return and exchange policy, ensuring a smooth and worry-free
-            shopping experience.{" "}
+          <p className="flex items-center gap-2">
+            <span>↩️</span>
+            <span>
+              We value your satisfaction above all — that’s why we offer a simple
+              7-day return and exchange policy, ensuring a smooth and worry-free
+              shopping experience.
+            </span>
           </p>
-          <p>Shop smart. Shop genuine. Shop with trust and comfort.</p>
+          <p className="mt-2 font-medium text-gray-700">
+            Shop smart. Shop genuine. Shop with trust and comfort.
+          </p>
         </div>
+
       </div>
-      {/* Description and Review Section */}
 
       <RelatedProduct
         category={productData.category}

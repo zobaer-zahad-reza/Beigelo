@@ -18,6 +18,10 @@ const imageArr = [
     imgLink: "https://i.ibb.co.com/0RvwqCCD/Tissot-Fina.jpg",
     name: "Tissot",
   },
+  {
+    imgLink: "https://i.ibb.co.com/4gXZZw0V/a6aea1e1-15a0-4e8b-ac77-1eb2932e7835.jpg",
+    name: "Frank_Muller",
+  },
 ];
 
 const BrandMarquee = () => (

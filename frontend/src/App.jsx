@@ -6,7 +6,7 @@ import SearchBar from "./components/SearchBar";
 import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
 import Spinner from "./components/Spinner";
-// import PrivacyPolicy from "./pages/PrivacyPolicy"; // 1. Static import remove kora holo
+// import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SocialSideNav from "./components/SocialSideNav";
 
 const Home = lazy(() => import("./pages/Home"));
@@ -21,7 +21,7 @@ const Orders = lazy(() => import("./pages/Orders"));
 const Verify = lazy(() => import("./pages/Verify"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
 const ErrorPage = lazy(() => import("./pages/ErrorPage"));
-const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy")); // 2. Ekhane lazy load kora holo
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 const App = () => {
   return (
