@@ -10,6 +10,7 @@ const Add = ({ token, backendUrl }) => {
   const [image4, setImage4] = useState(false);
 
   const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
@@ -28,6 +29,7 @@ const Add = ({ token, backendUrl }) => {
       const formData = new FormData();
 
       formData.append("name", name);
+      formData.append("brand", brand);
       formData.append("description", description);
       formData.append("price", price);
       formData.append("quantity", quantity);
@@ -50,6 +52,7 @@ const Add = ({ token, backendUrl }) => {
       if (response.data.success) {
         toast.success(response.data.message);
         setDescription("");
+        setBrand("");
         setImage1(false);
         setImage2(false);
         setImage3(false);
@@ -141,6 +144,18 @@ const Add = ({ token, backendUrl }) => {
           required
         />
       </div>
+
+      <div className="w-full">
+        <p className="mb-0.5">Brand Name</p>
+        <input
+          onChange={(e) => setBrand(e.target.value)}
+          value={brand}
+          className="w-full max-w-[400px] px-3 py-2"
+          type="text"
+          placeholder="e.g. Rolex, Casio, etc."
+        />
+      </div>
+
       <div className="w-full">
         <p className="mb-0.5">Product Description</p>
         <textarea
@@ -211,6 +226,7 @@ const Add = ({ token, backendUrl }) => {
       </div>
 
       <div className={`${showSize ? "block" : "hidden"}`}>
+        {/* ... (Sizes code remains unchanged) ... */}
         <p className="mb-0.5">Product Sizes</p>
         <div className="flex gap-3">
           <div
