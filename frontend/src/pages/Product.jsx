@@ -79,6 +79,13 @@ const Product = () => {
         {/* Product Information */}
         <div className="flex-1">
           <h1 className="font-medium text-3xl">{productData.name}</h1>
+
+          {productData.brand && (
+            <h2 className="text-xl text-gray-600 font-medium mt-1">
+              {productData.brand}
+            </h2>
+          )}
+
           <div className="flex items-center gap-1 mt-2">
             <img src={assets.star_icon} alt="" className="w-3 5" />
             <img src={assets.star_icon} alt="" className="w-3 5" />

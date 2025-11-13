@@ -226,7 +226,6 @@ const Add = ({ token, backendUrl }) => {
       </div>
 
       <div className={`${showSize ? "block" : "hidden"}`}>
-        {/* ... (Sizes code remains unchanged) ... */}
         <p className="mb-0.5">Product Sizes</p>
         <div className="flex gap-3">
           <div
