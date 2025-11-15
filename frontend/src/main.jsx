@@ -5,15 +5,6 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import ShopContextProvider from "./context/ShopContext.jsx";
 
-function firePageView() {
-  if (window.fbq) {
-    window.fbq("track", "PageView");
-  } else {
-    setTimeout(firePageView, 100);
-  }
-}
-
-firePageView();
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <ShopContextProvider>
