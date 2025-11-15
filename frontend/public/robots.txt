@@ -7,6 +7,5 @@ Disallow: /cart
 Disallow: /checkout
 Disallow: /order
 Disallow: /profile
-Disallow: /admin # যদি অ্যাডমিন প্যানেলের কোনো অংশ থাকে
 
 # Point bots to your sitemap
