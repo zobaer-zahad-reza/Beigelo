@@ -4,8 +4,8 @@ Allow: /
 
 # Disallow bots from crawling specific user-centric pages
 Disallow: /cart
-Disallow: /checkout
-Disallow: /order
-Disallow: /profile
+Disallow: /place-order
+Disallow: /orders
+Disallow: /userprofile
 
 # Point bots to your sitemap
