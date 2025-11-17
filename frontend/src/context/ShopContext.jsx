@@ -71,7 +71,8 @@ const ShopContextProvider = (props) => {
     }
   };
 
-  const addToCart = async (itemId, size = "default") => {
+const addToCart = async (itemId, size = "default") => {
+
     if (!token) {
       Swal.fire({
         icon: "error",
@@ -81,6 +82,32 @@ const ShopContextProvider = (props) => {
       navigate("/login");
       return;
     }
+
+    // ২. GTM ট্র্যাকিং কোড (এখানে বসাতে হবে)
+    // প্রোডাক্টের ডিটেইলস খুঁজে বের করা (GA4/FB-তে প্রাইস পাঠানোর জন্য)
+    // দ্রষ্টব্য: আপনার context-এ যদি 'products' লিস্ট থাকে তবেই এটি কাজ করবে
+    const productToAdd = products.find((product) => product._id === itemId);
+
+    if (productToAdd) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "add_to_cart", // এই নামটি GTM Trigger-এ হুবহু থাকতে হবে
+        ecommerce: {
+          currency: "BDT",
+          value: productToAdd.price, // প্রোডাক্টের দাম
+          items: [
+            {
+              item_id: itemId,
+              item_name: productToAdd.name,
+              price: productToAdd.price,
+              quantity: 1,
+              variant: size,
+            },
+          ],
+        },
+      });
+    }
+
     setCartItems((prev) => {
       const itemInfo = prev[itemId] || {};
       const newQuantity = (itemInfo[size] || 0) + 1;
