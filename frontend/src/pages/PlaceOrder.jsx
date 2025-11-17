@@ -42,8 +42,55 @@ const PlaceOrder = () => {
   const subtotal = isBuyNowMode
     ? buyNowItem.price * buyNowItem.quantity
     : getCartAmount();
-  // (subtotal > 0 ? delivery_fee : 0)
+  
   const total = subtotal + delivery_fee;
+
+  const getGtmItems = () => {
+    if (isBuyNowMode && buyNowItem) {
+      return [{
+        item_id: buyNowItem._id,
+        item_name: buyNowItem.name,
+        price: buyNowItem.price,
+        quantity: buyNowItem.quantity,
+        variant: buyNowItem.size
+      }];
+    }
+    
+    // Cart Mode
+    return Object.entries(cartItems).flatMap(([itemId, sizes]) => {
+        const productData = products.find((p) => p._id === itemId);
+        if (!productData) return [];
+        return Object.entries(sizes)
+          .map(([size, quantity]) => {
+            if (quantity <= 0) return null;
+            return {
+              item_id: productData._id,
+              item_name: productData.name,
+              price: productData.price,
+              quantity: quantity,
+              variant: size
+            };
+          })
+          .filter(Boolean);
+      });
+  };
+
+  useEffect(() => {
+    const gtmItems = getGtmItems();
+    
+    if (gtmItems.length > 0 && total > 0) {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: 'begin_checkout',
+            ecommerce: {
+                currency: 'BDT',
+                value: total,
+                items: gtmItems
+            }
+        });
+    }
+  }, [products, cartItems, buyNowItem, total]); 
+
 
   useEffect(() => {
     if (!isBuyNowMode && getCartAmount() === 0 && !isOrdering) {
@@ -126,6 +173,21 @@ const PlaceOrder = () => {
             headersConfig
           );
           if (response.data.success) {
+            
+            const gtmItems = getGtmItems();
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+                event: 'purchase',
+                ecommerce: {
+                    transaction_id: Date.now(),
+                    value: total,
+                    tax: 0,
+                    shipping: delivery_fee,
+                    currency: 'BDT',
+                    items: gtmItems
+                }
+            });
+
             if (isBuyNowMode) {
               setBuyNowItem(null);
             } else {
@@ -238,9 +300,9 @@ const PlaceOrder = () => {
             value={formData.firstName}
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
             type="text"
-            placeholder="First Name"
+            placeholder="Your Name"
           />
-          <input
+          {/* <input
             required
             onChange={onChangeHandler}
             name="lastName"
@@ -248,7 +310,7 @@ const PlaceOrder = () => {
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
             type="text"
             placeholder="Last Name"
-          />
+          /> */}
         </div>
         <input
           required
@@ -259,7 +321,7 @@ const PlaceOrder = () => {
           type="email"
           placeholder="Email Address"
         />
-        <input
+        {/* <input
           required
           onChange={onChangeHandler}
           name="street"
@@ -267,7 +329,7 @@ const PlaceOrder = () => {
           className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
           type="text"
           placeholder="Street"
-        />
+        /> */}
         <div className="flex gap-3">
           <input
             required
@@ -285,11 +347,11 @@ const PlaceOrder = () => {
             value={formData.state}
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
             type="text"
-            placeholder="State"
+            placeholder="Addres"
           />
         </div>
         <div className="flex gap-3">
-          <input
+          {/* <input
             required
             onChange={onChangeHandler}
             name="zipcode"
@@ -297,8 +359,8 @@ const PlaceOrder = () => {
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
             type="number"
             placeholder="Zipcode"
-          />
-          <input
+          /> */}
+          {/* <input
             required
             onChange={onChangeHandler}
             name="country"
@@ -306,7 +368,7 @@ const PlaceOrder = () => {
             className="border border-gray-300 rounded py-1.5 px-3.5 w-full"
             type="text"
             placeholder="Country"
-          />
+          /> */}
         </div>
         <input
           required
