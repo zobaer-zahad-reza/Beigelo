@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
-import { assets } from "../assets/assets";
 import RelatedProduct from "../components/RelatedProduct";
 import OptimizedProductImage from "../components/OptimizedProductImage";
 import Spinner from "../components/Spinner";
@@ -29,10 +28,8 @@ const Product = () => {
       setImage(currentProduct.image[0]);
 
       window.dataLayer = window.dataLayer || [];
-
       window.dataLayer.push({
         event: "view_item",
-
         content_name: currentProduct.name,
         content_ids: [currentProduct._id],
         content_category: currentProduct.category,
@@ -50,33 +47,39 @@ const Product = () => {
     <div className="border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100">
       {/* Product Data */}
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
-        {/* Product Images */}
+        {/* --- Product Images Section (CLEAN VERSION) --- */}
         <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
+          {/* Thumbnails */}
           <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
             {productData.image.map((itemUrl, index) => (
               <div
                 key={index}
                 onClick={() => setImage(itemUrl)}
-                className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border border-transparent hover:border-gray-300"
+                className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border border-transparent hover:border-gray-300 rounded-md aspect-square overflow-hidden flex items-center justify-center"
               >
                 <OptimizedProductImage
                   publicId={getPublicIdFromUrl(itemUrl)}
                   name={productData.name}
-                  width={390}
-                  height={450}
+                  className="w-full h-full object-contain"
                 />
               </div>
             ))}
           </div>
-          <div className="w-full sm:w-[65%]">
-            {image && (
-              <OptimizedProductImage
-                publicId={getPublicIdFromUrl(image)}
-                name={productData.name}
-              />
-            )}
+
+          {/* Main Image */}
+          <div className="w-full sm:w-[75%]">
+            <div className="w-full aspect-square rounded-lg overflow-hidden flex items-center justify-center relative">
+              {image && (
+                <OptimizedProductImage
+                  publicId={getPublicIdFromUrl(image)}
+                  name={productData.name}
+                  className="w-full h-full object-contain"
+                />
+              )}
+            </div>
           </div>
         </div>
+
         {/* Product Information */}
         <div className="flex-1">
           <h1 className="font-medium text-3xl">{productData.name}</h1>
@@ -91,7 +94,7 @@ const Product = () => {
             <ProdRating />
             <p className="pl-2 text-sm text-gray-500">({138} reviews)</p>
           </div>
-          
+
           <p className="mt-4 text-3xl font-bold text-black">
             {currency}
             {productData.price}
@@ -116,7 +119,6 @@ const Product = () => {
               BUY NOW
             </button>
           </div>
-
         </div>
       </div>
 
@@ -124,9 +126,8 @@ const Product = () => {
       <div className="mt-20">
         <div className="flex">
           <b className="border px-5 py-3 text-sm bg-gray-50">Description</b>
-          {/* <p className="border px-5 py-3 text-sm">Reviews(122)</p> */}
         </div>
-        
+
         {/* --- Description Box --- */}
         <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-600">
           <p className="flex items-center gap-2">
@@ -146,16 +147,15 @@ const Product = () => {
           <p className="flex items-center gap-2">
             <span>↩️</span>
             <span>
-              We value your satisfaction above all — that’s why we offer a simple
-              7-day return and exchange policy, ensuring a smooth and worry-free
-              shopping experience.
+              We value your satisfaction above all — that’s why we offer a
+              simple 7-day return and exchange policy, ensuring a smooth and
+              worry-free shopping experience.
             </span>
           </p>
           <p className="mt-2 font-medium text-gray-700">
             Shop smart. Shop genuine. Shop with trust and comfort.
           </p>
         </div>
-
       </div>
 
       <RelatedProduct
