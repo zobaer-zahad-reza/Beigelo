@@ -24,23 +24,30 @@ const allowedOrigins = [
   "https://www.beigelo.com",
   "https://iamadmin.beigelo.com",
   "https://api.beigelo.com",
-
+  
+  // Localhost
   "http://localhost:5174",
   "http://localhost:5173",
+  "http://localhost:4000",
+
+  // Optional: HTTP versions
+  "http://beigelo.com",
+  "http://www.beigelo.com"
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      console.log("Request's Origin: ", origin);
+
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      } else {
+        console.error("❌ CORS Blocked Request from:", origin);
+        const msg = "The CORS policy for this site does not allow access from the specified Origin.";
         return callback(new Error(msg), false);
       }
-      return callback(null, true);
     },
     credentials: true,
   })
@@ -98,6 +105,15 @@ app.post("/api/send-email-contactpage", (req, res) => {
 
 app.get("/", (req, res) => {
   res.send("API Working ✅");
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error("⚠️ Server Error:", err.message);
+    if (err.message.includes("CORS")) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+    res.status(500).json({ success: false, message: "Internal Server Error" });
 });
 
 app.listen(port, () => console.log("🚀 Server Started on PORT : " + port));
