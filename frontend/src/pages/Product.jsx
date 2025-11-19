@@ -108,7 +108,7 @@ const Product = () => {
 
             {/* Main Image */}
             <div className="w-full sm:w-[75%]">
-              <div className="w-full aspect-square rounded-lg overflow-hidden flex items-center justify-center relative">
+              <div className="w-full h-[300px] sm:h-[650px] rounded-lg overflow-hidden flex items-center justify-center relative">
                 {image && (
                   <OptimizedProductImage
                     publicId={getPublicIdFromUrl(image)}
