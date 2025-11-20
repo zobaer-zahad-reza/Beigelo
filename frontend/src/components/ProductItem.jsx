@@ -24,7 +24,6 @@ const ProductItem = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const publicId1 = getPublicIdFromUrl(image[0]);
-  // চেক করা হচ্ছে দ্বিতীয় ইমেজ আছে কিনা, না থাকলে প্রথমটাই ব্যবহার হবে
   const publicId2 = image[1] ? getPublicIdFromUrl(image[1]) : null;
   const publicIdToShow = isHovered && publicId2 ? publicId2 : publicId1;
 
@@ -32,7 +31,6 @@ const ProductItem = ({
     isHovered ? "scale-110" : "scale-100"
   }`;
 
-  // Slugify দিয়ে URL Friendly নাম তৈরি করা
   const categorySlug = slugify(categoryName || "item", {
     lower: true,
     strict: true,
@@ -43,8 +41,7 @@ const ProductItem = ({
   });
   const productSlug = slugify(name || "product", { lower: true, strict: true });
 
-  // ডাইনামিক লিংক তৈরি
-  const productUrl = `/product/${categorySlug}/${subCategorySlug}/${productSlug}/${id}`;
+  const productUrl = `/product/${categorySlug}/${subCategorySlug}/${productSlug}`;
 
   return (
     <Link

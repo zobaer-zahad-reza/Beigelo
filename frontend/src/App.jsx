@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom"; // Navigate ইমপোর্ট করুন
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
@@ -35,28 +35,18 @@ const App = () => {
         <Suspense fallback={<Spinner />}>
           <Routes>
             <Route path="/" element={<Home />} />
-
-            {/* 1. Collection Page (All Products) */}
             <Route path="/collection" element={<Collection />} />
-
-            {/* 2. Product Root (Redirects to Collection) */}
             <Route
               path="/product"
               element={<Navigate to="/collection" replace />}
             />
-
-            {/* 3. Category Page (e.g. /product/watch) */}
             <Route path="/product/:categorySlug" element={<Collection />} />
-
-            {/* 4. Sub-Category Page (e.g. /product/watch/man) */}
             <Route
               path="/product/:categorySlug/:subCategorySlug"
               element={<Collection />}
             />
-
-            {/* 5. Single Product Details Page (Full Link) */}
             <Route
-              path="/product/:categorySlug/:subCategorySlug/:productSlug/:productId"
+              path="/product/:categorySlug/:subCategorySlug/:productSlug"
               element={<Product />}
             />
 

@@ -7,7 +7,6 @@ import ProductItem from "../components/ProductItem";
 import { TbFaceIdError } from "react-icons/tb";
 
 const Collection = () => {
-  // 1. URL থেকে প্যারামিটার গুলো ধরছি
   const { categorySlug, subCategorySlug } = useParams();
 
   const { products, search, showSearch } = useContext(ShopContext);
@@ -17,20 +16,16 @@ const Collection = () => {
   const [subCategory, setSubCategory] = useState([]);
   const [sortType, setSortType] = useState("relavent");
 
-  // 2. URL প্যারামিটার অনুযায়ী অটোমেটিক ক্যাটাগরি/সাব-ক্যাটাগরি সেট করার লজিক
   useEffect(() => {
     if (categorySlug) {
-      // URL এর "watch" কে "Watch" এ কনভার্ট করে স্টেটে সেট করা হচ্ছে
       const formattedCategory =
         categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1);
       setCategory([formattedCategory]);
     } else {
-      // যদি URL এ কিছু না থাকে, ক্যাটাগরি রিসেট হবে (অপশনাল)
       setCategory([]);
     }
 
     if (subCategorySlug) {
-      // URL এর "man" কে "Man" এ কনভার্ট করে স্টেটে সেট করা হচ্ছে
       const formattedSubCategory =
         subCategorySlug.charAt(0).toUpperCase() + subCategorySlug.slice(1);
       setSubCategory([formattedSubCategory]);
@@ -55,7 +50,6 @@ const Collection = () => {
     }
   };
 
-  // 3. মেইন ফিল্টারিং লজিক (আপনার আগের কোডই আছে)
   useEffect(() => {
     let processedProducts = [...products];
 
@@ -121,7 +115,7 @@ const Collection = () => {
                 type="checkbox"
                 value={"Watch"}
                 onChange={toggleCategory}
-                checked={category.includes("Watch")} // এই লাইনটি নতুন: চেক মার্ক দেখানোর জন্য
+                checked={category.includes("Watch")}
               />{" "}
               Watch
             </p>
@@ -162,7 +156,7 @@ const Collection = () => {
                 type="checkbox"
                 value={"Man"}
                 onChange={toggleSubCategory}
-                checked={subCategory.includes("Man")} // এই লাইনটি নতুন
+                checked={subCategory.includes("Man")}
               />{" "}
               Man
             </p>
@@ -217,7 +211,6 @@ const Collection = () => {
                 image={item.image}
                 categoryName={item.category}
                 subCategory={item.subCategory}
-                // productSlug পাস করা হচ্ছে যাতে ProductItem লিংকে ব্যবহার করতে পারে
                 productSlug={item.name.toLowerCase().split(" ").join("-")}
               />
             ))}

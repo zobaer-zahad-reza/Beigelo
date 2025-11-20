@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
-import RelatedProduct from "../components/RelatedProduct"; // খেয়াল রাখবেন আপনার কম্পোনেন্টের নাম RelatedProduct নাকি RelatedProducts
+import RelatedProduct from "../components/RelatedProduct";
 import OptimizedProductImage from "../components/OptimizedProductImage";
 import Spinner from "../components/Spinner";
 import ProdRating from "../components/ProdRating";
 import { Helmet, HelmetProvider } from "react-helmet-async";
+import slugify from "slugify";
 
 const getPublicIdFromUrl = (url) => {
   if (!url) return "";
@@ -16,21 +17,22 @@ const getPublicIdFromUrl = (url) => {
 };
 
 const Product = () => {
-  const { productId } = useParams();
+  const { productSlug } = useParams();
   const { products, currency, addToCart, buyNow } = useContext(ShopContext);
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // লিংকের productId এর সাথে ডাটাবেসের _id ম্যাচ করা হচ্ছে
-    const currentProduct = products.find((item) => item._id === productId);
+    const currentProduct = products.find((item) => {
+      const itemSlug = slugify(item.name, { lower: true, strict: true });
+      return itemSlug === productSlug;
+    });
 
     if (currentProduct) {
       setProductData(currentProduct);
       setImage(currentProduct.image[0]);
 
-      // Google Analytics / GTM DataLayer Push
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "view_item",
@@ -41,13 +43,12 @@ const Product = () => {
         currency: "BDT",
       });
     }
-  }, [productId, products, currency]);
+  }, [productSlug, products, currency]);
 
   if (!productData) {
     return <Spinner />;
   }
 
-  // Schema Markup for SEO
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
