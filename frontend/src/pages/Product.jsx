@@ -150,15 +150,13 @@ const Product = () => {
               >
                 {image && (
                   <div
-                    // পরিবর্তন: ইমেজের কন্টেইনার হাইট অটো অ্যাডজাস্ট হবে
-                    className="w-full h-auto sm:h-full flex items-center justify-center transition-transform duration-100 ease-out"
+                    className="w-full h-auto  flex items-center justify-center transition-transform duration-100 ease-out"
                     style={zoomStyle}
                   >
                     <OptimizedProductImage
                       publicId={getPublicIdFromUrl(image)}
                       name={productData.name}
-                      // পরিবর্তন: মোবাইলে h-auto যাতে অ্যাসপেক্ট রেশিও ঠিক থাকে
-                      className="w-full h-auto sm:h-full sm:object-contain pointer-events-none"
+                      className="w-full h-auto  sm:object-contain pointer-events-none"
                     />
                   </div>
                 )}
