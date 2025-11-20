@@ -23,6 +23,12 @@ const Product = () => {
   const [image, setImage] = useState("");
   const navigate = useNavigate();
 
+  // --- Zoom Logic ---
+  const [zoomStyle, setZoomStyle] = useState({
+    transformOrigin: "center",
+    transform: "scale(1)",
+  });
+
   useEffect(() => {
     const currentProduct = products.find((item) => {
       const itemSlug = slugify(item.name, { lower: true, strict: true });
@@ -44,6 +50,27 @@ const Product = () => {
       });
     }
   }, [productSlug, products, currency]);
+
+  // --- Zoom Handle Function ---
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } =
+      e.currentTarget.getBoundingClientRect();
+
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+
+    setZoomStyle({
+      transformOrigin: `${x}% ${y}%`,
+      transform: "scale(2)",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setZoomStyle({
+      transformOrigin: "center",
+      transform: "scale(1)",
+    });
+  };
 
   if (!productData) {
     return <Spinner />;
@@ -111,15 +138,24 @@ const Product = () => {
               ))}
             </div>
 
-            {/* Main Image */}
+            {/* --- Main Image --- */}
             <div className="w-full sm:w-[75%]">
-              <div className="w-full h-[300px] sm:h-[650px] rounded-lg overflow-hidden flex items-center justify-center relative">
+              <div
+                className="w-full h-[300px] sm:h-[650px] rounded-lg overflow-hidden relative cursor-zoom-in bg-white border border-gray-100"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+              >
                 {image && (
-                  <OptimizedProductImage
-                    publicId={getPublicIdFromUrl(image)}
-                    name={productData.name}
-                    className="w-full h-full object-contain"
-                  />
+                  <div
+                    className="w-full h-full flex items-center justify-center transition-transform duration-100 ease-out"
+                    style={zoomStyle}
+                  >
+                    <OptimizedProductImage
+                      publicId={getPublicIdFromUrl(image)}
+                      name={productData.name}
+                      className="w-full h-full object-contain pointer-events-none"
+                    />
+                  </div>
                 )}
               </div>
             </div>
