@@ -5,6 +5,8 @@ import { ShopContext } from "../context/ShopContext";
 import BottomNavbar from "./BottomNavbar";
 import useClickOutside from "../Hook/useClickOutside";
 
+import NavLogo from "../assets/NavLogo.png";
+
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
   const { setShowSearch, getCartCount, token, setToken, setCartItems } =
@@ -12,7 +14,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Helper function for mobile navigation
   const handleSideNavbar = (path) => {
     navigate(path);
     setVisible(false);
@@ -29,18 +30,16 @@ const Navbar = () => {
     setVisible(false);
   });
 
-  // Active styles for desktop NavLink
   const navLinkStyles = ({ isActive }) => ({
     color: isActive ? "#000000" : "#4B5563",
     fontWeight: isActive ? "600" : "500",
-    // borderBottom: isActive ? '2px solid black' : 'none',
     borderBottom: isActive ? "2px solid black" : "2px solid transparent",
   });
 
   return (
     <div className="flex items-center justify-between py-4 font-medium bg-white md:sticky md:top-0 md:z-10 md:bg-opacity-70 md:backdrop-blur-sm">
       <Link to="/">
-        <h1 className="text-5xl playfair-display-navlogo">Beigelo</h1>
+        <img className="w-40" src={NavLogo} alt="Logo" />
       </Link>
 
       {/* Menu Links - Desktop */}
