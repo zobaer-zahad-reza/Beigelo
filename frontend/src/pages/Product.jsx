@@ -1,13 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
-import RelatedProduct from "../components/RelatedProduct";
+import RelatedProduct from "../components/RelatedProduct"; // খেয়াল রাখবেন আপনার কম্পোনেন্টের নাম RelatedProduct নাকি RelatedProducts
 import OptimizedProductImage from "../components/OptimizedProductImage";
 import Spinner from "../components/Spinner";
 import ProdRating from "../components/ProdRating";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 
 const getPublicIdFromUrl = (url) => {
+  if (!url) return "";
   const parts = url.split("/");
   const publicIdWithFormat = parts[parts.length - 1];
   const publicId = publicIdWithFormat.split(".")[0];
@@ -22,12 +23,14 @@ const Product = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // লিংকের productId এর সাথে ডাটাবেসের _id ম্যাচ করা হচ্ছে
     const currentProduct = products.find((item) => item._id === productId);
 
     if (currentProduct) {
       setProductData(currentProduct);
       setImage(currentProduct.image[0]);
 
+      // Google Analytics / GTM DataLayer Push
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "view_item",
@@ -44,6 +47,7 @@ const Product = () => {
     return <Spinner />;
   }
 
+  // Schema Markup for SEO
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",

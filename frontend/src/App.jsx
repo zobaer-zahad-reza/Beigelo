@@ -1,14 +1,14 @@
 import React, { lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom"; // Navigate ইমপোর্ট করুন
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
 import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
 import Spinner from "./components/Spinner";
-// import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SocialSideNav from "./components/SocialSideNav";
 
+// Lazy loading
 const Home = lazy(() => import("./pages/Home"));
 const Collection = lazy(() => import("./pages/Collection"));
 const About = lazy(() => import("./pages/About"));
@@ -35,23 +35,33 @@ const App = () => {
         <Suspense fallback={<Spinner />}>
           <Routes>
             <Route path="/" element={<Home />} />
+
+            {/* 1. Collection Page (All Products) */}
             <Route path="/collection" element={<Collection />} />
-            <Route path="/product" element={<Collection />} />
+
+            {/* 2. Product Root (Redirects to Collection) */}
+            <Route
+              path="/product"
+              element={<Navigate to="/collection" replace />}
+            />
+
+            {/* 3. Category Page (e.g. /product/watch) */}
+            <Route path="/product/:categorySlug" element={<Collection />} />
+
+            {/* 4. Sub-Category Page (e.g. /product/watch/man) */}
             <Route
               path="/product/:categorySlug/:subCategorySlug"
               element={<Collection />}
             />
+
+            {/* 5. Single Product Details Page (Full Link) */}
             <Route
               path="/product/:categorySlug/:subCategorySlug/:productSlug/:productId"
               element={<Product />}
             />
+
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
-            <Route
-              path="/product/:categorySlug/:subCategorySlug/:productSlug/:productId"
-              element={<Product />}
-            />
-            <Route path="/collection" element={<Collection />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/place-order" element={<PlaceOrder />} />

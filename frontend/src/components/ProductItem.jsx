@@ -24,13 +24,15 @@ const ProductItem = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const publicId1 = getPublicIdFromUrl(image[0]);
-  const publicId2 = getPublicIdFromUrl(image[1]);
+  // চেক করা হচ্ছে দ্বিতীয় ইমেজ আছে কিনা, না থাকলে প্রথমটাই ব্যবহার হবে
+  const publicId2 = image[1] ? getPublicIdFromUrl(image[1]) : null;
   const publicIdToShow = isHovered && publicId2 ? publicId2 : publicId1;
 
   const imageClassName = `transition-all duration-500 ease-in-out ${
     isHovered ? "scale-110" : "scale-100"
   }`;
 
+  // Slugify দিয়ে URL Friendly নাম তৈরি করা
   const categorySlug = slugify(categoryName || "item", {
     lower: true,
     strict: true,
@@ -41,6 +43,7 @@ const ProductItem = ({
   });
   const productSlug = slugify(name || "product", { lower: true, strict: true });
 
+  // ডাইনামিক লিংক তৈরি
   const productUrl = `/product/${categorySlug}/${subCategorySlug}/${productSlug}/${id}`;
 
   return (
@@ -69,9 +72,7 @@ const ProductItem = ({
       </div>
 
       <div className="pt-3 px-1 flex flex-col gap-0.5">
-        {brand && (
-          <p className="text-sm text-gray-500">{brand}</p>
-        )}
+        {brand && <p className="text-sm text-gray-500">{brand}</p>}
         <p className="pt-0.5 pr-2 pb-0 text-base font-medium text-gray-800 ">
           {name}
         </p>
