@@ -169,14 +169,26 @@ const Contact = () => {
               <div className="flex flex-col justify-center items-start gap-6">
                 <h3 className="font-semibold text-xl text-black">Our Store</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  54709 Williams Station, Suite 350
+                  325-A, 3rd Floor, South Jatrabari, Kalam Mansion
                   <br />
-                  Washington, USA
+                  Dhaka-1204, Bangladesh.
                 </p>
                 <p className="text-gray-600 leading-relaxed">
-                  Tel: 01623 652457
+                  Tel:{" "}
+                  <a
+                    href="tel:+8801608068403"
+                    className="hover:text-black hover:underline transition-all"
+                  >
+                    +880 1608-068403
+                  </a>
                   <br />
-                  Email: contact@beigelo.com
+                  Email:{" "}
+                  <a
+                    href="mailto:beigelobd@gmail.com"
+                    className="hover:text-black hover:underline transition-all"
+                  >
+                    beigelobd@gmail.com
+                  </a>
                 </p>
               </div>
               <div className="flex flex-col justify-center items-start gap-4 border-t pt-8 w-full">

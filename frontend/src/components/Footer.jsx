@@ -29,8 +29,18 @@ const Footer = () => {
         <div>
           <p className="text-xl font-medium md-5">GET IN TOUCH</p>
           <ul className="flex flex-col gap-1 text-gray-600">
-            <li>+880 1608-068403 </li>
-            <li>beigelobd@gmail.com</li>
+            <a
+              href="tel:+8801608068403"
+              className="hover:text-black hover:underline transition-all"
+            >
+              +880 1608-068403
+            </a>
+            <a
+              href="mailto:beigelobd@gmail.com"
+              className="hover:text-black hover:underline transition-all"
+            >
+              beigelobd@gmail.com
+            </a>
           </ul>
         </div>
       </div>

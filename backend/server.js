@@ -19,33 +19,28 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // CORS Setup
 const allowedOrigins = [
-  // Live Domains
   "https://beigelo.com",
   "https://www.beigelo.com",
   "https://iamadmin.beigelo.com",
   "https://api.beigelo.com",
-  
-  // Localhost
   "http://localhost:5174",
   "http://localhost:5173",
   "http://localhost:4000",
-
-  // Optional: HTTP versions
   "http://beigelo.com",
-  "http://www.beigelo.com"
+  "http://www.beigelo.com",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) !== -1) {
         return callback(null, true);
       } else {
         console.error("❌ CORS Blocked Request from:", origin);
-        const msg = "The CORS policy for this site does not allow access from the specified Origin.";
+        const msg =
+          "The CORS policy for this site does not allow access from the specified Origin.";
         return callback(new Error(msg), false);
       }
     },
@@ -63,44 +58,45 @@ app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 
-// API Route for sending email
-app.post("/api/send-email-contactpage", (req, res) => {
+// API Route for sending email (Using Nodemailer + Gmail)
+app.post("/api/send-email-contactpage", async (req, res) => {
   const { name, email, message } = req.body;
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_FOR_USER_CONTACT,
-      pass: process.env.EMAIL_PASS_FOR_USER_CONTACT,
-    },
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_FOR_USER_CONTACT,
+        pass: process.env.EMAIL_PASS_FOR_USER_CONTACT,
+      },
+    });
 
-  const mailOptions = {
-    from: `"${name}" <${process.env.EMAIL_USER}>`,
-    to: process.env.EMAIL_FOR_USER_CONTACT,
-    subject: "New Message from Beigelo Contact Form",
-    html: `
+    const mailOptions = {
+      from: `"${name}" <${process.env.EMAIL_FOR_USER_CONTACT}>`,
+      replyTo: email,
+      to: process.env.EMAIL_FOR_USER_CONTACT,
+      subject: "New Message from Beigelo Contact Form",
+      html: `
         <h3>You have a new message from your website!</h3>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Message:</strong></p>
         <p>${message}</p>
-    `,
-  };
+      `,
+    };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.error("Error sending email:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Something went wrong. Please try again.",
-      });
-    }
+    const info = await transporter.sendMail(mailOptions);
     console.log("Email sent: " + info.response);
     res
       .status(200)
       .json({ success: true, message: "Message sent successfully!" });
-  });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong. Please try again.",
+    });
+  }
 });
 
 app.get("/", (req, res) => {
@@ -109,11 +105,11 @@ app.get("/", (req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-    console.error("⚠️ Server Error:", err.message);
-    if (err.message.includes("CORS")) {
-        return res.status(500).json({ success: false, message: err.message });
-    }
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+  console.error("⚠️ Server Error:", err.message);
+  if (err.message.includes("CORS")) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+  res.status(500).json({ success: false, message: "Internal Server Error" });
 });
 
 app.listen(port, () => console.log("🚀 Server Started on PORT : " + port));

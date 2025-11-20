@@ -36,12 +36,22 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/collection" element={<Collection />} />
+            <Route path="/product" element={<Collection />} />
+            <Route
+              path="/product/:categorySlug/:subCategorySlug"
+              element={<Collection />}
+            />
+            <Route
+              path="/product/:categorySlug/:subCategorySlug/:productSlug/:productId"
+              element={<Product />}
+            />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route
               path="/product/:categorySlug/:subCategorySlug/:productSlug/:productId"
               element={<Product />}
             />
+            <Route path="/collection" element={<Collection />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route path="/place-order" element={<PlaceOrder />} />
