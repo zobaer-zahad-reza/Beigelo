@@ -51,21 +51,23 @@ const Product = () => {
     }
   }, [productSlug, products, currency]);
 
-  // --- Zoom Handle ---
+  // --- Zoom Handle Function ---
   const handleMouseMove = (e) => {
     const { left, top, width, height } =
       e.currentTarget.getBoundingClientRect();
 
+    // মাউসের পজিশন অনুযায়ী শতাংশ (percentage) বের করা হচ্ছে
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
 
     setZoomStyle({
       transformOrigin: `${x}% ${y}%`,
-      transform: "scale(1.5)",
+      transform: "scale(1.5)", // Zoom Level 1.5
     });
   };
 
   const handleMouseLeave = () => {
+    // মাউস সরিয়ে নিলে ইমেজ আগের অবস্থায় ফিরে আসবে
     setZoomStyle({
       transformOrigin: "center",
       transform: "scale(1)",
@@ -138,22 +140,25 @@ const Product = () => {
               ))}
             </div>
 
-            {/* --- Main Image --- */}
+            {/* --- Main Image with Zoom Functionality --- */}
             <div className="w-full sm:w-[75%]">
               <div
-                className="w-full h-[300px] sm:h-[650px] rounded-lg overflow-hidden relative cursor-crosshair bg-white border border-gray-100"
+                // পরিবর্তন: মোবাইলে h-auto, ডেস্কটপে ফিক্সড হাইট
+                className="w-full h-auto sm:h-[650px] rounded-lg overflow-hidden relative cursor-crosshair bg-white border border-gray-100"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
               >
                 {image && (
                   <div
-                    className="w-full h-full flex items-center justify-center transition-transform duration-100 ease-out"
+                    // পরিবর্তন: ইমেজের কন্টেইনার হাইট অটো অ্যাডজাস্ট হবে
+                    className="w-full h-auto sm:h-full flex items-center justify-center transition-transform duration-100 ease-out"
                     style={zoomStyle}
                   >
                     <OptimizedProductImage
                       publicId={getPublicIdFromUrl(image)}
                       name={productData.name}
-                      className="w-full h-full object-contain pointer-events-none"
+                      // পরিবর্তন: মোবাইলে h-auto যাতে অ্যাসপেক্ট রেশিও ঠিক থাকে
+                      className="w-full h-auto sm:h-full sm:object-contain pointer-events-none"
                     />
                   </div>
                 )}
