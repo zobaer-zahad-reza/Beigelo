@@ -23,7 +23,7 @@ const Product = () => {
   const [image, setImage] = useState("");
   const navigate = useNavigate();
 
-  // --- Zoom Logic ---
+  // --- Zoom Logic States ---
   const [zoomStyle, setZoomStyle] = useState({
     transformOrigin: "center",
     transform: "scale(1)",
@@ -51,7 +51,7 @@ const Product = () => {
     }
   }, [productSlug, products, currency]);
 
-  // --- Zoom Handle Function ---
+  // --- Zoom Handle ---
   const handleMouseMove = (e) => {
     const { left, top, width, height } =
       e.currentTarget.getBoundingClientRect();
@@ -61,7 +61,7 @@ const Product = () => {
 
     setZoomStyle({
       transformOrigin: `${x}% ${y}%`,
-      transform: "scale(2)",
+      transform: "scale(1.5)",
     });
   };
 
@@ -141,7 +141,7 @@ const Product = () => {
             {/* --- Main Image --- */}
             <div className="w-full sm:w-[75%]">
               <div
-                className="w-full h-[300px] sm:h-[650px] rounded-lg overflow-hidden relative cursor-zoom-in bg-white border border-gray-100"
+                className="w-full h-[300px] sm:h-[650px] rounded-lg overflow-hidden relative cursor-crosshair bg-white border border-gray-100"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
               >
