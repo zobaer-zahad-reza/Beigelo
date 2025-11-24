@@ -12,7 +12,6 @@ const Cart = () => {
     currency,
     cartItems,
     updateQuantity,
-    addToCart,
     navigate,
     user,
     setBuyNowItem,
@@ -59,6 +58,14 @@ const Cart = () => {
         {cartData.map((item, index) => {
           const productData = products.find((p) => p._id === item._id);
           if (!productData) return null;
+          const hasOffer =
+            productData.offerPrice &&
+            productData.offerPrice > 0 &&
+            productData.offerPrice < productData.price;
+            
+          const finalPrice = hasOffer
+            ? productData.offerPrice
+            : productData.price;
 
           return (
             <div
@@ -77,11 +84,20 @@ const Cart = () => {
                   <p className="text-xl sm:text-lg font-bold">
                     {productData.name}
                   </p>
-                  <div className="flex items-center gap-5 mt-2">
-                    <p>
+                  <div className="flex items-center gap-3 mt-2">
+                    <p className="font-semibold">
                       {currency}
-                      {productData.price}
+                      {finalPrice}
                     </p>
+                    
+                    {hasOffer && (
+                      <p className="text-gray-400 line-through text-sm">
+                        {currency}
+                        {productData.price}
+                      </p>
+                    )}
+                    {/* ----------------------------- */}
+                    
                     <p className="px-2 sm:px-3 sm:py-1 border bg-slate-50">
                       {item.size}
                     </p>

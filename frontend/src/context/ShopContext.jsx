@@ -71,7 +71,7 @@ const ShopContextProvider = (props) => {
     }
   };
 
-const addToCart = async (itemId, size = "default") => {
+  const addToCart = async (itemId, size = "default") => {
 
     if (!token) {
       Swal.fire({
@@ -83,23 +83,24 @@ const addToCart = async (itemId, size = "default") => {
       return;
     }
 
-    // ২. GTM ট্র্যাকিং কোড (এখানে বসাতে হবে)
-    // প্রোডাক্টের ডিটেইলস খুঁজে বের করা (GA4/FB-তে প্রাইস পাঠানোর জন্য)
-    // দ্রষ্টব্য: আপনার context-এ যদি 'products' লিস্ট থাকে তবেই এটি কাজ করবে
     const productToAdd = products.find((product) => product._id === itemId);
 
     if (productToAdd) {
+      const priceToTrack = (productToAdd.offerPrice && productToAdd.offerPrice > 0 && productToAdd.offerPrice < productToAdd.price)
+        ? productToAdd.offerPrice 
+        : productToAdd.price;
+
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
-        event: "add_to_cart", // এই নামটি GTM Trigger-এ হুবহু থাকতে হবে
+        event: "add_to_cart",
         ecommerce: {
           currency: "BDT",
-          value: productToAdd.price, // প্রোডাক্টের দাম
+          value: priceToTrack,
           items: [
             {
               item_id: itemId,
               item_name: productToAdd.name,
-              price: productToAdd.price,
+              price: priceToTrack,
               quantity: 1,
               variant: size,
             },
@@ -130,12 +131,17 @@ const addToCart = async (itemId, size = "default") => {
     }
   };
 
-
   const buyNow = (itemId, size = "default") => {
     const product = products.find((p) => p._id === itemId);
     if (product) {
+        const finalPrice = (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price)
+            ? product.offerPrice
+            : product.price;
+
         const itemToBuy = {
             ...product,
+            price: finalPrice,
+            originalPrice: product.price,
             quantity: 1,
             size: size,
         };
@@ -183,8 +189,18 @@ const addToCart = async (itemId, size = "default") => {
     for (const itemId in cartItems) {
       const product = products.find((p) => p._id === itemId);
       if (product) {
+        const priceToUse = (product.offerPrice && product.offerPrice > 0 && product.offerPrice < product.price)
+            ? product.offerPrice 
+            : product.price;
+
         for (const size in cartItems[itemId]) {
-          total += product.price * cartItems[itemId][size];
+          try {
+             if (cartItems[itemId][size] > 0) {
+                total += priceToUse * cartItems[itemId][size];
+             }
+          } catch (error) {
+              console.log(error);
+          }
         }
       }
     }
@@ -205,7 +221,7 @@ const addToCart = async (itemId, size = "default") => {
           if (res.data.success) {
             const fetchedUser = res.data.user;
             setUser(fetchedUser);
-setName(fetchedUser.name);
+            setName(fetchedUser.name);
             setEmail(fetchedUser.email);
             setAvatar(fetchedUser.avatar);
             await getUserCart(token);
