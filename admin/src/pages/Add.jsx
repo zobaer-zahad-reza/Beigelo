@@ -8,6 +8,8 @@ const Add = ({ token, backendUrl }) => {
   const [image2, setImage2] = useState(false);
   const [image3, setImage3] = useState(false);
   const [image4, setImage4] = useState(false);
+  const [image5, setImage5] = useState(false);
+  const [image6, setImage6] = useState(false);
 
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
@@ -16,6 +18,10 @@ const Add = ({ token, backendUrl }) => {
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState("Watch");
   const [subCategory, setSubCategory] = useState("Man");
+
+  // ১. নতুন স্টেট যোগ করা হলো Watch Grade এর জন্য
+  const [watchGrade, setWatchGrade] = useState("Original");
+
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
   const [showSize, setShowSize] = useState(false);
@@ -38,10 +44,17 @@ const Add = ({ token, backendUrl }) => {
       formData.append("bestseller", bestseller);
       formData.append("sizes", JSON.stringify(sizes));
 
+      // ২. শুধুমাত্র Watch ক্যাটাগরি হলে watchGrade ডাটাবেসে পাঠাবে
+      if (category === "Watch") {
+        formData.append("watchGrade", watchGrade);
+      }
+
       image1 && formData.append("image1", image1);
       image2 && formData.append("image2", image2);
       image3 && formData.append("image3", image3);
       image4 && formData.append("image4", image4);
+      image5 && formData.append("image5", image5);
+      image6 && formData.append("image6", image6);
 
       const response = await axios.post(
         `${backendUrl}/api/product/add`,
@@ -57,9 +70,12 @@ const Add = ({ token, backendUrl }) => {
         setImage2(false);
         setImage3(false);
         setImage4(false);
+        setImage5(false);
+        setImage6(false);
         setPrice("");
         setQuantity("");
         setName("");
+        setWatchGrade("Original");
       } else {
         toast.error(response.data.message);
       }
@@ -131,6 +147,34 @@ const Add = ({ token, backendUrl }) => {
               hidden
             />
           </label>
+
+          <label htmlFor="image5">
+            <img
+              className="w-20"
+              src={!image5 ? assets.upload_area : URL.createObjectURL(image5)}
+              alt=""
+            />
+            <input
+              onChange={(e) => setImage5(e.target.files[0])}
+              type="file"
+              id="image5"
+              hidden
+            />
+          </label>
+
+          <label htmlFor="image6">
+            <img
+              className="w-20"
+              src={!image6 ? assets.upload_area : URL.createObjectURL(image6)}
+              alt=""
+            />
+            <input
+              onChange={(e) => setImage6(e.target.files[0])}
+              type="file"
+              id="image6"
+              hidden
+            />
+          </label>
         </div>
       </div>
       <div className="w-full">
@@ -168,7 +212,7 @@ const Add = ({ token, backendUrl }) => {
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8">
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 flex-wrap">
         <div>
           <p className="mb-0.5">Product Category</p>
           <select
@@ -180,6 +224,7 @@ const Add = ({ token, backendUrl }) => {
             <option value="Perfume">Perfume</option>
           </select>
         </div>
+
         <div>
           <p className="mb-0.5">Sub Category</p>
           <select
@@ -192,6 +237,27 @@ const Add = ({ token, backendUrl }) => {
           </select>
         </div>
 
+        {category === "Watch" && (
+          <div>
+            <p className="mb-0.5">Watch Grade</p>
+            <select
+              onChange={(e) => setWatchGrade(e.target.value)}
+              value={watchGrade}
+              className="w-full px-3 py-2"
+            >
+              <option value="Original">Original</option>
+              <option value="Master Copy">Master Grade</option>
+              <option value="First Copy">Euro Grade</option>
+              <option value="First Copy">1:1 Grade</option>
+              <option value="Premium Quality">AAA Grade</option>
+              <option value="Premium Quality">AAA+ Grade</option>
+              <option value="Premium Quality">AA Grade</option>
+              <option value="Premium Quality">A Grade</option>
+              <option value="Premium Quality">Swiss Grade</option>
+            </select>
+          </div>
+        )}
+
         <div>
           <p className="mb-0.5">Product Price</p>
           <input
@@ -199,7 +265,7 @@ const Add = ({ token, backendUrl }) => {
             value={price}
             className="w-full px-3 py-2 sm:w-[100px]"
             type="Number"
-            placeholder="25"
+            placeholder="৳ 2499"
           />
         </div>
 
@@ -228,91 +294,26 @@ const Add = ({ token, backendUrl }) => {
       <div className={`${showSize ? "block" : "hidden"}`}>
         <p className="mb-0.5">Product Sizes</p>
         <div className="flex gap-3">
-          <div
-            onClick={() =>
-              setSizes((prev) =>
-                prev.includes("S")
-                  ? prev.filter((item) => item !== "S")
-                  : [...prev, "S"]
-              )
-            }
-          >
-            <p
-              className={`${
-                sizes.includes("S") ? "bg-pink-100" : "bg-slate-200"
-              } px-3 py-1 cursor-pointer`}
+          {["S", "M", "L", "XL", "XXL"].map((size) => (
+            <div
+              key={size}
+              onClick={() =>
+                setSizes((prev) =>
+                  prev.includes(size)
+                    ? prev.filter((item) => item !== size)
+                    : [...prev, size]
+                )
+              }
             >
-              S
-            </p>
-          </div>
-          <div
-            onClick={() =>
-              setSizes((prev) =>
-                prev.includes("M")
-                  ? prev.filter((item) => item !== "M")
-                  : [...prev, "M"]
-              )
-            }
-          >
-            <p
-              className={`${
-                sizes.includes("M") ? "bg-pink-100" : "bg-slate-200"
-              } px-3 py-1 cursor-pointer`}
-            >
-              M
-            </p>
-          </div>
-          <div
-            onClick={() =>
-              setSizes((prev) =>
-                prev.includes("L")
-                  ? prev.filter((item) => item !== "L")
-                  : [...prev, "L"]
-              )
-            }
-          >
-            <p
-              className={`${
-                sizes.includes("L") ? "bg-pink-100" : "bg-slate-200"
-              } px-3 py-1 cursor-pointer`}
-            >
-              L
-            </p>
-          </div>
-          <div
-            onClick={() =>
-              setSizes((prev) =>
-                prev.includes("XL")
-                  ? prev.filter((item) => item !== "XL")
-                  : [...prev, "XL"]
-              )
-            }
-          >
-            <p
-              className={`${
-                sizes.includes("XL") ? "bg-pink-100" : "bg-slate-200"
-              } px-3 py-1 cursor-pointer`}
-            >
-              XL
-            </p>
-          </div>
-          <div
-            onClick={() =>
-              setSizes((prev) =>
-                prev.includes("XXL")
-                  ? prev.filter((item) => item !== "XXL")
-                  : [...prev, "XXL"]
-              )
-            }
-          >
-            <p
-              className={`${
-                sizes.includes("XXL") ? "bg-pink-100" : "bg-slate-200"
-              } px-3 py-1 cursor-pointer`}
-            >
-              XXL
-            </p>
-          </div>
+              <p
+                className={`${
+                  sizes.includes(size) ? "bg-pink-100" : "bg-slate-200"
+                } px-3 py-1 cursor-pointer`}
+              >
+                {size}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
