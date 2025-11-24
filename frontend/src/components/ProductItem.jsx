@@ -86,7 +86,7 @@ const ProductItem = ({
         <div className="flex items-center justify-between">
           <p
             className={`text-base font-bold ${
-              isSoldOut ? "text-gray-400 line-through" : "text-black"
+              isSoldOut ? "text-gray-400 line-through hidden" : "text-black"
             }`}
           >
             {currency} {price}
