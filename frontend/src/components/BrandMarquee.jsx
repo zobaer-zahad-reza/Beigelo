@@ -11,16 +11,29 @@ import Title from "./Title";
 
 const imageArr = [
   {
-    imgLink: "https://i.ibb.co.com/hxb67wSz/Frank-Muller.jpg",
+    imgLink: "https://i.ibb.co.com/4gS6VQsv/download.jpg",
     name: "Frank_Muller",
   },
   {
-    imgLink: "https://i.ibb.co.com/0RvwqCCD/Tissot-Fina.jpg",
+    imgLink:
+      "https://i.ibb.co.com/zVK5c6JF/tissot-logo-png-seeklogo-298018.png",
     name: "Tissot",
   },
   {
-    imgLink: "https://i.ibb.co.com/4gXZZw0V/a6aea1e1-15a0-4e8b-ac77-1eb2932e7835.jpg",
-    name: "Frank_Muller",
+    imgLink: "https://i.ibb.co.com/zhCKKWQJ/download.png",
+    name: "Omega",
+  },
+  {
+    imgLink: "https://i.ibb.co.com/ym00jkYp/download.png",
+    name: "Tag-Heuer",
+  },
+  {
+    imgLink: "https://i.ibb.co.com/1fLDccqK/images.png",
+    name: "Fossil",
+  },
+  {
+    imgLink: "https://i.ibb.co.com/VpqyrQVP/download.png",
+    name: "Rolex",
   },
 ];
 
