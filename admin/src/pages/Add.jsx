@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -14,18 +14,36 @@ const Add = ({ token, backendUrl }) => {
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
   const [description, setDescription] = useState("");
+
   const [price, setPrice] = useState("");
+  const [offerPrice, setOfferPrice] = useState("");
+  const [discount, setDiscount] = useState(0);
+
   const [quantity, setQuantity] = useState("");
   const [category, setCategory] = useState("Watch");
   const [subCategory, setSubCategory] = useState("Man");
-
-  // ১. নতুন স্টেট যোগ করা হলো Watch Grade এর জন্য
   const [watchGrade, setWatchGrade] = useState("Original");
-
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
   const [showSize, setShowSize] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const regularPrice = parseFloat(price);
+    const discountedPrice = parseFloat(offerPrice);
+
+    if (
+      regularPrice > 0 &&
+      discountedPrice > 0 &&
+      regularPrice > discountedPrice
+    ) {
+      const discountValue =
+        ((regularPrice - discountedPrice) / regularPrice) * 100;
+      setDiscount(Math.round(discountValue));
+    } else {
+      setDiscount(0);
+    }
+  }, [price, offerPrice]);
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -38,13 +56,17 @@ const Add = ({ token, backendUrl }) => {
       formData.append("brand", brand);
       formData.append("description", description);
       formData.append("price", price);
+
+      if (offerPrice) {
+        formData.append("offerPrice", offerPrice);
+      }
+
       formData.append("quantity", quantity);
       formData.append("category", category);
       formData.append("subCategory", subCategory);
       formData.append("bestseller", bestseller);
       formData.append("sizes", JSON.stringify(sizes));
 
-      // ২. শুধুমাত্র Watch ক্যাটাগরি হলে watchGrade ডাটাবেসে পাঠাবে
       if (category === "Watch") {
         formData.append("watchGrade", watchGrade);
       }
@@ -73,6 +95,7 @@ const Add = ({ token, backendUrl }) => {
         setImage5(false);
         setImage6(false);
         setPrice("");
+        setOfferPrice("");
         setQuantity("");
         setName("");
         setWatchGrade("Original");
@@ -94,7 +117,7 @@ const Add = ({ token, backendUrl }) => {
     >
       <div>
         <p className="mb-0.2">Upload Image</p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <label htmlFor="image1">
             <img
               className="w-20"
@@ -147,7 +170,6 @@ const Add = ({ token, backendUrl }) => {
               hidden
             />
           </label>
-
           <label htmlFor="image5">
             <img
               className="w-20"
@@ -161,7 +183,6 @@ const Add = ({ token, backendUrl }) => {
               hidden
             />
           </label>
-
           <label htmlFor="image6">
             <img
               className="w-20"
@@ -177,6 +198,7 @@ const Add = ({ token, backendUrl }) => {
           </label>
         </div>
       </div>
+
       <div className="w-full">
         <p className="mb-0.5">Product Name</p>
         <input
@@ -246,36 +268,55 @@ const Add = ({ token, backendUrl }) => {
               className="w-full px-3 py-2"
             >
               <option value="Original">Original</option>
-              <option value="Master Copy">Master Grade</option>
-              <option value="First Copy">Euro Grade</option>
-              <option value="First Copy">1:1 Grade</option>
-              <option value="Premium Quality">AAA Grade</option>
-              <option value="Premium Quality">AAA+ Grade</option>
-              <option value="Premium Quality">AA Grade</option>
-              <option value="Premium Quality">A Grade</option>
-              <option value="Premium Quality">Swiss Grade</option>
+              <option value="Master Grade">Master Grade</option>
+              <option value="Euro Grade">Euro Grade</option>
+              <option value="1:1 Grade">1:1 Grade</option>
+              <option value="AAA Grade">AAA Grade</option>
+              <option value="AAA+ Grade">AAA+ Grade</option>
+              <option value="AA Grade">AA Grade</option>
+              <option value="A Grade">A Grade</option>
+              <option value="Swiss Grade">Swiss Grade</option>
             </select>
           </div>
         )}
 
+        {/* --- Price, Offer Price & Discount Section --- */}
         <div>
-          <p className="mb-0.5">Product Price</p>
+          <p className="mb-0.5">Regular Price</p>
           <input
             onChange={(e) => setPrice(e.target.value)}
+            required
             value={price}
-            className="w-full px-3 py-2 sm:w-[100px]"
-            type="Number"
-            placeholder="৳ 2499"
+            className="w-full px-3 py-2 sm:w-[120px]"
+            type="number"
+            placeholder="৳ 2500"
           />
         </div>
 
+        <div className="relative">
+          <p className="mb-0.5">Offer Price</p>
+          <input
+            onChange={(e) => setOfferPrice(e.target.value)}
+            value={offerPrice}
+            className="w-full px-3 py-2 sm:w-[120px]"
+            type="number"
+            placeholder="৳ 2000"
+          />
+          {/* Discount Badge */}
+          {discount > 0 && (
+            <span className="absolute -top-3 -right-2 bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
+              {discount}% OFF
+            </span>
+          )}
+        </div>
+
         <div>
-          <p className="mb-0.5">Product Quantity</p>
+          <p className="mb-0.5">Quantity</p>
           <input
             onChange={(e) => setQuantity(e.target.value)}
             value={quantity}
             className="w-full px-3 py-2 sm:w-[100px]"
-            type="Number"
+            type="number"
             placeholder="10"
             required
           />
