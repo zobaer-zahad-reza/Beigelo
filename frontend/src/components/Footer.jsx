@@ -1,6 +1,7 @@
 import React from "react";
 // import { assets } from "../assets/assets";
 import { Link } from "react-router-dom";
+import NavLogo from "../assets/NavLogo.png";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -10,7 +11,7 @@ const Footer = () => {
       <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm">
         <div>
           <Link to="/">
-            <h1 className="text-5xl playfair-display-navlogo">Beigelo</h1>
+            <img className="w-40" src={NavLogo} alt="Logo" />
           </Link>
           <p className="w-full md:w-2/3 text-gray-600 mt-4">
             Crafting timeless accessories for the modern you. At Beigelo, we
