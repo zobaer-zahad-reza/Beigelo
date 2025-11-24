@@ -212,8 +212,7 @@ const Collection = () => {
                 categoryName={item.category}
                 subCategory={item.subCategory}
                 productSlug={item.name.toLowerCase().split(" ").join("-")}
-                rating={item.rating}
-                reviews={item.reviews}
+                quantity={item.quantity}
               />
             ))}
           </div>

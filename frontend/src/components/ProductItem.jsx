@@ -19,17 +19,20 @@ const ProductItem = ({
   price,
   categoryName,
   subCategory,
+  quantity,
 }) => {
   const { currency } = useContext(ShopContext);
   const [isHovered, setIsHovered] = useState(false);
+
+  const isSoldOut = quantity === 0;
 
   const publicId1 = getPublicIdFromUrl(image[0]);
   const publicId2 = image[1] ? getPublicIdFromUrl(image[1]) : null;
   const publicIdToShow = isHovered && publicId2 ? publicId2 : publicId1;
 
   const imageClassName = `transition-all duration-500 ease-in-out ${
-    isHovered ? "scale-110" : "scale-100"
-  }`;
+    isHovered && !isSoldOut ? "scale-110" : "scale-100"
+  } `;
 
   const categorySlug = slugify(categoryName || "item", {
     lower: true,
@@ -45,12 +48,19 @@ const ProductItem = ({
 
   return (
     <Link
-      className="text-gray-700 cursor-pointer"
+      className={`text-gray-700 cursor-pointer block `}
       to={productUrl}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="overflow-hidden">
+      <div className="overflow-hidden relative rounded-sm">
+        {/* --- SOLD OUT BADGE --- */}
+        {isSoldOut && (
+          <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md uppercase tracking-wider">
+            Sold Out
+          </div>
+        )}
+
         {publicIdToShow ? (
           <OptimizedProductImage
             className={imageClassName}
@@ -70,12 +80,23 @@ const ProductItem = ({
 
       <div className="pt-3 px-1 flex flex-col gap-0.5">
         {brand && <p className="text-sm text-gray-500">{brand}</p>}
-        <p className="pt-0.5 pr-2 pb-0 text-base font-medium text-gray-800 ">
+        <p className="pt-0.5 pr-2 pb-0 text-base font-medium text-gray-800 truncate">
           {name}
         </p>
-        <p className="text-base font-bold text-black">
-          {currency} {price}
-        </p>
+        <div className="flex items-center justify-between">
+          <p
+            className={`text-base font-bold ${
+              isSoldOut ? "text-gray-400 line-through" : "text-black"
+            }`}
+          >
+            {currency} {price}
+          </p>
+          {isSoldOut && (
+            <span className="text-xs text-red-500 font-medium">
+              Out of Stock
+            </span>
+          )}
+        </div>
       </div>
     </Link>
   );

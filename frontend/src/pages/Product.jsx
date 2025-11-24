@@ -7,6 +7,7 @@ import Spinner from "../components/Spinner";
 import ProdRating from "../components/ProdRating";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import slugify from "slugify";
+import { FaWhatsapp } from "react-icons/fa";
 
 const getPublicIdFromUrl = (url) => {
   if (!url) return "";
@@ -22,6 +23,8 @@ const Product = () => {
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState("");
   const navigate = useNavigate();
+
+  const yourWhatsAppNumber = "8801630071818";
 
   // --- Zoom Logic States ---
   const [zoomStyle, setZoomStyle] = useState({
@@ -72,9 +75,22 @@ const Product = () => {
     });
   };
 
+  // WhatsApp Button Handler
+  const handleWhatsAppRequest = () => {
+    if (!productData) return;
+    const message = `Hi, I am interested in "${productData.name}" but it is currently Sold Out. Can you please let me know if it becomes available?`;
+    const url = `https://wa.me/${yourWhatsAppNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(url, "_blank");
+  };
+
   if (!productData) {
     return <Spinner />;
   }
+
+  // --- SOLD OUT CHECK ---
+  const isSoldOut = productData.quantity === 0;
 
   const productSchema = {
     "@context": "https://schema.org/",
@@ -90,7 +106,9 @@ const Product = () => {
       "@type": "Offer",
       priceCurrency: "BDT",
       price: productData.price,
-      availability: "https://schema.org/InStock",
+      availability: isSoldOut
+        ? "https://schema.org/OutOfStock"
+        : "https://schema.org/InStock",
       url: window.location.href,
     },
   };
@@ -132,7 +150,7 @@ const Product = () => {
                   <OptimizedProductImage
                     publicId={getPublicIdFromUrl(itemUrl)}
                     name={productData.name}
-                    className="w-full h-full object-contain"
+                    className={`w-full h-full object-contain`}
                   />
                 </div>
               ))}
@@ -145,15 +163,22 @@ const Product = () => {
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
               >
+                {/* SOLD OUT BADGE */}
+                {isSoldOut && (
+                  <div className="absolute top-4 left-4 z-20 bg-red-600 text-white px-4 py-1.5 rounded font-bold shadow-lg text-sm uppercase tracking-widest">
+                    Sold Out
+                  </div>
+                )}
+
                 {image && (
                   <div
-                    className="w-full h-auto  flex items-center justify-center transition-transform duration-100 ease-out"
+                    className="w-full h-auto flex items-center justify-center transition-transform duration-100 ease-out"
                     style={zoomStyle}
                   >
                     <OptimizedProductImage
                       publicId={getPublicIdFromUrl(image)}
                       name={productData.name}
-                      className="w-full h-auto  sm:object-contain pointer-events-none"
+                      className={`w-full h-auto sm:object-contain pointer-events-none `}
                     />
                   </div>
                 )}
@@ -171,66 +196,80 @@ const Product = () => {
               </h2>
             )}
 
-            <div className="flex items-center gap-1 mt-2">
-              <ProdRating />
-              <p className="pl-2 text-sm text-gray-500">({138} reviews)</p>
+            <div className="mt-4 flex items-center gap-4">
+              <p
+                className={`text-3xl font-bold ${
+                  isSoldOut ? "text-gray-400 line-through" : "text-black"
+                }`}
+              >
+                {currency}
+                {productData.price}
+              </p>
+              {isSoldOut && (
+                <span className="text-xl font-bold text-red-600">
+                  Out of Stock
+                </span>
+              )}
             </div>
-
-            <p className="mt-4 text-3xl font-bold text-black">
-              {currency}
-              {productData.price}
-            </p>
 
             <p className="mt-4 text-gray-600 md:w-4/5">
               {productData.description}
             </p>
 
-            {/* --- Button Section--- */}
+            {/* --- Button Section --- */}
             <div className="flex flex-col gap-3 mt-6 max-w-xs">
+              {/* Add To Cart Button */}
               <button
                 onClick={() => addToCart(productData._id)}
-                className="w-full bg-white text-black border border-black py-3 text-sm font-medium active:bg-gray-200 hover:bg-gray-100 transition-colors"
+                disabled={isSoldOut}
+                className={`w-full border py-3 text-sm font-medium transition-colors ${
+                  isSoldOut
+                    ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
+                    : "bg-white text-black border-black active:bg-gray-200 hover:bg-gray-100"
+                }`}
               >
-                ADD TO CART
+                {isSoldOut ? "OUT OF STOCK" : "ADD TO CART"}
               </button>
+
+              {/* Buy Now Button */}
               <button
                 onClick={() => buyNow(productData._id)}
-                className="w-full bg-black text-white py-3 text-sm font-medium active:bg-gray-700 hover:bg-gray-800 transition-colors"
+                disabled={isSoldOut}
+                className={`w-full py-3 text-sm font-medium transition-colors ${
+                  isSoldOut
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-black text-white active:bg-gray-700 hover:bg-gray-800"
+                }`}
               >
-                BUY NOW
+                {isSoldOut ? "UNAVAILABLE" : "BUY NOW"}
               </button>
+
+              {/* WhatsApp Request Button */}
+              {isSoldOut && (
+                <button
+                  onClick={handleWhatsAppRequest}
+                  className="w-full bg-green-600 text-white border border-green-600 py-3 text-sm font-medium active:bg-green-700 hover:bg-green-700 transition-colors flex items-center justify-center gap-2 mt-2 rounded-sm shadow-sm"
+                >
+                  <FaWhatsapp size={24} />
+                  Request Restock via WhatsApp
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Description and Review Section */}
+        {/* Description and Review Section*/}
         <div className="mt-20">
           <div className="flex">
             <b className="border px-5 py-3 text-sm bg-gray-50">Description</b>
           </div>
 
-          {/* --- Description Box --- */}
           <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-600">
             <p className="flex items-center gap-2">
               <span>🛡️</span>
               <span>
                 Experience the assurance of 100% original and authentic
                 products, crafted to meet the highest standards of quality.
-              </span>
-            </p>
-            <p className="flex items-center gap-2">
-              <span>🚚</span>
-              <span>
-                Enjoy the convenience of Cash on Delivery, giving you full
-                confidence in every purchase.
-              </span>
-            </p>
-            <p className="flex items-center gap-2">
-              <span>↩️</span>
-              <span>
-                We value your satisfaction above all — that’s why we offer a
-                simple 7-day return and exchange policy, ensuring a smooth and
-                worry-free shopping experience.
               </span>
             </p>
             <p className="mt-2 font-medium text-gray-700">
