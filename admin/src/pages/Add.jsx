@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import axios from "axios";
 import { toast } from "react-toastify";
+import DescriptionEditor from "../components/DescriptionEditor";
 
 const Add = ({ token, backendUrl }) => {
   const [image1, setImage1] = useState(false);
@@ -222,19 +223,15 @@ const Add = ({ token, backendUrl }) => {
         />
       </div>
 
-      <div className="w-full">
+      <div className="w-full max-w-[500px]">
         <p className="mb-0.5">Product Description</p>
-        <textarea
-          onChange={(e) => setDescription(e.target.value)}
-          value={description}
-          className="w-full max-w-[400px] px-3 py-2"
-          type="text"
-          placeholder="Write Content Here"
-          required
+        <DescriptionEditor 
+            value={description} 
+            onChange={setDescription} 
         />
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 flex-wrap">
+      <div className="flex flex-col sm:flex-row gap-2 w-full sm:gap-8 flex-wrap pt-4 sm:pt-0">
         <div>
           <p className="mb-0.5">Product Category</p>
           <select
@@ -280,7 +277,6 @@ const Add = ({ token, backendUrl }) => {
           </div>
         )}
 
-        {/* --- Price, Offer Price & Discount Section --- */}
         <div>
           <p className="mb-0.5">Regular Price</p>
           <input
@@ -302,7 +298,6 @@ const Add = ({ token, backendUrl }) => {
             type="number"
             placeholder="৳ 2000"
           />
-          {/* Discount Badge */}
           {discount > 0 && (
             <span className="absolute -top-3 -right-2 bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm">
               {discount}% OFF

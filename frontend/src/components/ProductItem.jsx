@@ -17,6 +17,7 @@ const ProductItem = ({
   name,
   brand,
   price,
+  offerPrice,
   categoryName,
   subCategory,
   quantity,
@@ -25,6 +26,12 @@ const ProductItem = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const isSoldOut = quantity === 0;
+
+  // --- Discount ---
+  const hasDiscount = offerPrice && offerPrice > 0 && offerPrice < price;
+  const discountPercentage = hasDiscount
+    ? Math.round(((price - offerPrice) / price) * 100)
+    : 0;
 
   const publicId1 = getPublicIdFromUrl(image[0]);
   const publicId2 = image[1] ? getPublicIdFromUrl(image[1]) : null;
@@ -61,6 +68,13 @@ const ProductItem = ({
           </div>
         )}
 
+        {/* --- DISCOUNT BADGE --- */}
+        {!isSoldOut && hasDiscount && (
+          <div className="absolute top-2 right-2 z-10 bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md">
+            -{discountPercentage}% OFF
+          </div>
+        )}
+
         {publicIdToShow ? (
           <OptimizedProductImage
             className={imageClassName}
@@ -83,14 +97,26 @@ const ProductItem = ({
         <p className="pt-0.5 pr-2 pb-0 text-base font-medium text-gray-800 truncate">
           {name}
         </p>
-        <div className="flex items-center justify-between">
-          <p
-            className={`text-base font-bold ${
-              isSoldOut ? "text-gray-400 line-through hidden" : "text-black"
-            }`}
-          >
-            {currency} {price}
-          </p>
+
+        {/* --- Price Section --- */}
+        <div className="flex items-center justify-between mt-1">
+          <div className="flex items-center gap-2">
+            {/* Main Price */}
+            <p
+              className={`text-base font-bold ${
+                isSoldOut ? "text-gray-400 line-through" : "text-black"
+              }`}
+            >
+              {currency} {hasDiscount ? offerPrice : price}
+            </p>
+
+            {hasDiscount && !isSoldOut && (
+              <p className="text-xs text-gray-400 line-through">
+                {currency} {price}
+              </p>
+            )}
+          </div>
+
           {isSoldOut && (
             <span className="text-xs text-red-500 font-medium">
               Out of Stock

@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import RelatedProduct from "../components/RelatedProduct";
 import OptimizedProductImage from "../components/OptimizedProductImage";
 import Spinner from "../components/Spinner";
-import ProdRating from "../components/ProdRating";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import slugify from "slugify";
 import { FaWhatsapp } from "react-icons/fa";
@@ -22,7 +21,6 @@ const Product = () => {
   const { products, currency, addToCart, buyNow } = useContext(ShopContext);
   const [productData, setProductData] = useState(null);
   const [image, setImage] = useState("");
-  const navigate = useNavigate();
 
   const yourWhatsAppNumber = "8801630071818";
 
@@ -48,7 +46,7 @@ const Product = () => {
         content_name: currentProduct.name,
         content_ids: [currentProduct._id],
         content_category: currentProduct.category,
-        value: currentProduct.price,
+        value: currentProduct.offerPrice > 0 ? currentProduct.offerPrice : currentProduct.price,
         currency: "BDT",
       });
     }
@@ -92,6 +90,12 @@ const Product = () => {
   // --- SOLD OUT CHECK ---
   const isSoldOut = productData.quantity === 0;
 
+  // --- DISCOUNT ---
+  const hasDiscount = productData.offerPrice && productData.offerPrice > 0 && productData.offerPrice < productData.price;
+  const discountPercentage = hasDiscount
+    ? Math.round(((productData.price - productData.offerPrice) / productData.price) * 100)
+    : 0;
+
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -105,7 +109,7 @@ const Product = () => {
     offers: {
       "@type": "Offer",
       priceCurrency: "BDT",
-      price: productData.price,
+      price: hasDiscount ? productData.offerPrice : productData.price, // Schema Updated
       availability: isSoldOut
         ? "https://schema.org/OutOfStock"
         : "https://schema.org/InStock",
@@ -129,7 +133,7 @@ const Product = () => {
           />
           <meta property="og:image" content={productData.image[0]} />
           <meta property="og:type" content="product" />
-          <meta property="product:price:amount" content={productData.price} />
+          <meta property="product:price:amount" content={hasDiscount ? productData.offerPrice : productData.price} />
           <meta property="product:price:currency" content="BDT" />
           <script type="application/ld+json">
             {JSON.stringify(productSchema)}
@@ -169,6 +173,13 @@ const Product = () => {
                     Sold Out
                   </div>
                 )}
+                
+                {/* DISCOUNT BADGE ON IMAGE */}
+                {!isSoldOut && hasDiscount && (
+                   <div className="absolute top-4 right-4 z-20 bg-green-500 text-white px-3 py-1 rounded-full font-bold shadow-md text-sm">
+                     {discountPercentage}% OFF
+                   </div>
+                )}
 
                 {image && (
                   <div
@@ -196,25 +207,44 @@ const Product = () => {
               </h2>
             )}
 
-            <div className="mt-4 flex items-center gap-4">
-              <p
-                className={`text-3xl font-bold ${
-                  isSoldOut ? "text-gray-400 line-through" : "text-black"
-                }`}
-              >
-                {currency}
-                {productData.price}
-              </p>
-              {isSoldOut && (
-                <span className="text-xl font-bold text-red-600">
-                  Out of Stock
-                </span>
-              )}
-            </div>
+            <div className="mt-4 flex flex-col gap-1">
+              <div className="flex items-center gap-4">
+                {/* Main Price */}
+                <p
+                  className={`text-3xl font-bold ${
+                    isSoldOut ? "text-gray-400 line-through" : "text-black"
+                  }`}
+                >
+                  {currency}
+                  {hasDiscount ? productData.offerPrice : productData.price}
+                </p>
 
-            <p className="mt-4 text-gray-600 md:w-4/5">
-              {productData.description}
-            </p>
+                {/* Old Price & Badge */}
+                {hasDiscount && !isSoldOut && (
+                    <div className="flex items-center gap-2">
+                        <p className="text-xl text-gray-400 line-through font-medium">
+                            {currency}{productData.price}
+                        </p>
+                        <span className="bg-pink-100 text-pink-600 px-2 py-1 text-xs font-bold rounded">
+                            SAVE {discountPercentage}%
+                        </span>
+                    </div>
+                )}
+                
+                {/* Out of stock Text */}
+                {isSoldOut && (
+                  <span className="text-xl font-bold text-red-600">
+                    Out of Stock
+                  </span>
+                )}
+              </div>
+            </div>
+            {/* ----------------------------- */}
+
+            <div
+              className="mt-4 text-gray-600 md:w-4/5"
+              dangerouslySetInnerHTML={{ __html: productData.description }}
+            />
 
             {/* --- Button Section --- */}
             <div className="flex flex-col gap-3 mt-6 max-w-xs">

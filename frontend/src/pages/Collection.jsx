@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom"; // useParams এখানে যুক্ত করা হয়েছে
+import { useParams, Link } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import Title from "../components/Title";
@@ -142,7 +142,7 @@ const Collection = () => {
           </div>
         </div>
 
-        {/* Sub-Category Filter */}
+        {/* Sub-Category*/}
         <div
           className={`border border-gray-300 pl-5 py-3 my-5 ${
             showFilter ? "" : "hidden"
@@ -199,7 +199,7 @@ const Collection = () => {
           </select>
         </div>
 
-        {/* Map Products */}
+        {/* Products */}
         {filterProducts.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
             {filterProducts.map((item, index) => (
@@ -213,6 +213,7 @@ const Collection = () => {
                 subCategory={item.subCategory}
                 productSlug={item.name.toLowerCase().split(" ").join("-")}
                 quantity={item.quantity}
+                offerPrice={item.offerPrice}
               />
             ))}
           </div>
