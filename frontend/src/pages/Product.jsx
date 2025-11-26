@@ -175,7 +175,7 @@ const Product = () => {
             {/* --- Main Image --- */}
             <div className="w-full sm:w-[75%]">
               <div
-                className="w-full h-auto sm:h-[650px] rounded-lg overflow-hidden relative cursor-zoom-in bg-white border border-gray-100"
+                className="w-full h-auto rounded-lg overflow-hidden relative cursor-zoom-in bg-white border border-gray-100"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
               >
