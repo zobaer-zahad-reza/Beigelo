@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import RelatedProduct from "../components/RelatedProduct";
 import OptimizedProductImage from "../components/OptimizedProductImage";
@@ -173,7 +173,7 @@ const Product = () => {
             </div>
 
             {/* --- Main Image --- */}
-            <div className="w-full sm:w-[75%]">
+            <div className="w-full sm:w-[65%]">
               <div
                 className="w-full h-auto rounded-lg overflow-hidden relative cursor-zoom-in bg-white border border-gray-100"
                 onMouseMove={handleMouseMove}
@@ -214,8 +214,9 @@ const Product = () => {
             <h1 className="font-medium text-3xl">{productData.name}</h1>
 
             {productData.brand && (
-              <h2 className="text-lg text-gray-700 font-semibold mt-1">
-                {productData.brand}
+              <h2 className="text-lg text-gray-700 font-semibold mt-2">
+                Brand:{" "}
+                <Link to={`${productData.brand}`}>{productData.brand}</Link>
               </h2>
             )}
 

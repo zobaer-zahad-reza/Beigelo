@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { FaTimes } from "react-icons/fa";
+import React from "react";
 import {
   FaFacebookF,
   FaInstagram,
   FaYoutube,
   FaWhatsapp,
-  FaCommentDots,
 } from "react-icons/fa6";
 
-// --- Data Array ---
+// All social Links
 const socialLinks = [
   {
     name: "Facebook",
@@ -50,73 +48,8 @@ const socialLinks = [
 ];
 
 const SocialSideNav = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-
-    return () => {
-      window.removeEventListener("resize", checkIsMobile);
-    };
-  }, []);
-
-  const toggleBubble = () => {
-    setIsOpen(!isOpen);
-  };
-
-  if (isMobile) {
-    return (
-      <div className="fixed bottom-16 right-6 z-[999]">
-        {/* Main Chat Bubble Button */}
-        <button
-          onClick={toggleBubble}
-          className="relative w-14 h-14 rounded-full bg-blue-600 text-white flex items-center justify-center 
-                     shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out"
-        >
-          {isOpen ? (
-            <FaTimes className="text-2xl" />
-          ) : (
-            <FaCommentDots className="text-2xl" />
-          )}
-        </button>
-
-        <div
-          className={`absolute bottom-full right-0 mb-4 flex flex-col items-end space-y-3 transition-all duration-300 ease-in-out ${
-            isOpen
-              ? "opacity-100 visible translate-y-0"
-              : "opacity-0 invisible translate-y-4"
-          }`}
-        >
-          {socialLinks.map((link, index) => (
-            <a
-              key={link.name}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`
-                relative w-12 h-12 rounded-full text-white flex items-center justify-center 
-                shadow-md transition-all duration-300 ease-in-out transform
-                ${link.bgColor} ${link.hoverBgColor} ${link.shadow}
-                ${isOpen ? "scale-100" : "scale-0"}
-                `}
-              style={{ transitionDelay: isOpen ? `${index * 0.05}s` : "0s" }}
-            >
-              <link.icon className="text-xl z-[2]" />
-            </a>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <nav className="fixed top-1/2 right-0 -translate-y-1/2 z-[999]">
+    <nav className="fixed top-1/2 right-0 -translate-y-1/2 z-[999] hidden sm:block">
       <ul className="list-none m-0 p-0">
         {socialLinks.map((link) => (
           <li
