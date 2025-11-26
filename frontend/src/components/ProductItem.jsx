@@ -97,7 +97,7 @@ const ProductItem = ({
 
       <div className="pt-3 px-1 flex flex-col gap-0.5">
         {brand && <p className="text-sm text-gray-500">{brand}</p>}
-        <p className="pt-0.5 pr-2 pb-0 text-base font-medium text-gray-800 truncate">
+        <p className="pt-0.5 pr-2 pb-0 text-base text-wrap font-medium text-gray-800 truncate">
           {name}
         </p>
 
