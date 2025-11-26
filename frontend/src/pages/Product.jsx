@@ -253,11 +253,6 @@ const Product = () => {
               </div>
             </div>
 
-            <div
-              className="mt-4 text-gray-600 md:w-4/5"
-              dangerouslySetInnerHTML={{ __html: productData.description }}
-            />
-
             {/* --- Button Section --- */}
             <div className="flex flex-col gap-3 mt-6 max-w-xs">
               {/* Add To Cart Button */}
@@ -308,10 +303,10 @@ const Product = () => {
 
           <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-600">
             <p className="flex items-center gap-2">
-              <span>
-                Experience the assurance of 100% original and authentic
-                products, crafted to meet the highest standards of quality.
-              </span>
+              <div
+                className="mt-4 text-gray-600 md:w-4/5"
+                dangerouslySetInnerHTML={{ __html: productData.description }}
+              />
             </p>
             <p className="mt-2 font-medium text-gray-700">
               Shop smart. Shop genuine. Shop with trust and comfort.
