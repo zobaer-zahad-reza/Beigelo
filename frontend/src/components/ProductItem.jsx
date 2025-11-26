@@ -27,10 +27,13 @@ const ProductItem = ({
 
   const isSoldOut = quantity === 0;
 
-  // --- Discount ---
-  const hasDiscount = offerPrice && offerPrice > 0 && offerPrice < price;
+  const numPrice = Number(price);
+  const numOfferPrice = Number(offerPrice);
+
+  const hasDiscount = numOfferPrice > 0 && numOfferPrice < numPrice;
+
   const discountPercentage = hasDiscount
-    ? Math.round(((price - offerPrice) / price) * 100)
+    ? Math.round(((numPrice - numOfferPrice) / numPrice) * 100)
     : 0;
 
   const publicId1 = getPublicIdFromUrl(image[0]);
@@ -107,12 +110,13 @@ const ProductItem = ({
                 isSoldOut ? "text-gray-400 line-through" : "text-black"
               }`}
             >
-              {currency} {hasDiscount ? offerPrice : price}
+              {currency} {hasDiscount ? numOfferPrice : numPrice}
             </p>
 
+            {/* Old Price */}
             {hasDiscount && !isSoldOut && (
               <p className="text-xs text-gray-400 line-through">
-                {currency} {price}
+                {currency} {numPrice}
               </p>
             )}
           </div>

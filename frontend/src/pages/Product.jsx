@@ -24,7 +24,7 @@ const Product = () => {
 
   const yourWhatsAppNumber = "8801630071818";
 
-  // --- Zoom Logic States ---
+  // Zoom
   const [zoomStyle, setZoomStyle] = useState({
     transformOrigin: "center",
     transform: "scale(1)",
@@ -40,13 +40,17 @@ const Product = () => {
       setProductData(currentProduct);
       setImage(currentProduct.image[0]);
 
+      const pPrice = Number(currentProduct.price);
+      const pOffer = Number(currentProduct.offerPrice);
+      const finalPrice = pOffer > 0 && pOffer < pPrice ? pOffer : pPrice;
+
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "view_item",
         content_name: currentProduct.name,
         content_ids: [currentProduct._id],
         content_category: currentProduct.category,
-        value: currentProduct.offerPrice > 0 ? currentProduct.offerPrice : currentProduct.price,
+        value: finalPrice,
         currency: "BDT",
       });
     }
@@ -87,13 +91,18 @@ const Product = () => {
     return <Spinner />;
   }
 
-  // --- SOLD OUT CHECK ---
+  // 1. Sold Out
   const isSoldOut = productData.quantity === 0;
 
-  // --- DISCOUNT ---
-  const hasDiscount = productData.offerPrice && productData.offerPrice > 0 && productData.offerPrice < productData.price;
+  // 2. Price & Discount
+  const numPrice = Number(productData.price);
+  const numOfferPrice = Number(productData.offerPrice);
+
+  // Discount
+  const hasDiscount = numOfferPrice > 0 && numOfferPrice < numPrice;
+
   const discountPercentage = hasDiscount
-    ? Math.round(((productData.price - productData.offerPrice) / productData.price) * 100)
+    ? Math.round(((numPrice - numOfferPrice) / numPrice) * 100)
     : 0;
 
   const productSchema = {
@@ -109,7 +118,7 @@ const Product = () => {
     offers: {
       "@type": "Offer",
       priceCurrency: "BDT",
-      price: hasDiscount ? productData.offerPrice : productData.price, // Schema Updated
+      price: hasDiscount ? numOfferPrice : numPrice,
       availability: isSoldOut
         ? "https://schema.org/OutOfStock"
         : "https://schema.org/InStock",
@@ -133,7 +142,10 @@ const Product = () => {
           />
           <meta property="og:image" content={productData.image[0]} />
           <meta property="og:type" content="product" />
-          <meta property="product:price:amount" content={hasDiscount ? productData.offerPrice : productData.price} />
+          <meta
+            property="product:price:amount"
+            content={hasDiscount ? numOfferPrice : numPrice}
+          />
           <meta property="product:price:currency" content="BDT" />
           <script type="application/ld+json">
             {JSON.stringify(productSchema)}
@@ -173,12 +185,12 @@ const Product = () => {
                     Sold Out
                   </div>
                 )}
-                
-                {/* DISCOUNT BADGE ON IMAGE */}
+
+                {/* DISCOUNT BADGE ON IMAGE  */}
                 {!isSoldOut && hasDiscount && (
-                   <div className="absolute top-4 right-4 z-20 bg-green-500 text-white px-3 py-1 rounded-full font-bold shadow-md text-sm">
-                     {discountPercentage}% OFF
-                   </div>
+                  <div className="absolute top-4 right-4 z-20 bg-green-500 text-white px-3 py-1 rounded-full font-bold shadow-md text-sm">
+                    {discountPercentage}% OFF
+                  </div>
                 )}
 
                 {image && (
@@ -209,28 +221,29 @@ const Product = () => {
 
             <div className="mt-4 flex flex-col gap-1">
               <div className="flex items-center gap-4">
-                {/* Main Price */}
+                {/* Main Price Display */}
                 <p
                   className={`text-3xl font-bold ${
                     isSoldOut ? "text-gray-400 line-through" : "text-black"
                   }`}
                 >
                   {currency}
-                  {hasDiscount ? productData.offerPrice : productData.price}
+                  {hasDiscount ? numOfferPrice : numPrice}
                 </p>
 
                 {/* Old Price & Badge */}
                 {hasDiscount && !isSoldOut && (
-                    <div className="flex items-center gap-2">
-                        <p className="text-xl text-gray-400 line-through font-medium">
-                            {currency}{productData.price}
-                        </p>
-                        <span className="bg-pink-100 text-pink-600 px-2 py-1 text-xs font-bold rounded">
-                            SAVE {discountPercentage}%
-                        </span>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xl text-gray-400 line-through font-medium">
+                      {currency}
+                      {numPrice}
+                    </p>
+                    <span className="bg-pink-100 text-pink-600 px-2 py-1 text-xs font-bold rounded">
+                      SAVE {discountPercentage}%
+                    </span>
+                  </div>
                 )}
-                
+
                 {/* Out of stock Text */}
                 {isSoldOut && (
                   <span className="text-xl font-bold text-red-600">
@@ -239,7 +252,6 @@ const Product = () => {
                 )}
               </div>
             </div>
-            {/* ----------------------------- */}
 
             <div
               className="mt-4 text-gray-600 md:w-4/5"
@@ -296,7 +308,6 @@ const Product = () => {
 
           <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-600">
             <p className="flex items-center gap-2">
-              <span>🛡️</span>
               <span>
                 Experience the assurance of 100% original and authentic
                 products, crafted to meet the highest standards of quality.
