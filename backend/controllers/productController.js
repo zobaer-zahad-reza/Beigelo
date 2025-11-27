@@ -19,7 +19,7 @@ const addProduct = async (req, res) => {
       quantity,
     } = req.body;
 
-    // Image Handling
+    // Images
     const image1 = req.files.image1 && req.files.image1[0];
     const image2 = req.files.image2 && req.files.image2[0];
     const image3 = req.files.image3 && req.files.image3[0];
@@ -41,12 +41,12 @@ const addProduct = async (req, res) => {
       })
     );
 
-    // Parse Sizes Safely
+    // Parse Sizes
     let parsedSizes;
     try {
       parsedSizes = sizes ? JSON.parse(sizes) : [];
     } catch (e) {
-      parsedSizes = []; // Error handle: যদি JSON parse ফেইল করে, এম্পটি অ্যারে দিবে
+      parsedSizes = [];
     }
 
     const productData = {
@@ -61,21 +61,17 @@ const addProduct = async (req, res) => {
       sizes: parsedSizes,
       image: imagesUrl,
       date: Date.now(),
-
-      // New Fields
       offerPrice: offerPrice ? Number(offerPrice) : 0,
       discount: discount ? Number(discount) : 0,
       watchGrade: watchGrade || "Original",
     };
-
-    console.log("Saving Product:", productData); // সার্ভার টার্মিনালে ডাটা প্রিন্ট হবে
 
     const product = new productModel(productData);
     await product.save();
 
     res.json({ success: true, message: "Product Added" });
   } catch (error) {
-    console.log("Error in addProduct:", error); // টার্মিনালে আসল এরর দেখাবে
+    console.log("Error in addProduct:", error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -136,10 +132,81 @@ const updateQuantity = async (req, res) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  try {
+    const {
+      id,
+      name,
+      brand,
+      description,
+      price,
+      offerPrice,
+      category,
+      subCategory,
+      sizes,
+      bestseller,
+      watchGrade,
+      quantity,
+    } = req.body;
+
+    const product = await productModel.findById(id);
+    if (!product) {
+      return res.json({ success: false, message: "Product not found" });
+    }
+
+    let updatedImages = [...product.image];
+
+    const imageIndexes = req.body.imageIndexes
+      ? JSON.parse(req.body.imageIndexes)
+      : [];
+
+    if (req.files && req.files.length > 0) {
+      const newImagesUrls = await Promise.all(
+        req.files.map(async (item) => {
+          let result = await cloudinary.uploader.upload(item.path, {
+            resource_type: "image",
+          });
+          return result.secure_url;
+        })
+      );
+      newImagesUrls.forEach((url, i) => {
+        const indexToReplace = parseInt(imageIndexes[i]);
+        updatedImages[indexToReplace] = url;
+      });
+    }
+
+    const updateData = {
+      name,
+      brand,
+      description,
+      price: Number(price),
+      offerPrice: offerPrice === "" ? 0 : Number(offerPrice),
+      category,
+      subCategory,
+      quantity: Number(quantity),
+      bestseller: bestseller === "true",
+      sizes: JSON.parse(sizes),
+      image: updatedImages,
+    };
+
+    if (category === "Watch" && watchGrade) {
+      updateData.watchGrade = watchGrade;
+    }
+
+    await productModel.findByIdAndUpdate(id, updateData);
+
+    res.json({ success: true, message: "Product Updated Successfully" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   listProducts,
   addProduct,
   removeProduct,
   singleProduct,
   updateQuantity,
+  updateProduct,
 };

@@ -1,14 +1,15 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { FaRegEdit } from "react-icons/fa";
+import { FaRegEdit, FaPlus } from "react-icons/fa";
 import { toast } from "react-toastify";
 import DescriptionEditor from "../components/DescriptionEditor";
+import { MdDelete } from "react-icons/md";
 
 const List = ({ token, backendUrl, currency }) => {
   const [list, setList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // --- EDIT STATE ---
   const [showEditModal, setShowEditModal] = useState(false);
 
   // Discount calculation state
@@ -28,11 +29,10 @@ const List = ({ token, backendUrl, currency }) => {
     quantity: "",
     sizes: [],
     bestseller: false,
-    image: [], // Existing image URLs from backend
-    newImages: {}, // Object to store new files: { 0: File, 1: File }
+    image: [],
+    newImages: {},
   });
 
-  // Calculate Discount Percentage automatically
   useEffect(() => {
     const regularPrice = parseFloat(editingProduct.price);
     const discountedPrice = parseFloat(editingProduct.offerPrice);
@@ -110,9 +110,6 @@ const List = ({ token, backendUrl, currency }) => {
     }
   };
 
-  // --- EDIT HANDLERS ---
-
-  // 1. Click Edit -> Load Data into State
   const handleEditClick = (item) => {
     setEditingProduct({
       id: item._id,
@@ -128,13 +125,13 @@ const List = ({ token, backendUrl, currency }) => {
       sizes: item.sizes || [],
       bestseller: item.bestseller,
       image: item.image || [],
-      newImages: {}, // Reset new images
+      newImages: {},
     });
     setShowSize(item.sizes && item.sizes.length > 0);
     setShowEditModal(true);
   };
 
-  // 2. Handle Text/Select/Checkbox Changes
+  // Handle Text/Select/Checkbox Changes
   const handleEditChange = (e) => {
     const { name, value, type, checked } = e.target;
     setEditingProduct((prev) => ({
@@ -143,7 +140,7 @@ const List = ({ token, backendUrl, currency }) => {
     }));
   };
 
-  // 3. Handle Description Editor
+  // Handle Description Editor
   const handleDescriptionChange = (value) => {
     setEditingProduct((prev) => ({
       ...prev,
@@ -151,7 +148,7 @@ const List = ({ token, backendUrl, currency }) => {
     }));
   };
 
-  // 4. Handle Size Selection
+  // Handle Size Selection
   const handleSizeChange = (size) => {
     setEditingProduct((prev) => {
       const currentSizes = prev.sizes;
@@ -163,7 +160,7 @@ const List = ({ token, backendUrl, currency }) => {
     });
   };
 
-  // 5. Handle Image Click & Upload (Updates specific index)
+  // Handle Image Uploads
   const handleImageUpload = (e, index) => {
     const file = e.target.files[0];
     if (file) {
@@ -171,15 +168,16 @@ const List = ({ token, backendUrl, currency }) => {
         ...prev,
         newImages: {
           ...prev.newImages,
-          [index]: file, // Store file with index key
+          [index]: file,
         },
       }));
     }
   };
 
-  // 6. Submit Updated Data
   const submitEdit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
     try {
       const formData = new FormData();
       formData.append("id", editingProduct.id);
@@ -197,11 +195,10 @@ const List = ({ token, backendUrl, currency }) => {
       if (editingProduct.category === "Watch") {
         formData.append("watchGrade", editingProduct.watchGrade);
       }
-
-      // Append only the new files.
-      // Note: Backend must handle "image" key to replace or add.
-      Object.values(editingProduct.newImages).forEach((file) => {
-        formData.append("image", file);
+      const imageIndexes = Object.keys(editingProduct.newImages);
+      formData.append("imageIndexes", JSON.stringify(imageIndexes));
+      imageIndexes.forEach((index) => {
+        formData.append("image", editingProduct.newImages[index]);
       });
 
       const response = await axios.post(
@@ -220,6 +217,8 @@ const List = ({ token, backendUrl, currency }) => {
     } catch (error) {
       console.error("Error updating product:", error);
       toast.error("Failed to update product.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -243,7 +242,7 @@ const List = ({ token, backendUrl, currency }) => {
     <>
       <p className="mb-2">ALL Products List</p>
 
-      {/*-------Search Bar-------*/}
+      {/* Search Bar */}
       <div className="mb-4">
         <input
           type="text"
@@ -255,7 +254,7 @@ const List = ({ token, backendUrl, currency }) => {
       </div>
 
       <div className="flex flex-col gap-2">
-        {/*-------List Table Title----*/}
+        {/* List Table Title */}
         <div className="hidden md:grid grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] items-center py-1 px-3 border bg-gray-100 text-sm">
           <b>Image</b>
           <b>Name</b>
@@ -265,7 +264,7 @@ const List = ({ token, backendUrl, currency }) => {
           <b className="text-center">Action</b>
         </div>
 
-        {/*-------Product List-------*/}
+        {/* Product List */}
         {filteredList.map((item, index) => (
           <div
             className="grid grid-cols-[1fr_3fr_1fr] md:grid-cols-[1fr_3fr_1fr_1fr_1fr_1fr] items-center gap-2 py-1 px-2 border text-sm"
@@ -299,21 +298,21 @@ const List = ({ token, backendUrl, currency }) => {
               </button>
             </div>
 
-            {/* ACTION COLUMN: Edit & Delete */}
+            {/* Edit and Delete */}
             <div className="flex items-center justify-center gap-4">
               <button
                 className="text-blue-500 hover:text-blue-700"
                 onClick={() => handleEditClick(item)}
                 title="Edit"
               >
-                <FaRegEdit size={20} />
+                <FaRegEdit size={24} />
               </button>
               <p
                 onClick={() => removeProduct(item._id)}
                 className="cursor-pointer text-lg text-red-600 hover:text-red-800 font-bold"
                 title="Delete"
               >
-                X
+                <MdDelete size={24} />
               </p>
             </div>
           </div>
@@ -331,18 +330,17 @@ const List = ({ token, backendUrl, currency }) => {
               onSubmit={submitEdit}
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              {/* --- CLICKABLE IMAGE DISPLAY SECTION --- */}
               <div className="col-span-2">
                 <p className="text-sm font-bold mb-2">
-                  Product Images (Click to Change)
+                  Product Images (Click to Change / Add)
                 </p>
-                <div className="flex gap-2 flex-wrap">
+                <div className="flex gap-2 flex-wrap items-center">
+                  {/* Loop through existing images */}
                   {editingProduct.image.map((img, index) => (
                     <label
                       key={index}
                       htmlFor={`image-upload-${index}`}
                       className="cursor-pointer relative group"
-                      title="Click to replace image"
                     >
                       <img
                         src={
@@ -355,7 +353,6 @@ const List = ({ token, backendUrl, currency }) => {
                         alt={`Product ${index + 1}`}
                         className="w-20 h-20 object-cover border rounded hover:opacity-75 transition-opacity"
                       />
-                      {/* Hidden File Input for this specific index */}
                       <input
                         type="file"
                         id={`image-upload-${index}`}
@@ -368,6 +365,41 @@ const List = ({ token, backendUrl, currency }) => {
                       </div>
                     </label>
                   ))}
+
+                  {/* Add New Image Button */}
+                  {editingProduct.image.length < 6 && (
+                    <label
+                      htmlFor={`image-upload-new`}
+                      className="w-20 h-20 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors"
+                      title="Add New Image"
+                    >
+                      {editingProduct.newImages[editingProduct.image.length] ? (
+                        <img
+                          src={URL.createObjectURL(
+                            editingProduct.newImages[
+                              editingProduct.image.length
+                            ]
+                          )}
+                          className="w-full h-full object-cover rounded"
+                          alt="New"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center text-gray-400">
+                          <FaPlus size={20} />
+                          <span className="text-xs mt-1">Add</span>
+                        </div>
+                      )}
+
+                      <input
+                        type="file"
+                        id={`image-upload-new`}
+                        hidden
+                        onChange={(e) =>
+                          handleImageUpload(e, editingProduct.image.length)
+                        }
+                      />
+                    </label>
+                  )}
                 </div>
               </div>
 
@@ -401,7 +433,7 @@ const List = ({ token, backendUrl, currency }) => {
                 />
               </div>
 
-              {/* Description Editor */}
+              {/* Description */}
               <div className="col-span-2">
                 <label className="block text-sm font-bold mb-1">
                   Description
@@ -444,7 +476,7 @@ const List = ({ token, backendUrl, currency }) => {
                 </select>
               </div>
 
-              {/* Watch Grade (Conditional) */}
+              {/* Watch Grade */}
               {editingProduct.category === "Watch" && (
                 <div className="col-span-2">
                   <label className="block text-sm font-bold mb-1">
@@ -575,15 +607,43 @@ const List = ({ token, backendUrl, currency }) => {
                 <button
                   type="button"
                   onClick={() => setShowEditModal(false)}
+                  disabled={isLoading}
                   className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 font-medium"
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 font-medium flex items-center gap-2 disabled:bg-gray-500 disabled:cursor-not-allowed"
                 >
-                  Save Changes
+                  {isLoading ? (
+                    <>
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Updating...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
                 </button>
               </div>
             </form>
