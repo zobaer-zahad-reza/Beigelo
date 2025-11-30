@@ -7,6 +7,7 @@ import List from "./pages/List";
 import Orders from "./pages/Orders";
 import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
+import AddBrand from "./pages/AddBrand";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export const currency = "৳ ";
@@ -35,10 +36,40 @@ const App = () => {
               <Routes>
                 {/* Default Route */}
 
-                <Route path="/add" element={<Add token={token} backendUrl={backendUrl} currency={currency}/>} />
-                <Route path="/list" element={<List token={token} backendUrl={backendUrl} currency={currency}/>} />
-                <Route path="/orders" element={<Orders token={token} backendUrl={backendUrl}
-                  currency={currency} />} />
+                <Route
+                  path="/add"
+                  element={
+                    <Add
+                      token={token}
+                      backendUrl={backendUrl}
+                      currency={currency}
+                    />
+                  }
+                />
+                <Route
+                  path="/list"
+                  element={
+                    <List
+                      token={token}
+                      backendUrl={backendUrl}
+                      currency={currency}
+                    />
+                  }
+                />
+                <Route
+                  path="/orders"
+                  element={
+                    <Orders
+                      token={token}
+                      backendUrl={backendUrl}
+                      currency={currency}
+                    />
+                  }
+                />
+                <Route
+                  path="/add-brand"
+                  element={<AddBrand token={token} backendUrl={backendUrl} />}
+                />
               </Routes>
             </div>
           </div>

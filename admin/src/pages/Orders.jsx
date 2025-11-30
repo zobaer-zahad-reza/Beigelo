@@ -7,14 +7,12 @@ const Orders = ({ token, backendUrl, currency }) => {
   const [orders, setOrders] = useState([]);
 
   const fetchAllOrders = async () => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
+
     try {
-      const response = await axios.get(
-        `${backendUrl}/api/order/list`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await axios.get(`${backendUrl}/api/order/list`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.data.success) {
         setOrders(response.data.orders.reverse());
       } else {
@@ -28,7 +26,6 @@ const Orders = ({ token, backendUrl, currency }) => {
 
   const statusHandler = async (event, orderId) => {
     try {
-
       const response = await axios.post(
         `${backendUrl}/api/order/status`,
         { orderId, status: event.target.value },
@@ -36,6 +33,7 @@ const Orders = ({ token, backendUrl, currency }) => {
       );
       if (response.data.success) {
         await fetchAllOrders();
+        toast.success("Order status updated!");
       }
     } catch (error) {
       toast.error("Failed to update status.");
@@ -48,64 +46,152 @@ const Orders = ({ token, backendUrl, currency }) => {
   }, [token]);
 
   return (
-    <div>
-      <h3>Order Page</h3>
-      <div>
-        {orders.map((order, index) => (
-          <div
-            className="grid grid-cols-1 sm:grid-cols-[0.5fr_2fr_1fr] lg:grid-cols-[0.5fr_2fr_1fr_1fr_1fr] gap-3 items-start border-2 border-gray-200 p-5 md:p-8 my-3 md:my-4 text-xs sm:text-sm text-gray-700"
-            key={index}
-          >
-            <img src={assets.parcel_icon} alt="" className="w-10 h-10" />
-            <div>
-              <div>
-                {order.items.map((item, itemIndex) => (
-                  <p className="py-0.5" key={itemIndex}>
-                    {item.name} x {item.quantity} <span> {item.size}</span>
-                    {itemIndex < order.items.length - 1 ? "," : ""}
-                  </p>
-                ))}
+    <div className="px-4 sm:px-8 py-8 min-h-screen bg-gray-50">
+      <h3 className="text-2xl font-bold text-gray-800 mb-6">
+        Order Management
+      </h3>
+
+      <div className="flex flex-col gap-6">
+        {orders.length === 0 ? (
+          <p className="text-gray-500">No orders found.</p>
+        ) : (
+          orders.map((order, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm"
+            >
+              {/* --- Column 1: Items with Images --- */}
+              <div className="flex flex-col gap-3">
+                <h4 className="font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                  <img
+                    src={assets.parcel_icon}
+                    alt=""
+                    className="w-5 h-5 opacity-60"
+                  />
+                  Items Ordered
+                </h4>
+
+                <div className="flex flex-col gap-4">
+                  {order.items.map((item, itemIndex) => (
+                    <div
+                      key={itemIndex}
+                      className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0"
+                    >
+                      {/* PRODUCT IMAGE ADDED HERE */}
+                      <img
+                        src={item.image[0]}
+                        alt={item.name}
+                        className="w-12 h-12 object-cover rounded-md border border-gray-200"
+                      />
+
+                      <div className="flex flex-col">
+                        <p className="font-medium text-gray-800">{item.name}</p>
+                        <div className="flex items-center gap-2 mt-1 text-gray-500 text-xs">
+                          <span>Qty: {item.quantity}</span>
+
+                          {item.size === "default"
+                            ? null
+                            : (
+                                <div>
+                                  <span>|</span>
+                                  <div className="text-sm text-gray-500 border border-gray-300 px-2 py-1 rounded-md">
+                                    Size: {item.size.toUpperCase()}
+                                  </div>
+                                </div>
+                              ) || null}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <p className="mt-3 mb-2 font-medium">
-                {order.address.firstName + " " + order.address.lastName}
-              </p>
-              <div>
-                <p>{order.address.street + ","}</p>
-                <p>
-                  {order.address.city +
-                    ", " +
-                    order.address.state +
-                    ", " +
-                    order.address.country +
-                    ", " +
-                    order.address.zipcode}
+
+              {/* --- Column 2: Customer Details --- */}
+              <div className="border-l border-gray-200 pl-0 md:pl-8 border-t md:border-t-0 pt-4 md:pt-0">
+                <h4 className="font-semibold text-gray-700 mb-2">
+                  Delivery Address
+                </h4>
+                <p className="font-medium text-gray-800">
+                  {order.address.firstName + " " + order.address.lastName}
+                </p>
+                <div className="text-gray-500 mt-1 leading-relaxed">
+                  <p>{order.address.street},</p>
+                  <p>
+                    {order.address.city}, {order.address.state},{" "}
+                    {order.address.country}, {order.address.zipcode}
+                  </p>
+                </div>
+                <p className="text-gray-600 mt-2 font-medium flex items-center gap-2">
+                  <span className="text-xs uppercase tracking-wide text-gray-400">
+                    Phone:
+                  </span>
+                  {order.address.phone}
                 </p>
               </div>
-              <p>{order.address.phone}</p>
+
+              {/* --- Column 3: Order Info & Actions --- */}
+              <div className="border-l border-gray-200 pl-0 md:pl-8 border-t md:border-t-0 pt-4 md:pt-0 flex flex-col justify-between">
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-3">
+                    Order Summary
+                  </h4>
+                  <div className="grid grid-cols-2 gap-y-2 text-gray-600">
+                    <p>Total Items:</p>
+                    <p className="font-medium text-gray-800">
+                      {order.items.length}
+                    </p>
+
+                    <p>Order Date:</p>
+                    <p className="font-medium text-gray-800">
+                      {new Date(order.date).toLocaleDateString()}
+                    </p>
+
+                    <p>Method:</p>
+                    <p className="font-medium text-gray-800">
+                      {order.paymentMethod}
+                    </p>
+
+                    <p>Total Amount:</p>
+                    <p className="font-bold text-gray-900 text-lg">
+                      {currency} {order.amount}
+                    </p>
+
+                    <p>Payment:</p>
+                    <div>
+                      {order.payment ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          Done
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                          Pending
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Order Status
+                  </label>
+                  <select
+                    onChange={(event) => statusHandler(event, order._id)}
+                    value={order.status}
+                    className="block w-full px-3 py-2 text-sm bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer transition-colors hover:border-gray-400"
+                  >
+                    <option value="Order Placed">Order Placed</option>
+                    <option value="Packing">Packing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Out For Delivery">Out For Delivery</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Order Canceled">Order Canceled</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-sm sm:text-[15px]">Items : {order.items.length}</p>
-              <p className="mt-3">Method : {order.paymentMethod}</p>
-              <p>Payment : {order.payment ? "Done" : "Pending"}</p>
-              <p>Date : {new Date(order.date).toLocaleDateString()}</p>
-            </div>
-            <p className="text-sm sm:text-[15px]">
-              {currency} {order.amount}
-            </p>
-            <select
-              onChange={(event) => statusHandler(event, order._id)}
-              value={order.status}
-              className="p-2 font-semibold border rounded"
-            >
-              <option value="Order Placed">Order Placed</option>
-              <option value="Packing">Packing</option>
-              <option value="Shipped">Shipped</option>
-              <option value="Out For Delivery">Out For Delivery</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Order Canceled">Order Canceled</option>
-            </select>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
