@@ -1,22 +1,45 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import Title from "../components/Title";
 import ProductItem from "../components/ProductItem";
+import axios from "axios";
 import { TbFaceIdError } from "react-icons/tb";
 
 const Collection = () => {
   const { categorySlug, subCategorySlug } = useParams();
+  const location = useLocation();
 
-  const { products, search, showSearch } = useContext(ShopContext);
+  const { products, search, showSearch, backendUrl } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
+
+  // Filter States
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
+  const [brandCategory, setBrandCategory] = useState([]);
+
+  const [brands, setBrands] = useState([]);
+
   const [sortType, setSortType] = useState("relavent");
 
   useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/brand/list`);
+        if (response.data.success) {
+          setBrands(response.data.brands);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchBrands();
+  }, [backendUrl]);
+
+  useEffect(() => {
+    // Category Slug ( /collection/men)
     if (categorySlug) {
       const formattedCategory =
         categorySlug.charAt(0).toUpperCase() + categorySlug.slice(1);
@@ -25,6 +48,7 @@ const Collection = () => {
       setCategory([]);
     }
 
+    // SubCategory Slug
     if (subCategorySlug) {
       const formattedSubCategory =
         subCategorySlug.charAt(0).toUpperCase() + subCategorySlug.slice(1);
@@ -32,7 +56,16 @@ const Collection = () => {
     } else {
       setSubCategory([]);
     }
-  }, [categorySlug, subCategorySlug]);
+
+    // Brand Query (?brand=Rolex)
+    const searchParams = new URLSearchParams(location.search);
+    const brandQuery = searchParams.get("brand");
+    if (brandQuery) {
+      setBrandCategory([brandQuery]);
+    } else {
+      setBrandCategory([]);
+    }
+  }, [categorySlug, subCategorySlug, location.search]);
 
   const toggleCategory = (e) => {
     if (category.includes(e.target.value)) {
@@ -50,27 +83,48 @@ const Collection = () => {
     }
   };
 
+  const toggleBrand = (e) => {
+    if (brandCategory.includes(e.target.value)) {
+      setBrandCategory((prev) =>
+        prev.filter((item) => item !== e.target.value)
+      );
+    } else {
+      setBrandCategory((prev) => [...prev, e.target.value]);
+    }
+  };
+
   useEffect(() => {
     let processedProducts = [...products];
 
+    // Search Filter
     if (showSearch && search) {
       processedProducts = processedProducts.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
     }
 
+    // Category Filter
     if (category.length > 0) {
       processedProducts = processedProducts.filter((item) =>
         category.includes(item.category)
       );
     }
 
+    // SubCategory Filter
     if (subCategory.length > 0) {
       processedProducts = processedProducts.filter((item) =>
         subCategory.includes(item.subCategory)
       );
     }
 
+    // Brand Filter (NEW)
+    if (brandCategory.length > 0) {
+      processedProducts = processedProducts.filter((item) =>
+        brandCategory.includes(item.brand)
+      );
+    }
+
+    // Sorting
     switch (sortType) {
       case "low-high":
         processedProducts.sort((a, b) => a.price - b.price);
@@ -83,7 +137,15 @@ const Collection = () => {
     }
 
     setFilterProducts(processedProducts);
-  }, [category, subCategory, search, showSearch, products, sortType]);
+  }, [
+    category,
+    subCategory,
+    brandCategory,
+    search,
+    showSearch,
+    products,
+    sortType,
+  ]); // brandCategory ডিপেন্ডেন্সি এড করা হয়েছে
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
@@ -142,7 +204,7 @@ const Collection = () => {
           </div>
         </div>
 
-        {/* Sub-Category*/}
+        {/* Sub-Category Filter */}
         <div
           className={`border border-gray-300 pl-5 py-3 my-5 ${
             showFilter ? "" : "hidden"
@@ -182,6 +244,34 @@ const Collection = () => {
             </p>
           </div>
         </div>
+
+        {/* --- BRAND FILTER (NEW) --- */}
+        <div
+          className={`border border-gray-300 pl-5 py-3 my-5 ${
+            showFilter ? "" : "hidden"
+          } sm:block`}
+        >
+          <p className="mb-3 text-sm font-medium">BRANDS</p>
+          <div className="flex flex-col gap-2 text-sm font-light text-gray-700 max-h-60 overflow-y-auto">
+            {/* ব্যাকএন্ড থেকে আসা ব্র্যান্ড লিস্ট লুপ করা হচ্ছে */}
+            {brands.length > 0 ? (
+              brands.map((brand, index) => (
+                <p key={index} className="flex gap-2">
+                  <input
+                    className="w-3"
+                    type="checkbox"
+                    value={brand.name}
+                    onChange={toggleBrand}
+                    checked={brandCategory.includes(brand.name)}
+                  />{" "}
+                  {brand.name}
+                </p>
+              ))
+            ) : (
+              <p className="text-xs text-gray-400">Loading brands...</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Right Side */}
@@ -211,14 +301,17 @@ const Collection = () => {
                 image={item.image}
                 categoryName={item.category}
                 subCategory={item.subCategory}
-                productSlug={item.name.toLowerCase().split(" ").join("-")}
+                // productSlug={item.name.toLowerCase().split(" ").join("-")}
                 quantity={item.quantity}
                 offerPrice={item.offerPrice}
               />
             ))}
           </div>
         ) : (
-          <div className="text-center min-h-screen my-auto">
+          <div className="text-center min-h-screen my-auto flex flex-col items-center justify-center">
+            <div className="text-6xl text-gray-200 mb-4">
+              <TbFaceIdError />
+            </div>
             <h1 className="text-black font-bold text-3xl">Not Found</h1>
             <h3 className="text-gray-500 font-semibold text-xl mt-4">
               If you need this product you can{" "}

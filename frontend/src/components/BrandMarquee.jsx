@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useContext, useEffect, useState } from "react";
 import {
   Marquee,
   MarqueeContent,
@@ -8,63 +9,67 @@ import {
 } from "@/components/kibo-ui/marquee";
 import { Link } from "react-router-dom";
 import Title from "./Title";
+import axios from "axios";
+import { ShopContext } from "../context/ShopContext";
 
-const imageArr = [
-  {
-    imgLink: "https://i.ibb.co.com/4gS6VQsv/download.jpg",
-    name: "Frank_Muller",
-  },
-  {
-    imgLink:
-      "https://i.ibb.co.com/zVK5c6JF/tissot-logo-png-seeklogo-298018.png",
-    name: "Tissot",
-  },
-  {
-    imgLink: "https://i.ibb.co.com/zhCKKWQJ/download.png",
-    name: "Omega",
-  },
-  {
-    imgLink: "https://i.ibb.co.com/ym00jkYp/download.png",
-    name: "Tag-Heuer",
-  },
-  {
-    imgLink: "https://i.ibb.co.com/1fLDccqK/images.png",
-    name: "Fossil",
-  },
-  {
-    imgLink: "https://i.ibb.co.com/VpqyrQVP/download.png",
-    name: "Rolex",
-  },
-];
+const BrandMarquee = () => {
+  const { backendUrl } = useContext(ShopContext);
+  const [brands, setBrands] = useState([]);
 
-const BrandMarquee = () => (
-  <div className="mt-16">
-    <div className="text-center py-8 text-3xl md:text-4xl">
-      <Title text1={"POPULAR"} text2={"BRANDS"} />
-    </div>
-    <div className="flex size-full items-center justify-center bg-background  mb-16">
-      <Marquee>
-        <MarqueeFade side="left" />
-        <MarqueeFade side="right" />
-        <MarqueeContent>
-          {imageArr.map((image, index) => (
-            <Link to={image.name}>
-              <MarqueeItem
-                className="w-28 md:w-44 flex flex-col justify-center align-middle "
+  // --- Fetch Brands from Database ---
+  useEffect(() => {
+    const fetchBrands = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/brand/list`);
+        if (response.data.success) {
+          setBrands(response.data.brands);
+        }
+      } catch (error) {
+        console.error("Error fetching brands:", error);
+      }
+    };
+
+    fetchBrands();
+  }, [backendUrl]);
+
+  if (brands.length === 0) return null;
+
+  return (
+    <div className="mt-16">
+      <div className="text-center py-8 text-3xl md:text-4xl">
+        <Title text1={"POPULAR"} text2={"BRANDS"} />
+      </div>
+
+      <div className="flex size-full items-center justify-center bg-background mb-16">
+        <Marquee pauseOnHover={true} className="[--duration:40s]">
+          <MarqueeFade side="left" />
+          <MarqueeFade side="right" />
+
+          <MarqueeContent>
+            {brands.map((brand, index) => (
+              <Link
+                to={`/collection?brand=${brand.name}`}
                 key={index}
+                className="mx-4 md:mx-8 group"
               >
-                <img
-                  alt={`Placeholder ${index}`}
-                  className="overflow-hidden rounded-full"
-                  src={`${image.imgLink}`}
-                />
-              </MarqueeItem>
-            </Link>
-          ))}
-        </MarqueeContent>
-      </Marquee>
+                <MarqueeItem className="w-28 md:w-44 flex flex-col justify-center items-center cursor-pointer transition-transform duration-300 hover:scale-110">
+                  <img
+                    alt={brand.name}
+                    className="h-20 w-auto object-contain grayscale group-hover:grayscale-0 transition-all duration-300 opacity-80 group-hover:opacity-100"
+                    src={brand.image}
+                  />
+
+                  <p className="mt-2 text-sm font-medium text-gray-500 group-hover:text-black">
+                    {brand.name}
+                  </p>
+                </MarqueeItem>
+              </Link>
+            ))}
+          </MarqueeContent>
+        </Marquee>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default BrandMarquee;

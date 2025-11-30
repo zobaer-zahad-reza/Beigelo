@@ -3,14 +3,11 @@ import { NavLink } from "react-router-dom";
 import { assets } from "../assets/assets";
 
 const Sidebar = () => {
-  // 1. State for toggling the dropdown
   const [showAddMenu, setShowAddMenu] = useState(false);
 
   return (
     <div className="w-[18%] min-h-screen border-r-2 bg-white">
       <div className="flex flex-col gap-4 pt-6 pl-[20%] text-[15px]">
-        {/* --- ADD ITEMS DROPDOWN TRIGGER --- */}
-        {/* এটা এখন আর NavLink না, এটা একটা div যা ক্লিক করলে মেনু খুলবে */}
         <div
           onClick={() => setShowAddMenu(!showAddMenu)}
           className={`flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l cursor-pointer hover:bg-gray-50 transition-colors ${
@@ -20,18 +17,15 @@ const Sidebar = () => {
           <img className="w-5 h-5" src={assets.add_icon} alt="" />
           <div className="hidden md:flex justify-between items-center w-full">
             <p>Add Items</p>
-            {/* Arrow Icon for UX */}
             <span className="text-[10px] text-gray-500 ml-2">
               {showAddMenu ? "▲" : "▼"}
             </span>
           </div>
         </div>
 
-        {/* --- DROPDOWN OPTIONS (Conditional Rendering) --- */}
-        {/* showAddMenu true হলেই এই অপশনগুলো দেখাবে */}
         {showAddMenu && (
           <div className="flex flex-col gap-2 ml-2 md:ml-4 border-l-2 border-gray-100 pl-2 animate-fadeIn">
-            {/* Option 1: Add Product */}
+            {/* Add Product */}
             <NavLink
               to="/add"
               className={({ isActive }) =>
@@ -43,7 +37,7 @@ const Sidebar = () => {
               <p className="hidden md:block">Add Product</p>
             </NavLink>
 
-            {/* Option 2: Add Category (Example) */}
+            {/* Add Category */}
             <NavLink
               to="/add-category"
               className={({ isActive }) =>
@@ -55,7 +49,7 @@ const Sidebar = () => {
               <p className="hidden md:block">Add Category</p>
             </NavLink>
 
-            {/* Option 3: Add Brand (Example) */}
+            {/* Add Brand */}
             <NavLink
               to="/add-brand"
               className={({ isActive }) =>
@@ -69,7 +63,7 @@ const Sidebar = () => {
           </div>
         )}
 
-        {/* --- LIST ITEMS --- */}
+        {/*LIST ITEMS*/}
         <NavLink
           className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l"
           to="/list"
@@ -78,7 +72,7 @@ const Sidebar = () => {
           <p className="hidden md:block">List Items</p>
         </NavLink>
 
-        {/* --- ORDERS --- */}
+        {/* ORDERS */}
         <NavLink
           className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l"
           to="/orders"

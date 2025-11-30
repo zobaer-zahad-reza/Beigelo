@@ -8,6 +8,7 @@ import productRouter from "./routes/productRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import nodemailer from "nodemailer";
+import brandRouter from "./routes/brandRoute.js";
 
 // App Config
 const app = express();
@@ -57,6 +58,7 @@ app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
+app.use("/api/brand", brandRouter);
 
 // API Route for sending email (Using Nodemailer + Gmail)
 app.post("/api/send-email-contactpage", async (req, res) => {

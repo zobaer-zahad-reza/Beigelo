@@ -18,9 +18,14 @@ const AddBrand = ({ token, backendUrl }) => {
       formData.append("image", image);
 
       const response = await axios.post(
-        `${backendUrl}/api/brand/add`, // আপনার ব্যাকএন্ডে এই রাউটটি থাকতে হবে
+        `${backendUrl}/api/brand/add`,
         formData,
-        { headers: { token } }
+        {
+          headers: {
+            // "Bearer " এর পর একটি স্পেস অবশ্যই থাকতে হবে
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       if (response.data.success) {
@@ -32,7 +37,7 @@ const AddBrand = ({ token, backendUrl }) => {
       }
     } catch (error) {
       console.error(error);
-      toast.error(error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
