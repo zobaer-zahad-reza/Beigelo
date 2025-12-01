@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { assets } from "../assets/assets";
+import BrandList from "../components/BrandList";
 
 const AddBrand = ({ token, backendUrl }) => {
   const [image, setImage] = useState(false);
@@ -22,7 +23,6 @@ const AddBrand = ({ token, backendUrl }) => {
         formData,
         {
           headers: {
-            // "Bearer " এর পর একটি স্পেস অবশ্যই থাকতে হবে
             Authorization: `Bearer ${token}`,
           },
         }
@@ -44,11 +44,11 @@ const AddBrand = ({ token, backendUrl }) => {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto mt-10 p-6 bg-white border rounded-lg shadow-sm">
+    <div className="w-full mx-auto mt-10 p-6 bg-white border rounded-lg shadow-sm">
       <h2 className="text-2xl font-bold mb-6 text-gray-700">Add New Brand</h2>
 
       <form onSubmit={onSubmitHandler} className="flex flex-col gap-6">
-        {/* --- Brand Logo Upload --- */}
+        {/* Brand Logo Upload */}
         <div className="flex flex-col gap-2">
           <p className="font-medium text-gray-700">Upload Brand Logo</p>
           <label htmlFor="image" className="cursor-pointer w-32">
@@ -80,7 +80,7 @@ const AddBrand = ({ token, backendUrl }) => {
           </label>
         </div>
 
-        {/* --- Brand Name Input --- */}
+        {/* Brand Name Input */}
         <div className="flex flex-col gap-2">
           <label className="font-medium text-gray-700">Brand Name</label>
           <input
@@ -93,7 +93,7 @@ const AddBrand = ({ token, backendUrl }) => {
           />
         </div>
 
-        {/* --- Submit Button --- */}
+        {/* Submit Button */}
         <button
           type="submit"
           disabled={loading}
@@ -106,6 +106,8 @@ const AddBrand = ({ token, backendUrl }) => {
           {loading ? "Adding Brand..." : "ADD BRAND"}
         </button>
       </form>
+
+      <BrandList token={token} backendUrl={backendUrl} />
     </div>
   );
 };
