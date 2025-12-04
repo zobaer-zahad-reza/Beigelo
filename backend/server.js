@@ -14,15 +14,11 @@ import brandRouter from "./routes/brandRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
-// Middlewares
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
-
-// CORS Setup
+// -------- CORS Setup (Moved to Top) --------
 const allowedOrigins = [
   "https://beigelo.com",
   "https://www.beigelo.com",
-  "https://iamadmin.beigelo.com",
+  "https://iamadmin.beigelo.com", // ✅ Admin Panel Added
   "https://api.beigelo.com",
   "http://localhost:5174",
   "http://localhost:5173",
@@ -34,6 +30,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) !== -1) {
@@ -45,9 +42,13 @@ app.use(
         return callback(new Error(msg), false);
       }
     },
-    credentials: true,
+    credentials: true, // Cookies/Authorization headers allow করার জন্য
   })
 );
+
+// -------- Middlewares --------
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // Database & Cloudinary
 connectDB();
@@ -60,7 +61,7 @@ app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/brand", brandRouter);
 
-// API Route for sending email (Using Nodemailer + Gmail)
+// API Route for sending email
 app.post("/api/send-email-contactpage", async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -109,7 +110,8 @@ app.get("/", (req, res) => {
 app.use((err, req, res, next) => {
   console.error("⚠️ Server Error:", err.message);
   if (err.message.includes("CORS")) {
-    return res.status(500).json({ success: false, message: err.message });
+    // CORS error হলে 500 না দিয়ে 403 (Forbidden) দেওয়া ভালো, তবে 500 ও চলবে
+    return res.status(403).json({ success: false, message: err.message });
   }
   res.status(500).json({ success: false, message: "Internal Server Error" });
 });
