@@ -4,11 +4,17 @@ import { Link } from "react-router-dom";
 import OptimizedProductImage from "./OptimizedProductImage";
 import slugify from "slugify";
 
+// --- Helper Function: Safely extract ID ---
 const getPublicIdFromUrl = (url) => {
   if (!url) return null;
-  const regex = /\/upload\/(?:v\d+\/)?([^\.]+)/;
-  const match = url.match(regex);
-  return match ? match[1] : null;
+  try {
+    // Standard Cloudinary Regex (looks for /upload/v1234/filename)
+    const regex = /\/upload\/(?:v\d+\/)?([^\.]+)/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  } catch (error) {
+    return null;
+  }
 };
 
 const ProductItem = ({
@@ -36,14 +42,30 @@ const ProductItem = ({
     ? Math.round(((numPrice - numOfferPrice) / numPrice) * 100)
     : 0;
 
-  const publicId1 = getPublicIdFromUrl(image[0]);
-  const publicId2 = image[1] ? getPublicIdFromUrl(image[1]) : null;
-  const publicIdToShow = isHovered && publicId2 ? publicId2 : publicId1;
+  // --- IMAGE LOGIC (FIXED) ---
+  // 1. Check if image array exists
+  const hasImage = Array.isArray(image) && image.length > 0;
 
-  const imageClassName = `transition-all duration-500 ease-in-out ${
+  // 2. Get Raw URLs
+  const primaryImageUrl = hasImage ? image[0] : null;
+  const secondaryImageUrl = hasImage && image.length > 1 ? image[1] : null;
+
+  // 3. Try to extract Public IDs (Cloudinary Optimization)
+  const publicId1 = getPublicIdFromUrl(primaryImageUrl);
+  const publicId2 = getPublicIdFromUrl(secondaryImageUrl);
+
+  // 4. Determine what to show based on Hover
+  const showSecondary = isHovered && secondaryImageUrl;
+
+  // Decide which ID and URL is currently active
+  const activePublicId = showSecondary ? publicId2 : publicId1;
+  const activeImageUrl = showSecondary ? secondaryImageUrl : primaryImageUrl;
+
+  const imageClassName = `transition-all duration-500 ease-in-out object-cover ${
     isHovered && !isSoldOut ? "scale-110" : "scale-100"
   } `;
 
+  // Slugs for URL
   const categorySlug = slugify(categoryName || "item", {
     lower: true,
     strict: true,
@@ -78,20 +100,36 @@ const ProductItem = ({
           </div>
         )}
 
-        {publicIdToShow ? (
+        {/* --- SMART IMAGE RENDERING --- */}
+        {activePublicId ? (
+          // Plan A: Jodi ID thikmoto extract kora jay, Optimized Image use koro
           <OptimizedProductImage
             className={imageClassName}
-            publicId={publicIdToShow}
+            publicId={activePublicId}
             width={390}
             height={450}
             name={name}
           />
-        ) : (
-          <div
-            className="bg-gray-200"
-            style={{ width: 390, height: 450 }}
-            aria-label={name}
+        ) : activeImageUrl ? (
+          // Plan B: Jodi ID na pawa jay, Database er raw Link use koro (Fallback)
+          <img
+            src={activeImageUrl}
+            alt={name}
+            className={imageClassName}
+            width={390}
+            height={450}
+            loading="lazy"
+            style={{ width: "100%", height: "auto", aspectRatio: "390/450" }}
           />
+        ) : (
+          // Plan C: Jodi Image e na thake
+          <div
+            className="bg-gray-200 flex items-center justify-center text-gray-400"
+            style={{ width: "100%", aspectRatio: "390/450" }}
+            aria-label={name}
+          >
+            No Image
+          </div>
         )}
       </div>
 

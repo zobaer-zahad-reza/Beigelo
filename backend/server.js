@@ -18,7 +18,7 @@ const port = process.env.PORT || 4000;
 const allowedOrigins = [
   "https://beigelo.com",
   "https://www.beigelo.com",
-  "https://iamadmin.beigelo.com", // ✅ Admin Panel Added
+  "https://iamadmin.beigelo.com",
   "https://api.beigelo.com",
   "http://localhost:5174",
   "http://localhost:5173",
@@ -30,19 +30,19 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl requests)
+      // Mobile app ba server-to-server call (Postman/Curl) er jonno origin null thakte pare
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) !== -1) {
         return callback(null, true);
       } else {
         console.error("❌ CORS Blocked Request from:", origin);
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
+        return callback(new Error("CORS Policy Error"), false);
       }
     },
-    credentials: true, // Cookies/Authorization headers allow করার জন্য
+    credentials: true, // Cookie/Session allow korar jonno
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // <-- ETA ADD KORUN
+    allowedHeaders: ["Content-Type", "Authorization", "token"], // <-- ETA ADD KORUN (Jate header block na hoy)
   })
 );
 
