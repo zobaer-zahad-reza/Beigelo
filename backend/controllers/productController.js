@@ -1,4 +1,3 @@
-import { v2 as cloudinary } from "cloudinary";
 import productModel from "../models/productModel.js";
 
 // Function For add Product
@@ -19,7 +18,7 @@ const addProduct = async (req, res) => {
       quantity,
     } = req.body;
 
-    // Images
+    // Images Handling (Since upload.js already uploaded to Cloudinary, just take the path)
     const image1 = req.files.image1 && req.files.image1[0];
     const image2 = req.files.image2 && req.files.image2[0];
     const image3 = req.files.image3 && req.files.image3[0];
@@ -31,15 +30,8 @@ const addProduct = async (req, res) => {
       (item) => item !== undefined
     );
 
-    // Cloudinary Upload
-    let imagesUrl = await Promise.all(
-      images.map(async (item) => {
-        let result = await cloudinary.uploader.upload(item.path, {
-          resource_type: "image",
-        });
-        return result.secure_url;
-      })
-    );
+    // Get URLs directly from req.files (Cloudinary Storage puts the URL in .path)
+    let imagesUrl = images.map((item) => item.path);
 
     // Parse Sizes
     let parsedSizes;
@@ -90,6 +82,7 @@ const listProducts = async (req, res) => {
 // Function For remove Product
 const removeProduct = async (req, res) => {
   try {
+    // Optional: You might want to delete from Cloudinary too, but for now just DB delete
     await productModel.findByIdAndDelete(req.body.id);
     res.json({ success: true, message: "Product Removed" });
   } catch (error) {
@@ -160,18 +153,27 @@ const updateProduct = async (req, res) => {
       ? JSON.parse(req.body.imageIndexes)
       : [];
 
-    if (req.files && req.files.length > 0) {
-      const newImagesUrls = await Promise.all(
-        req.files.map(async (item) => {
-          let result = await cloudinary.uploader.upload(item.path, {
-            resource_type: "image",
-          });
-          return result.secure_url;
-        })
-      );
+    // Handling new uploads for update
+    if (req.files) {
+      // Note: Depending on how your route handles files (array vs fields),
+      // you might need to adjust this. Assuming 'req.files' is an array here:
+      let newFiles = [];
+      if (Array.isArray(req.files)) {
+        newFiles = req.files;
+      } else {
+        // If req.files is object (from fields), extract arrays
+        Object.values(req.files).forEach((fileArray) => {
+          newFiles = [...newFiles, ...fileArray];
+        });
+      }
+
+      const newImagesUrls = newFiles.map((item) => item.path);
+
       newImagesUrls.forEach((url, i) => {
         const indexToReplace = parseInt(imageIndexes[i]);
-        updatedImages[indexToReplace] = url;
+        if (!isNaN(indexToReplace)) {
+          updatedImages[indexToReplace] = url;
+        }
       });
     }
 

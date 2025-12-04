@@ -1,11 +1,27 @@
 import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import dotenv from "dotenv";
 
-const storage = multer.diskStorage({
-    filename: function(req,file,callback){
-        callback(null,file.originalname)
-    }
-})
+// .env ফাইল থেকে কনফিগারেশন লোড করা
+dotenv.config();
 
-const upload = multer({storage})
+// ১. Cloudinary কনফিগারেশন
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-export default upload
+// ২. Cloudinary স্টোরেজ সেটআপ
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "Beigelo_Products", // Cloudinary-তে এই নামে ফোল্ডার তৈরি হবে
+    allowed_formats: ["jpg", "png", "jpeg", "webp"], // এই ফরম্যাটগুলো সাপোর্ট করবে
+  },
+});
+
+const upload = multer({ storage: storage });
+
+export default upload;
