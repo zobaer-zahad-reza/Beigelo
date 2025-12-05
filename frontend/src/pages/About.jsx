@@ -1,5 +1,6 @@
 import React from "react";
 import Title from "../components/Title";
+import aboutImage from "../assets/about_img.webp";
 import NewsletterBox from "../components/NewsletterBox";
 import LocationMap from "../components/LocationMap";
 
@@ -12,8 +13,9 @@ const About = () => {
       <div className="my-10 flex flex-col md:flex-row gap-16">
         <img
           className="w-full md:max-w-[450px]"
-          src="https://i.postimg.cc/ZYM3PTg4/about-img-BAJy-TXw9.png"
-          alt=""
+          src={aboutImage}
+          alt="about Image"
+          loading="lazy"
         />
         <div className="flex flex-col justify-center gap-6 md:w-2/4 text-gray-600">
           <p>
