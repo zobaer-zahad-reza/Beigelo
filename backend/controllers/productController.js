@@ -1,6 +1,6 @@
 import productModel from "../models/productModel.js";
 
-// --- Function For Add Product ---
+// Function For Add Product
 const addProduct = async (req, res) => {
   try {
     const {
@@ -18,8 +18,6 @@ const addProduct = async (req, res) => {
       quantity,
     } = req.body;
 
-    // Cloudinary থেকে ইমেজ URL বের করা (Cloudinary .path এ URL রিটার্ন করে)
-    // req.files চেক করা হচ্ছে যাতে ক্র্যাশ না করে
     const files = req.files || {};
 
     const image1 = files.image1 && files.image1[0];
@@ -33,10 +31,8 @@ const addProduct = async (req, res) => {
       (item) => item !== undefined
     );
 
-    // Cloudinary URL অ্যারে তৈরি
     let imagesUrl = images.map((item) => item.path);
 
-    // Sizes পার্স করা
     let parsedSizes;
     try {
       parsedSizes = sizes ? JSON.parse(sizes) : [];
@@ -93,7 +89,7 @@ const removeProduct = async (req, res) => {
   }
 };
 
-// --- Function For Single Product Info ---
+// Function For Single Product Info
 const singleProduct = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -105,7 +101,7 @@ const singleProduct = async (req, res) => {
   }
 };
 
-// --- Function to Update Quantity ---
+// Function to Update Quantity
 const updateQuantity = async (req, res) => {
   try {
     const { id, quantity } = req.body;
@@ -127,7 +123,7 @@ const updateQuantity = async (req, res) => {
   }
 };
 
-// --- Function to Update Product ---
+// Function for Update Product
 const updateProduct = async (req, res) => {
   try {
     const {
@@ -152,21 +148,17 @@ const updateProduct = async (req, res) => {
 
     let updatedImages = [...product.image];
 
-    // কোন ইমেজের ইনডেক্স রিপ্লেস হবে তা পার্স করা
     const imageIndexes = req.body.imageIndexes
       ? JSON.parse(req.body.imageIndexes)
       : [];
 
-    // নতুন আপলোড করা ফাইল হ্যান্ডেল করা
     if (req.files && req.files.length > 0) {
-      // যেহেতু রাউটে upload.array('image') ব্যবহার করা হয়েছে, তাই req.files সরাসরি অ্যারে হবে
+
       const newImagesUrls = req.files.map((item) => item.path);
 
       newImagesUrls.forEach((url, i) => {
-        // imageIndexes অ্যারে থেকে পজিশন নেওয়া
         const indexToReplace = parseInt(imageIndexes[i]);
         if (!isNaN(indexToReplace)) {
-          // নির্দিষ্ট ইনডেক্সে নতুন URL বসানো
           updatedImages[indexToReplace] = url;
         }
       });

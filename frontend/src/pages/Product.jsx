@@ -184,12 +184,11 @@ const Product = () => {
 
                 {/* DISCOUNT BADGE */}
                 {!isSoldOut && hasDiscount && (
-                  <div className="absolute top-4 right-4 z-20 bg-green-500 text-white px-3 py-1 rounded-full font-bold shadow-md text-sm">
+                  <div className="absolute top-4 right-4 z-0 bg-green-500 text-white px-3 py-1 rounded-full font-bold shadow-md text-sm">
                     {discountPercentage}% OFF
                   </div>
                 )}
 
-                {/* UPDATE: Main Image Display Logic */}
                 {image ? (
                   <div
                     className="w-full h-auto flex items-center justify-center transition-transform duration-100 ease-out"
@@ -211,7 +210,7 @@ const Product = () => {
             </div>
           </div>
 
-          {/* Product Information (Right Side - No Changes) */}
+          {/* Product Information */}
           <div className="flex-1">
             <h1 className="font-medium text-3xl">{productData.name}</h1>
 
