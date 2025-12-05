@@ -1,6 +1,6 @@
 import productModel from "../models/productModel.js";
 
-// Function For add Product
+// --- Function For Add Product ---
 const addProduct = async (req, res) => {
   try {
     const {
@@ -18,22 +18,25 @@ const addProduct = async (req, res) => {
       quantity,
     } = req.body;
 
-    // Images Handling (Since upload.js already uploaded to Cloudinary, just take the path)
-    const image1 = req.files.image1 && req.files.image1[0];
-    const image2 = req.files.image2 && req.files.image2[0];
-    const image3 = req.files.image3 && req.files.image3[0];
-    const image4 = req.files.image4 && req.files.image4[0];
-    const image5 = req.files.image5 && req.files.image5[0];
-    const image6 = req.files.image6 && req.files.image6[0];
+    // Cloudinary থেকে ইমেজ URL বের করা (Cloudinary .path এ URL রিটার্ন করে)
+    // req.files চেক করা হচ্ছে যাতে ক্র্যাশ না করে
+    const files = req.files || {};
+
+    const image1 = files.image1 && files.image1[0];
+    const image2 = files.image2 && files.image2[0];
+    const image3 = files.image3 && files.image3[0];
+    const image4 = files.image4 && files.image4[0];
+    const image5 = files.image5 && files.image5[0];
+    const image6 = files.image6 && files.image6[0];
 
     const images = [image1, image2, image3, image4, image5, image6].filter(
       (item) => item !== undefined
     );
 
-    // Get URLs directly from req.files (Cloudinary Storage puts the URL in .path)
+    // Cloudinary URL অ্যারে তৈরি
     let imagesUrl = images.map((item) => item.path);
 
-    // Parse Sizes
+    // Sizes পার্স করা
     let parsedSizes;
     try {
       parsedSizes = sizes ? JSON.parse(sizes) : [];
@@ -51,7 +54,7 @@ const addProduct = async (req, res) => {
       subCategory,
       bestseller: bestseller === "true" ? true : false,
       sizes: parsedSizes,
-      image: imagesUrl,
+      image: imagesUrl, // Cloudinary URLs
       date: Date.now(),
       offerPrice: offerPrice ? Number(offerPrice) : 0,
       discount: discount ? Number(discount) : 0,
@@ -61,14 +64,14 @@ const addProduct = async (req, res) => {
     const product = new productModel(productData);
     await product.save();
 
-    res.json({ success: true, message: "Product Added" });
+    res.json({ success: true, message: "Product Added Successfully" });
   } catch (error) {
     console.log("Error in addProduct:", error);
     res.json({ success: false, message: error.message });
   }
 };
 
-// Function For list Product
+// --- Function For List Product ---
 const listProducts = async (req, res) => {
   try {
     const products = await productModel.find({});
@@ -79,10 +82,9 @@ const listProducts = async (req, res) => {
   }
 };
 
-// Function For remove Product
+// --- Function For Remove Product ---
 const removeProduct = async (req, res) => {
   try {
-    // Optional: You might want to delete from Cloudinary too, but for now just DB delete
     await productModel.findByIdAndDelete(req.body.id);
     res.json({ success: true, message: "Product Removed" });
   } catch (error) {
@@ -91,7 +93,7 @@ const removeProduct = async (req, res) => {
   }
 };
 
-// Function For single Product Info
+// --- Function For Single Product Info ---
 const singleProduct = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -103,7 +105,7 @@ const singleProduct = async (req, res) => {
   }
 };
 
-// Function to Update Quantity
+// --- Function to Update Quantity ---
 const updateQuantity = async (req, res) => {
   try {
     const { id, quantity } = req.body;
@@ -125,6 +127,7 @@ const updateQuantity = async (req, res) => {
   }
 };
 
+// --- Function to Update Product ---
 const updateProduct = async (req, res) => {
   try {
     const {
@@ -149,29 +152,21 @@ const updateProduct = async (req, res) => {
 
     let updatedImages = [...product.image];
 
+    // কোন ইমেজের ইনডেক্স রিপ্লেস হবে তা পার্স করা
     const imageIndexes = req.body.imageIndexes
       ? JSON.parse(req.body.imageIndexes)
       : [];
 
-    // Handling new uploads for update
-    if (req.files) {
-      // Note: Depending on how your route handles files (array vs fields),
-      // you might need to adjust this. Assuming 'req.files' is an array here:
-      let newFiles = [];
-      if (Array.isArray(req.files)) {
-        newFiles = req.files;
-      } else {
-        // If req.files is object (from fields), extract arrays
-        Object.values(req.files).forEach((fileArray) => {
-          newFiles = [...newFiles, ...fileArray];
-        });
-      }
-
-      const newImagesUrls = newFiles.map((item) => item.path);
+    // নতুন আপলোড করা ফাইল হ্যান্ডেল করা
+    if (req.files && req.files.length > 0) {
+      // যেহেতু রাউটে upload.array('image') ব্যবহার করা হয়েছে, তাই req.files সরাসরি অ্যারে হবে
+      const newImagesUrls = req.files.map((item) => item.path);
 
       newImagesUrls.forEach((url, i) => {
+        // imageIndexes অ্যারে থেকে পজিশন নেওয়া
         const indexToReplace = parseInt(imageIndexes[i]);
         if (!isNaN(indexToReplace)) {
+          // নির্দিষ্ট ইনডেক্সে নতুন URL বসানো
           updatedImages[indexToReplace] = url;
         }
       });

@@ -12,6 +12,7 @@ import adminAuth from "../middleware/adminAuth.js";
 
 const productRouter = express.Router();
 
+// Add Product Route (Multiple Fields)
 productRouter.post(
   "/add",
   adminAuth,
@@ -25,11 +26,21 @@ productRouter.post(
   ]),
   addProduct
 );
+
+// Remove Product Route
 productRouter.post("/remove", adminAuth, removeProduct);
+
+// Single Product Info Route
 productRouter.post("/single", singleProduct);
+
+// List Products Route
 productRouter.get("/list", listProducts);
+
+// Update Quantity Route
 productRouter.post("/update-quantity", adminAuth, updateQuantity);
 
+// Update Product Route (Array of images)
+// ফ্রন্টএন্ড থেকে formData.append('image', file) করে পাঠাতে হবে
 productRouter.post("/update", adminAuth, upload.array("image"), updateProduct);
 
 export default productRouter;
