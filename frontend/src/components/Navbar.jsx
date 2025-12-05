@@ -5,7 +5,7 @@ import { ShopContext } from "../context/ShopContext";
 import BottomNavbar from "./BottomNavbar";
 import useClickOutside from "../Hook/useClickOutside";
 
-import NavLogo from "../assets/NavLogo.png";
+import NavLogo from "../assets/NavLogo.webp";
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);

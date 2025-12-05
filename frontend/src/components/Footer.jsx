@@ -1,7 +1,7 @@
 import React from "react";
 // import { assets } from "../assets/assets";
 import { Link } from "react-router-dom";
-import NavLogo from "../assets/NavLogo.png";
+import NavLogo from "../assets/NavLogo.webp";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
