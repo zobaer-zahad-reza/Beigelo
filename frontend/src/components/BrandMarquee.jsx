@@ -101,7 +101,7 @@ const BrandMarquee = () => {
           onMouseEnter={handleMouseEnter}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className={`flex items-center space-x-8 overflow-x-hidden whitespace-nowrap py-4 px-4 cursor-grab ${
+          className={`flex items-center space-x-4 overflow-x-hidden whitespace-nowrap py-4 px-4 cursor-grab ${
             isDragging ? "cursor-grabbing" : ""
           }`}
           style={{ scrollBehavior: "auto" }} 
