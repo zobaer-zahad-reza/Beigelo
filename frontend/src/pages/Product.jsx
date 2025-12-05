@@ -2,19 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import RelatedProduct from "../components/RelatedProduct";
-import OptimizedProductImage from "../components/OptimizedProductImage";
+// import OptimizedProductImage from "../components/OptimizedProductImage";
 import Spinner from "../components/Spinner";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import slugify from "slugify";
 import { FaWhatsapp } from "react-icons/fa";
 
-const getPublicIdFromUrl = (url) => {
-  if (!url) return "";
-  const parts = url.split("/");
-  const publicIdWithFormat = parts[parts.length - 1];
-  const publicId = publicIdWithFormat.split(".")[0];
-  return publicId;
-};
 
 const Product = () => {
   const { productSlug } = useParams();
@@ -24,7 +17,7 @@ const Product = () => {
 
   const yourWhatsAppNumber = "8801630071818";
 
-  // Zoom
+  // Zoom State
   const [zoomStyle, setZoomStyle] = useState({
     transformOrigin: "center",
     transform: "scale(1)",
@@ -44,6 +37,7 @@ const Product = () => {
       const pOffer = Number(currentProduct.offerPrice);
       const finalPrice = pOffer > 0 && pOffer < pPrice ? pOffer : pPrice;
 
+      // Google Analytics Data Layer
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
         event: "view_item",
@@ -56,7 +50,7 @@ const Product = () => {
     }
   }, [productSlug, products, currency]);
 
-  // --- Zoom Handle ---
+  // Zoom Handle Logic
   const handleMouseMove = (e) => {
     const { left, top, width, height } =
       e.currentTarget.getBoundingClientRect();
@@ -91,20 +85,18 @@ const Product = () => {
     return <Spinner />;
   }
 
-  // 1. Sold Out
+  // 1. Sold Out Check
   const isSoldOut = productData.quantity === 0;
 
-  // 2. Price & Discount
+  // 2. Price & Discount Logic
   const numPrice = Number(productData.price);
   const numOfferPrice = Number(productData.offerPrice);
-
-  // Discount
   const hasDiscount = numOfferPrice > 0 && numOfferPrice < numPrice;
-
   const discountPercentage = hasDiscount
     ? Math.round(((numPrice - numOfferPrice) / numPrice) * 100)
     : 0;
 
+  // Schema for SEO
   const productSchema = {
     "@context": "https://schema.org/",
     "@type": "Product",
@@ -154,8 +146,11 @@ const Product = () => {
 
         {/* Product Data */}
         <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
-          {/* --- Product Images --- */}
+          
+          {/* --- Product Images Section --- */}
           <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
+            
+            {/* --- Thumbnails List (Left Side) --- */}
             <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
               {productData.image.map((itemUrl, index) => (
                 <div
@@ -163,16 +158,17 @@ const Product = () => {
                   onClick={() => setImage(itemUrl)}
                   className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border border-transparent hover:border-gray-300 rounded-md aspect-square overflow-hidden flex items-center justify-center"
                 >
-                  <OptimizedProductImage
-                    publicId={getPublicIdFromUrl(itemUrl)}
-                    name={productData.name}
-                    className={`w-full h-full object-contain`}
+                  {/* UPDATE: OptimizedProductImage বাদ দিয়ে সাধারণ <img> ট্যাগ ব্যবহার করা হয়েছে */}
+                  <img
+                    src={itemUrl}
+                    alt={productData.name}
+                    className="w-full h-full object-contain"
                   />
                 </div>
               ))}
             </div>
 
-            {/* --- Main Image --- */}
+            {/* --- Main Image View (Big Image) --- */}
             <div className="w-full sm:w-[65%]">
               <div
                 className="w-full h-auto rounded-lg overflow-hidden relative cursor-zoom-in bg-white border border-gray-100"
@@ -186,30 +182,36 @@ const Product = () => {
                   </div>
                 )}
 
-                {/* DISCOUNT BADGE ON IMAGE  */}
+                {/* DISCOUNT BADGE */}
                 {!isSoldOut && hasDiscount && (
                   <div className="absolute top-4 right-4 z-20 bg-green-500 text-white px-3 py-1 rounded-full font-bold shadow-md text-sm">
                     {discountPercentage}% OFF
                   </div>
                 )}
 
-                {image && (
+                {/* UPDATE: Main Image Display Logic */}
+                {image ? (
                   <div
                     className="w-full h-auto flex items-center justify-center transition-transform duration-100 ease-out"
                     style={zoomStyle}
                   >
-                    <OptimizedProductImage
-                      publicId={getPublicIdFromUrl(image)}
-                      name={productData.name}
-                      className={`w-full h-auto sm:object-contain pointer-events-none `}
+
+                    <img
+                      src={image}
+                      alt={productData.name}
+                      className="w-full h-auto sm:object-contain pointer-events-none"
                     />
+                  </div>
+                ) : (
+                  <div className="w-full h-64 flex items-center justify-center bg-gray-200 text-gray-500">
+                    No Image Available
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Product Information */}
+          {/* Product Information (Right Side - No Changes) */}
           <div className="flex-1">
             <h1 className="font-medium text-3xl">{productData.name}</h1>
 
@@ -222,7 +224,7 @@ const Product = () => {
 
             <div className="mt-4 flex flex-col gap-1">
               <div className="flex items-center gap-4">
-                {/* Main Price Display */}
+                {/* Main Price */}
                 <p
                   className={`text-3xl font-bold ${
                     isSoldOut ? "text-gray-400 line-through" : "text-black"
@@ -232,7 +234,7 @@ const Product = () => {
                   {hasDiscount ? numOfferPrice : numPrice}
                 </p>
 
-                {/* Old Price & Badge */}
+                {/* Old Price */}
                 {hasDiscount && !isSoldOut && (
                   <div className="flex items-center gap-2">
                     <p className="text-xl text-gray-400 line-through font-medium">
@@ -245,7 +247,6 @@ const Product = () => {
                   </div>
                 )}
 
-                {/* Out of stock Text */}
                 {isSoldOut && (
                   <span className="text-xl font-bold text-red-600">
                     Out of Stock
@@ -254,9 +255,8 @@ const Product = () => {
               </div>
             </div>
 
-            {/* --- Button Section --- */}
+            {/* --- Buttons --- */}
             <div className="flex flex-col gap-3 mt-6 max-w-xs">
-              {/* Add To Cart Button */}
               <button
                 onClick={() => addToCart(productData._id)}
                 disabled={isSoldOut}
@@ -269,7 +269,6 @@ const Product = () => {
                 {isSoldOut ? "OUT OF STOCK" : "ADD TO CART"}
               </button>
 
-              {/* Buy Now Button */}
               <button
                 onClick={() => buyNow(productData._id)}
                 disabled={isSoldOut}
@@ -282,7 +281,6 @@ const Product = () => {
                 {isSoldOut ? "UNAVAILABLE" : "BUY NOW"}
               </button>
 
-              {/* WhatsApp Request Button */}
               {isSoldOut && (
                 <button
                   onClick={handleWhatsAppRequest}
@@ -296,7 +294,7 @@ const Product = () => {
           </div>
         </div>
 
-        {/* Description and Review Section*/}
+        {/* Description Section */}
         <div className="mt-20">
           <div className="flex">
             <b className="border px-5 py-3 text-sm bg-gray-50">Description</b>
