@@ -2,21 +2,29 @@
 <html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="public/FavLogo.png" />
+    <link rel="icon" type="image/svg+xml" href="/FavLogo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- font -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.lordicon.com" />
+
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
-    <!-- canonical -->
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
     <link rel="canonical" href="https://www.beigelo.com/" />
 
     <title>Premium Watches, Caps & Perfumes in BD | Beigelo</title>
-    <!-- meta seo  -->
     <meta
       name="description"
       content="Upgrade your style with Beigelo. Shop authentic premium watches, trendy caps, and long-lasting perfumes. Best lifestyle store in Bangladesh with fast delivery."
@@ -53,13 +61,10 @@
       content="https://www.beigelo.com/FavLogo.png"
     />
 
-    <!-- hreflang tag -->
     <link rel="alternate" href="https://www.beigelo.com/" hreflang="bn-bd" />
 
-    <!-- lordIcon -->
-    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+    <script src="https://cdn.lordicon.com/lordicon.js" defer></script>
 
-    <!-- TikTok Pixel Code Start -->
     <script>
       !(function (w, d, t) {
         w.TiktokAnalyticsObject = t;
@@ -116,9 +121,6 @@
         ttq.page();
       })(window, document, "ttq");
     </script>
-    <!-- TikTok Pixel Code End -->
-
-    <!-- Google Tag Manager -->
     <script>
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
@@ -131,9 +133,6 @@
         f.parentNode.insertBefore(j, f);
       })(window, document, "script", "dataLayer", "GTM-5NGBQ2NV");
     </script>
-    <!-- End Google Tag Manager -->
-
-    <!-- Google tag (gtag.js) -->
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-0BMMC8ZH2T"
@@ -148,7 +147,6 @@
       gtag("config", "G-0BMMC8ZH2T");
     </script>
 
-    <!-- Organization Schema -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -173,7 +171,6 @@
   </head>
 
   <body>
-    <!-- Google Tag Manager (noscript) -->
     <noscript
       ><iframe
         src="https://www.googletagmanager.com/ns.html?id=GTM-5NGBQ2NV"
@@ -182,7 +179,6 @@
         style="display: none; visibility: hidden"
       ></iframe
     ></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
