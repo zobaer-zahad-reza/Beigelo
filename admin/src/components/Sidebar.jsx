@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { assets } from "../assets/assets";
+import { MdOutlineAnalytics } from "react-icons/md";
 
 const Sidebar = () => {
   const [showAddMenu, setShowAddMenu] = useState(false);
@@ -8,6 +9,17 @@ const Sidebar = () => {
   return (
     <div className="w-[18%] min-h-screen border-r-2 bg-white">
       <div className="flex flex-col gap-4 pt-6 pl-[20%] text-[15px]">
+
+      {/*Dashboard*/}
+        <NavLink
+          className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l"
+          to="/dashboard"
+        >
+          <MdOutlineAnalytics size={28} />
+          <p className="hidden md:block">Dashboard</p>
+        </NavLink>
+
+
         <div
           onClick={() => setShowAddMenu(!showAddMenu)}
           className={`flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l cursor-pointer hover:bg-gray-50 transition-colors ${
