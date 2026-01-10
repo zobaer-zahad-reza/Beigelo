@@ -7,6 +7,7 @@ import NewsletterBox from "../components/NewsletterBox";
 import SearchBar from "../components/SearchBar";
 import BrandMarquee from "../components/BrandMarquee";
 import Title from "../components/Title";
+import PromoBanner from "../components/PromoBanner";
 
 const Home = () => {
   return (
@@ -14,9 +15,10 @@ const Home = () => {
       <Hero />
       <BrandMarquee />
       <LatestCollection />
+      <PromoBanner />
       <BestSeller />
       <OurPolicy />
-      <NewsletterBox />
+      {/* <NewsletterBox /> */}
     </div>
   );
 };
