@@ -55,7 +55,7 @@ jobs:
             echo "Removing old node_modules..."
             rm -rf node_modules
             echo "Installing dependencies for Backend..."
-            npm install
+            npm install --legacy-peer-deps
             echo "Restarting server with PM2..."
             pm2 restart beigelo_server
             echo "✅ Backend Deployment Complete!"
