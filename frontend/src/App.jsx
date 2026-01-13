@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import ScrollToTop from "./components/ScrollToTop";
 import Spinner from "./components/Spinner";
 import SocialSideNav from "./components/SocialSideNav";
+import axios from "axios";
 
 // Lazy loading
 const Home = lazy(() => import("./pages/Home"));
@@ -24,6 +25,44 @@ const ErrorPage = lazy(() => import("./pages/ErrorPage"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 const App = () => {
+  useEffect(() => {
+    const trackUser = async () => {
+      try {
+        // ১. URL থেকে UTM প্যারামিটার বের করা
+        const queryParams = new URLSearchParams(window.location.search);
+
+        // ২. ডাটা অবজেক্ট তৈরি করা
+        const trackingData = {
+          utm_source: queryParams.get("utm_source"),
+          utm_medium: queryParams.get("utm_medium"),
+          utm_campaign: queryParams.get("utm_campaign"),
+          page: window.location.pathname,
+          referrer: document.referrer, // ব্যবহারকারী কোন সাইট থেকে এসেছে
+        };
+
+        // ৩. ব্যাকএন্ড লিংক সেট করা (Environment Variable থেকে)
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+        // ৪. ব্যাকএন্ডে পাঠানো (একবারই)
+        // সেশন স্টোরেজ চেক করা যাতে পেজ রিফ্রেশে বারবার কাউন্ট না হয়
+        if (!sessionStorage.getItem("visited")) {
+          // যদি backendUrl না পাওয়া যায়, তবে কনসোলে ওয়ার্নিং দেখাবে
+          if (!backendUrl) {
+            console.warn("Backend URL is missing in .env file");
+            return;
+          }
+
+          await axios.post(`${backendUrl}/api/visitors/track`, trackingData);
+          sessionStorage.setItem("visited", "true");
+        }
+      } catch (error) {
+        console.error("Tracking Error", error);
+      }
+    };
+
+    trackUser();
+  }, []);
+
   return (
     <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
       <ToastContainer />

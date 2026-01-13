@@ -9,6 +9,8 @@ import cartRouter from "./routes/cartRoute.js";
 import orderRouter from "./routes/orderRoute.js";
 import nodemailer from "nodemailer";
 import brandRouter from "./routes/brandRoute.js";
+import trackVisitor from "./middleware/trackVisitor.js";
+import trackingRoutes from "./routes/trackingRoutes.js";
 
 // App Config
 const app = express();
@@ -60,6 +62,9 @@ app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/brand", brandRouter);
+
+// Routes
+app.use("/api/visitors", trackingRoutes);
 
 // API Route for sending email
 app.post("/api/send-email-contactpage", async (req, res) => {
