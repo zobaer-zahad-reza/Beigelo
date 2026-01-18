@@ -1,9 +1,9 @@
 import React from "react";
-import { assets } from "../assets/assets"; // আপনার ঘড়ির একটি সুন্দর বড় ছবি এখানে ইমপোর্ট করবেন
+import  richarMile  from "../assets/richardMile.png";
 
 const PromoBanner = () => {
   return (
-    <div className="flex flex-col md:flex-row bg-gray-900 text-white my-20 py-16 px-6 md:px-20 items-center justify-between overflow-hidden">
+    <div className="flex flex-col md:flex-row bg-gray-900 text-white my-20 py-16 px-6 md:px-20 items-center rounded-lg justify-between overflow-hidden">
       {/* Text Side */}
       <div className="md:w-1/2 space-y-5 text-center md:text-left z-10">
         <p className="text-gray-400 uppercase tracking-widest text-sm">
@@ -26,9 +26,7 @@ const PromoBanner = () => {
       <div className="md:w-1/2 mt-10 md:mt-0 relative">
         {/* একটি বড় ঘড়ির ছবি এখানে বসবে */}
         <img
-          src={
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-LabiCnKmQOfAtDalPGKaFcFcvpehfEOkrQ&s"
-          } // আপনার যেকোনো একটি হাই-কোয়ালিটি ঘড়ির ছবি
+          src={richarMile} 
           alt="Luxury Watch"
           className="w-full max-w-md mx-auto hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
         />

@@ -70,7 +70,7 @@ const Product = () => {
     });
   };
 
-  // WhatsApp Button Handler
+  // WhatsApp Button Handler (For Sold Out)
   const handleWhatsAppRequest = () => {
     if (!productData) return;
     const message = `Hi, I am interested in "${productData.name}" but it is currently Sold Out. Can you please let me know if it becomes available?`;
@@ -84,10 +84,10 @@ const Product = () => {
     return <Spinner />;
   }
 
-  // Sold Out Check
+  // 1. Sold Out Check
   const isSoldOut = productData.quantity === 0;
 
-  // Price & Discount Logic
+  // 2. Price & Discount Logic
   const numPrice = Number(productData.price);
   const numOfferPrice = Number(productData.offerPrice);
   const hasDiscount = numOfferPrice > 0 && numOfferPrice < numPrice;
@@ -149,7 +149,7 @@ const Product = () => {
           {/* --- Product Images Section --- */}
           <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
             
-           
+            {/* --- Thumbnails List (Left Side) --- */}
             <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
               {productData.image.map((itemUrl, index) => (
                 <div
@@ -220,7 +220,7 @@ const Product = () => {
 
             <div className="mt-4 flex flex-col gap-1">
               <div className="flex items-center gap-4">
-                {/* Main Price */}
+                {/* Main Price (Formatted) */}
                 <p
                   className={`text-3xl font-bold ${
                     isSoldOut ? "text-gray-400 line-through" : "text-black"
@@ -230,7 +230,7 @@ const Product = () => {
                   {hasDiscount ? numOfferPrice.toLocaleString() : numPrice.toLocaleString()}
                 </p>
 
-                {/* Old Price */}
+                {/* Old Price (Formatted) */}
                 {hasDiscount && !isSoldOut && (
                   <div className="flex items-center gap-2">
                     <p className="text-xl text-gray-400 line-through font-medium">
@@ -277,16 +277,21 @@ const Product = () => {
                 {isSoldOut ? "UNAVAILABLE" : "BUY NOW"}
               </button>
 
-              {isSoldOut && (
-                <button
-                  onClick={handleWhatsAppRequest}
-                  className="w-full bg-green-600 text-white border border-green-600 py-3 text-sm font-medium active:bg-green-700 hover:bg-green-700 transition-colors flex items-center justify-center gap-2 mt-2 rounded-sm shadow-sm"
-                >
-                  <FaWhatsapp size={24} />
-                  Request Restock via WhatsApp
-                </button>
-              )}
+              {/* --- WhatsApp Chat Button (Always Visible - Fills the empty space) --- */}
+              <a
+                href={`https://wa.me/${yourWhatsAppNumber}?text=${encodeURIComponent(
+                  `Hi, I am interested in ${productData.name}. Is it available?`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2 border border-green-600 text-green-700 bg-green-50 hover:bg-green-600 hover:text-white py-3 rounded-sm font-medium transition-all duration-300 mt-2 shadow-sm"
+              >
+                <FaWhatsapp className="text-xl" />
+                Chat / Order on WhatsApp
+              </a>
+
             </div>
+
           </div>
         </div>
 
