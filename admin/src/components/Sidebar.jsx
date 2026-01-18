@@ -20,6 +20,16 @@ const Sidebar = () => {
         </NavLink>
 
 
+         {/*Fraud Check*/}
+        <NavLink
+          className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l"
+          to="/fraudCheck"
+        >
+          <MdOutlineAnalytics size={28} />
+          <p className="hidden md:block">Fraud Check</p>
+        </NavLink>
+
+
         <div
           onClick={() => setShowAddMenu(!showAddMenu)}
           className={`flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l cursor-pointer hover:bg-gray-50 transition-colors ${

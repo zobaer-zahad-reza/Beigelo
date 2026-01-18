@@ -11,12 +11,14 @@ import nodemailer from "nodemailer";
 import brandRouter from "./routes/brandRoute.js";
 import trackVisitor from "./middleware/trackVisitor.js";
 import trackingRoutes from "./routes/trackingRoutes.js";
+// NEW IMPORT: Fraud Route
+import fraudRouter from "./routes/fraudRoute.js"; 
 
 // App Config
 const app = express();
 const port = process.env.PORT || 4000;
 
-// -------- CORS Setup (Moved to Top) --------
+// CORS Setup 
 const allowedOrigins = [
   "https://beigelo.com",
   "https://www.beigelo.com",
@@ -32,7 +34,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Mobile app ba server-to-server call (Postman/Curl) er jonno origin null thakte pare
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) !== -1) {
@@ -42,13 +43,13 @@ app.use(
         return callback(new Error("CORS Policy Error"), false);
       }
     },
-    credentials: true, // Cookie/Session allow korar jonno
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // <-- ETA ADD KORUN
-    allowedHeaders: ["Content-Type", "Authorization", "token"], // <-- ETA ADD KORUN (Jate header block na hoy)
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "token"],
   })
 );
 
-// -------- Middlewares --------
+// Middlewares
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
@@ -56,15 +57,17 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 connectDB();
 connectCloudinary();
 
-// API Endpoints
+//API Endpoints
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/order", orderRouter);
 app.use("/api/brand", brandRouter);
-
-// Routes
 app.use("/api/visitors", trackingRoutes);
+
+// Fraud Check api
+app.use("/api/fraud", fraudRouter);
+
 
 // API Route for sending email
 app.post("/api/send-email-contactpage", async (req, res) => {
@@ -111,11 +114,10 @@ app.get("/", (req, res) => {
   res.send("API Working ✅");
 });
 
-// Global Error Handler
+
 app.use((err, req, res, next) => {
   console.error("⚠️ Server Error:", err.message);
   if (err.message.includes("CORS")) {
-    // CORS error হলে 500 না দিয়ে 403 (Forbidden) দেওয়া ভালো, তবে 500 ও চলবে
     return res.status(403).json({ success: false, message: err.message });
   }
   res.status(500).json({ success: false, message: "Internal Server Error" });

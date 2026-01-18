@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import { ToastContainer } from "react-toastify";
 import AddBrand from "./pages/AddBrand";
 import DashboardHome from "./pages/DashboardHome";
+import FraudCheck from "./pages/FraudCheck";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export const currency = "৳ ";
@@ -50,6 +51,9 @@ const App = () => {
 
                 <Route index element={<DashboardHome />} />
                 <Route path="/dashboard" element={<DashboardHome />}/>
+
+                <Route path="/fraudCheck" element={<FraudCheck />}/>
+
 
                 <Route
                   path="/list"
