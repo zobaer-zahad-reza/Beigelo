@@ -1,7 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { ShieldCheck, ShieldAlert, Search, Loader2, UserX, CheckCircle } from 'lucide-react';
-// যদি আপনার AppContext থাকে, সেখান থেকেও backendUrl নিতে পারেন
 
 const FraudCheck = () => {
     const [phone, setPhone] = useState('');
@@ -9,19 +8,15 @@ const FraudCheck = () => {
     const [result, setResult] = useState(null);
     const [error, setError] = useState('');
 
-    // --- .env থেকে Backend URL নেওয়া ---
-    // Vite প্রজেক্টের জন্য: import.meta.env.VITE_BACKEND_URL
-    // Create-React-App এর জন্য: process.env.REACT_APP_BACKEND_URL
     
     const backendUrl = import.meta.env.VITE_BACKEND_URL; 
-    // অথবা যদি সরাসরি ShopContext ব্যবহার করেন: const { backendUrl } = useContext(ShopContext);
 
     const handleCheck = async (e) => {
         e.preventDefault();
         setError('');
         setResult(null);
 
-        // 1. Phone Number Validation
+
         const bdPhoneRegex = /^(?:\+88|88)?(01[3-9]\d{8})$/;
         if (!bdPhoneRegex.test(phone)) {
             setError('Please enter a valid Bangladeshi mobile number (01XXXXXXXXX)');
@@ -36,8 +31,6 @@ const FraudCheck = () => {
         setLoading(true);
 
         try {
-            // 2. Real API Call
-            // console.log("Calling URL:", `${backendUrl}/api/fraud/check`); // ডিবাগিংয়ের জন্য
             
             const response = await axios.post(`${backendUrl}/api/fraud/check`, { phone });
             

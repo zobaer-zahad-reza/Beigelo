@@ -25,7 +25,6 @@ const ProductItem = ({
     ? Math.round(((numPrice - numOfferPrice) / numPrice) * 100)
     : 0;
 
-
   const primaryImageUrl = Array.isArray(image) && image.length > 0 ? image[0] : null;
   const secondaryImageUrl = Array.isArray(image) && image.length > 1 ? image[1] : null;
 
@@ -34,7 +33,8 @@ const ProductItem = ({
   const imageClassName = `transition-all duration-500 ease-in-out object-cover ${
     isHovered && !isSoldOut ? "scale-110" : "scale-100"
   } `;
-// slug for url
+
+  // slug for url
   const categorySlug = slugify(categoryName || "item", { lower: true, strict: true });
   const subCategorySlug = slugify(subCategory || "subcategory", { lower: true, strict: true });
   const productSlug = slugify(name || "product", { lower: true, strict: true });
@@ -49,7 +49,7 @@ const ProductItem = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="overflow-hidden relative rounded-sm">
-        {/*SOLD OUT BADGE */}
+        {/* SOLD OUT BADGE */}
         {isSoldOut && (
           <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-md uppercase tracking-wider">
             Sold Out
@@ -99,12 +99,13 @@ const ProductItem = ({
                 isSoldOut ? "text-gray-400 line-through" : "text-black"
               }`}
             >
-              {currency} {hasDiscount ? numOfferPrice : numPrice}
+
+              {currency} {hasDiscount ? numOfferPrice.toLocaleString() : numPrice.toLocaleString()}
             </p>
 
             {hasDiscount && !isSoldOut && (
               <p className="text-xs text-gray-400 line-through">
-                {currency} {numPrice}
+                {currency} {numPrice.toLocaleString()}
               </p>
             )}
           </div>

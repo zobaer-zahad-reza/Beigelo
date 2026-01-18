@@ -8,7 +8,6 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import slugify from "slugify";
 import { FaWhatsapp } from "react-icons/fa";
 
-
 const Product = () => {
   const { productSlug } = useParams();
   const { products, currency, addToCart, buyNow } = useContext(ShopContext);
@@ -85,10 +84,10 @@ const Product = () => {
     return <Spinner />;
   }
 
-  // 1. Sold Out Check
+  // Sold Out Check
   const isSoldOut = productData.quantity === 0;
 
-  // 2. Price & Discount Logic
+  // Price & Discount Logic
   const numPrice = Number(productData.price);
   const numOfferPrice = Number(productData.offerPrice);
   const hasDiscount = numOfferPrice > 0 && numOfferPrice < numPrice;
@@ -150,7 +149,7 @@ const Product = () => {
           {/* --- Product Images Section --- */}
           <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
             
-            {/* --- Thumbnails List (Left Side) --- */}
+           
             <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
               {productData.image.map((itemUrl, index) => (
                 <div
@@ -158,7 +157,6 @@ const Product = () => {
                   onClick={() => setImage(itemUrl)}
                   className="w-[24%] sm:w-full sm:mb-3 flex-shrink-0 cursor-pointer border border-transparent hover:border-gray-300 rounded-md aspect-square overflow-hidden flex items-center justify-center"
                 >
-                  {/* UPDATE: OptimizedProductImage বাদ দিয়ে সাধারণ <img> ট্যাগ ব্যবহার করা হয়েছে */}
                   <img
                     src={itemUrl}
                     alt={productData.name}
@@ -194,7 +192,6 @@ const Product = () => {
                     className="w-full h-auto flex items-center justify-center transition-transform duration-100 ease-out"
                     style={zoomStyle}
                   >
-
                     <img
                       src={image}
                       alt={productData.name}
@@ -230,7 +227,7 @@ const Product = () => {
                   }`}
                 >
                   {currency}
-                  {hasDiscount ? numOfferPrice : numPrice}
+                  {hasDiscount ? numOfferPrice.toLocaleString() : numPrice.toLocaleString()}
                 </p>
 
                 {/* Old Price */}
@@ -238,7 +235,7 @@ const Product = () => {
                   <div className="flex items-center gap-2">
                     <p className="text-xl text-gray-400 line-through font-medium">
                       {currency}
-                      {numPrice}
+                      {numPrice.toLocaleString()}
                     </p>
                     <span className="bg-pink-100 text-pink-600 px-2 py-1 text-xs font-bold rounded">
                       SAVE {discountPercentage}%
@@ -300,12 +297,12 @@ const Product = () => {
           </div>
 
           <div className="flex flex-col gap-4 border px-6 py-6 text-sm text-gray-600">
-            <p className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <div
                 className="mt-4 text-gray-600 md:w-4/5"
                 dangerouslySetInnerHTML={{ __html: productData.description }}
               />
-            </p>
+            </div>
             <p className="mt-2 font-medium text-gray-700">
               Shop smart. Shop genuine. Shop with trust and comfort.
             </p>

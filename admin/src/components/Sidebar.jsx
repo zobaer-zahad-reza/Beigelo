@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { MdOutlineAnalytics } from "react-icons/md";
+import { MdOutlineAnalytics, MdPersonSearch } from "react-icons/md";
+import { FaClipboardList } from "react-icons/fa";
 
 const Sidebar = () => {
   const [showAddMenu, setShowAddMenu] = useState(false);
@@ -25,7 +26,7 @@ const Sidebar = () => {
           className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l"
           to="/fraudCheck"
         >
-          <MdOutlineAnalytics size={28} />
+          <MdPersonSearch  size={28} />
           <p className="hidden md:block">Fraud Check</p>
         </NavLink>
 
@@ -90,7 +91,7 @@ const Sidebar = () => {
           className="flex items-center gap-3 border border-gray-300 border-r-0 px-3 py-3 rounded-l"
           to="/list"
         >
-          <img className="w-5 h-5" src={assets.order_icon} alt="" />
+          <FaClipboardList size={26} />
           <p className="hidden md:block">List Items</p>
         </NavLink>
 
