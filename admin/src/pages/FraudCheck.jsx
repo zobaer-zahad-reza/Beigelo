@@ -57,7 +57,7 @@ const FraudCheck = () => {
 
   // Pie Chart Component
   const CircularProgress = ({ value, color }) => {
-    const radius = 45; // Bigger chart
+    const radius = 45;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (value / 100) * circumference;
 
@@ -155,7 +155,7 @@ const FraudCheck = () => {
         {/* Dashboard Content */}
         {result && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Status & Stats */}
+            {/* Status & Stats */}
             <div className="lg:col-span-1 space-y-6">
               {/* Status Card */}
               <div
@@ -231,7 +231,7 @@ const FraudCheck = () => {
               )}
             </div>
 
-            {/* Right Column: Detailed Table */}
+            {/* Detailed Table */}
             <div className="lg:col-span-2">
               {result.couriers && result.couriers.length > 0 ? (
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden h-full">

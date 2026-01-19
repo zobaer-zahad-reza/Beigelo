@@ -25,19 +25,14 @@ export const checkFraudRisk = async (req, res) => {
 
     const apiData = apiResponse.data;
 
-    // Debugging: কনসোলে চেক করুন ডাটা ঠিক আসছে কিনা
-    // console.log("API Data:", JSON.stringify(apiData?.data?.Summaries, null, 2));
-
     if (apiData && apiData.status === true && apiData.data) {
       const fraudData = apiData.data;
       const summariesObj = fraudData.Summaries || {};
 
-      // ১. Courier Data Processing (Object to Array)
-      // আমরা এখান থেকেই সব ডাটা বের করব
+      // Courier Data Processing
       const formattedCouriers = Object.keys(summariesObj).map((key) => {
         const item = summariesObj[key];
 
-        // ডাটা নাম্বার হিসেবে নিশ্চিত করা হচ্ছে (String '35' হলে সেটা Number 35 হবে)
         const cTotal = Number(item.total || 0);
         const cDelivered = Number(item.success || 0);
         const cCancel = Number(item.cancel || 0);
@@ -51,13 +46,13 @@ export const checkFraudRisk = async (req, res) => {
           logo: item.logo || null,
           total: cTotal,
           delivered: cDelivered,
-          returned: cCancel, // এটি যোগ করা হলো ক্যালকুলেশনের জন্য
+          returned: cCancel,
           returnRate: returnRate,
         };
       });
 
-      // ২. Recalculate Totals (Manually)
-      // API-এর totalSummary ব্যবহার না করে আমরা নিজেরা যোগ করব, যাতে টেবিলের সাথে হুবহু মিলে।
+      // Recalculate Totals (Manually)
+
       const finalTotal = formattedCouriers.reduce(
         (sum, item) => sum + item.total,
         0,
@@ -75,7 +70,7 @@ export const checkFraudRisk = async (req, res) => {
       const finalSuccessRate =
         finalTotal > 0 ? Math.round((finalDelivered / finalTotal) * 100) : 0;
 
-      // ৩. Risk Logic
+      // Risk Logic
       let isSafe = true;
       let riskLevel = "Low";
 
@@ -88,7 +83,7 @@ export const checkFraudRisk = async (req, res) => {
         isSafe: isSafe,
         risk_level: riskLevel,
         details: {
-          total: finalTotal, // এখন এটি টেবিলের যোগফলের সমান হবে
+          total: finalTotal,
           delivered: finalDelivered,
           returned: finalReturned,
           successRate: finalSuccessRate,
