@@ -75,7 +75,7 @@ const Product = () => {
     if (!productData) return;
     const message = `Hi, I am interested in "${productData.name}" but it is currently Sold Out. Can you please let me know if it becomes available?`;
     const url = `https://wa.me/${yourWhatsAppNumber}?text=${encodeURIComponent(
-      message
+      message,
     )}`;
     window.open(url, "_blank");
   };
@@ -84,10 +84,10 @@ const Product = () => {
     return <Spinner />;
   }
 
-  // 1. Sold Out Check
+  // Sold Out Check
   const isSoldOut = productData.quantity === 0;
 
-  // 2. Price & Discount Logic
+  // Price & Discount Logic
   const numPrice = Number(productData.price);
   const numOfferPrice = Number(productData.offerPrice);
   const hasDiscount = numOfferPrice > 0 && numOfferPrice < numPrice;
@@ -145,10 +145,8 @@ const Product = () => {
 
         {/* Product Data */}
         <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
-          
           {/* --- Product Images Section --- */}
           <div className="flex-1 flex flex-col-reverse gap-3 sm:flex-row">
-            
             {/* --- Thumbnails List (Left Side) --- */}
             <div className="flex sm:flex-col overflow-x-auto sm:overflow-y-scroll justify-between sm:justify-normal sm:w-[18.7%] w-full">
               {productData.image.map((itemUrl, index) => (
@@ -227,7 +225,9 @@ const Product = () => {
                   }`}
                 >
                   {currency}
-                  {hasDiscount ? numOfferPrice.toLocaleString() : numPrice.toLocaleString()}
+                  {hasDiscount
+                    ? numOfferPrice.toLocaleString()
+                    : numPrice.toLocaleString()}
                 </p>
 
                 {/* Old Price (Formatted) */}
@@ -277,10 +277,9 @@ const Product = () => {
                 {isSoldOut ? "UNAVAILABLE" : "BUY NOW"}
               </button>
 
-              {/* --- WhatsApp Chat Button (Always Visible - Fills the empty space) --- */}
               <a
                 href={`https://wa.me/${yourWhatsAppNumber}?text=${encodeURIComponent(
-                  `Hi, I am interested in ${productData.name}. Is it available?`
+                  `Hi, I am interested in ${productData.name}. Is it available?`,
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -289,9 +288,7 @@ const Product = () => {
                 <FaWhatsapp className="text-xl" />
                 Chat / Order on WhatsApp
               </a>
-
             </div>
-
           </div>
         </div>
 

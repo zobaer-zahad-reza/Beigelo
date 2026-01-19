@@ -81,10 +81,10 @@ const ShopContextProvider = (props) => {
 
   // Add to Cart Function
   const addToCart = async (itemId, size) => {
-    if (!size) {
-      toast.error("Please Select Product Size");
-      return;
-    }
+    // if (!size) {
+    //   toast.error("Please Select Product Size");
+    //   return;
+    // }
 
     if (!token) {
       Swal.fire({
@@ -148,10 +148,10 @@ const ShopContextProvider = (props) => {
 
   // Buy Now Function
   const buyNow = (itemId, size) => {
-    if (!size) {
-      toast.error("Please Select Product Size");
-      return;
-    }
+    // if (!size) {
+    //   toast.error("Please Select Product Size");
+    //   return;
+    // }
 
     const product = products.find((p) => p._id === itemId);
     if (product) {
