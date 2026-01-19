@@ -5,14 +5,15 @@ import Title from "../components/Title";
 import ProductItem from "../components/ProductItem";
 import axios from "axios";
 import { TbFaceIdError } from "react-icons/tb";
-import { IoClose } from "react-icons/io5"; // Close icon for mobile drawer
-import { FaFilter } from "react-icons/fa"; // Filter icon
+import { IoClose } from "react-icons/io5";
+import { FaFilter } from "react-icons/fa";
 
 const Collection = () => {
   const { categorySlug, subCategorySlug } = useParams();
   const location = useLocation();
 
   const { products, search, showSearch, backendUrl } = useContext(ShopContext);
+
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
 
@@ -23,6 +24,7 @@ const Collection = () => {
   const [brands, setBrands] = useState([]);
   const [sortType, setSortType] = useState("relavent");
 
+  // Fetch Brands from Backend
   useEffect(() => {
     const fetchBrands = async () => {
       try {
@@ -37,6 +39,7 @@ const Collection = () => {
     fetchBrands();
   }, [backendUrl]);
 
+  // Set Filters based on URL Params
   useEffect(() => {
     if (categorySlug) {
       const formattedCategory =
@@ -83,7 +86,7 @@ const Collection = () => {
   const toggleBrand = (e) => {
     if (brandCategory.includes(e.target.value)) {
       setBrandCategory((prev) =>
-        prev.filter((item) => item !== e.target.value)
+        prev.filter((item) => item !== e.target.value),
       );
     } else {
       setBrandCategory((prev) => [...prev, e.target.value]);
@@ -93,27 +96,27 @@ const Collection = () => {
   useEffect(() => {
     let processedProducts = [...products];
 
-    if (showSearch && search) {
+    if (search) {
       processedProducts = processedProducts.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        item.name.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
     if (category.length > 0) {
       processedProducts = processedProducts.filter((item) =>
-        category.includes(item.category)
+        category.includes(item.category),
       );
     }
 
     if (subCategory.length > 0) {
       processedProducts = processedProducts.filter((item) =>
-        subCategory.includes(item.subCategory)
+        subCategory.includes(item.subCategory),
       );
     }
 
     if (brandCategory.length > 0) {
       processedProducts = processedProducts.filter((item) =>
-        brandCategory.includes(item.brand)
+        brandCategory.includes(item.brand),
       );
     }
 
@@ -129,29 +132,31 @@ const Collection = () => {
     }
 
     setFilterProducts(processedProducts);
-  }, [category, subCategory, brandCategory, search, showSearch, products, sortType]);
+  }, [category, subCategory, brandCategory, search, products, sortType]);
 
   return (
-    <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t relative">
-      
-      {/* --- Filter Sidebar (Mobile Overlay + Desktop Static) --- */}
-      {/* Mobile Background Overlay */}
-      <div 
-        className={`fixed inset-0 z-40 bg-black/50 sm:hidden transition-opacity duration-300 ${showFilter ? 'opacity-100 visible' : 'opacity-0 invisible'}`} 
+    <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t relative ">
+      <div
+        className={`fixed inset-0 z-40 bg-black/50 sm:hidden transition-opacity duration-300 ${showFilter ? "opacity-100 visible" : "opacity-0 invisible"}`}
         onClick={() => setShowFilter(false)}
       ></div>
 
       {/* Filter Content Container */}
-      <div className={`
+      <div
+        className={`
           min-w-60 bg-white 
           fixed sm:static top-0 right-0 bottom-0 z-50 h-full sm:h-auto w-[80%] sm:w-auto shadow-2xl sm:shadow-none p-5 sm:p-0 overflow-y-auto sm:overflow-visible
           transition-transform duration-300 ease-in-out transform
-          ${showFilter ? 'translate-x-0' : 'translate-x-full sm:translate-x-0'}
-      `}>
-        {/* Mobile Header (Close Button) */}
+          ${showFilter ? "translate-x-0" : "translate-x-full sm:translate-x-0"}
+      `}
+      >
+        {/* Mobile Header  */}
         <div className="flex justify-between items-center mb-6 sm:hidden">
-            <span className="text-xl font-medium">Filters</span>
-            <IoClose onClick={() => setShowFilter(false)} className="text-2xl cursor-pointer" />
+          <span className="text-xl font-medium">Filters</span>
+          <IoClose
+            onClick={() => setShowFilter(false)}
+            className="text-2xl cursor-pointer"
+          />
         </div>
 
         <p className="hidden sm:block my-2 text-xl flex items-center gap-2 font-medium">
@@ -162,8 +167,11 @@ const Collection = () => {
         <div className="border border-gray-300 pl-5 py-3 mt-6">
           <p className="mb-3 text-sm font-medium">CATEGORIES</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-            {['Watch', 'Cap', 'Perfume'].map((cat) => (
-               <label key={cat} className="flex gap-2 items-center cursor-pointer hover:text-black transition-colors">
+            {["Watch", "Cap", "Perfume"].map((cat) => (
+              <label
+                key={cat}
+                className="flex gap-2 items-center cursor-pointer hover:text-black transition-colors"
+              >
                 <input
                   className="w-3 h-3 accent-black"
                   type="checkbox"
@@ -181,8 +189,11 @@ const Collection = () => {
         <div className="border border-gray-300 pl-5 py-3 my-5">
           <p className="mb-3 text-sm font-medium">TYPE</p>
           <div className="flex flex-col gap-2 text-sm font-light text-gray-700">
-            {['Man', 'Women', 'Kids'].map((sub) => (
-              <label key={sub} className="flex gap-2 items-center cursor-pointer hover:text-black transition-colors">
+            {["Man", "Women", "Kids"].map((sub) => (
+              <label
+                key={sub}
+                className="flex gap-2 items-center cursor-pointer hover:text-black transition-colors"
+              >
                 <input
                   className="w-3 h-3 accent-black"
                   type="checkbox"
@@ -202,7 +213,10 @@ const Collection = () => {
           <div className="flex flex-col gap-2 text-sm font-light text-gray-700 max-h-60 overflow-y-auto custom-scrollbar">
             {brands.length > 0 ? (
               brands.map((brand, index) => (
-                <label key={index} className="flex gap-2 items-center cursor-pointer hover:text-black transition-colors">
+                <label
+                  key={index}
+                  className="flex gap-2 items-center cursor-pointer hover:text-black transition-colors"
+                >
                   <input
                     className="w-3 h-3 accent-black"
                     type="checkbox"
@@ -218,44 +232,50 @@ const Collection = () => {
             )}
           </div>
         </div>
-        
-        {/* Mobile Apply Button (Optional visual helper) */}
-        <button 
-            onClick={() => setShowFilter(false)}
-            className="w-full bg-black text-white py-3 mt-4 text-sm font-medium uppercase sm:hidden active:bg-gray-800"
+
+        {/* Mobile Apply Button */}
+        <button
+          onClick={() => setShowFilter(false)}
+          className="w-full bg-black text-white py-3 mt-4 text-sm font-medium uppercase sm:hidden active:bg-gray-800"
         >
-            Apply Filters
+          Apply Filters
         </button>
       </div>
 
-      {/* Right Side (Products & Header) */}
       <div className="flex-1">
-        
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between text-base sm:text-2xl mb-4 gap-4">
           <Title text1={"ALL"} text2={"COLLECTIONS"} />
-          
-          {/* Mobile Toolbar (Filter Trigger & Sort) */}
-          <div className="flex justify-between gap-4 items-center w-full sm:w-auto">
-             {/* Mobile Filter Button */}
-             <button 
-                onClick={() => setShowFilter(true)} 
-                className="sm:hidden flex items-center gap-2 border border-gray-300 px-4 py-2 text-sm text-gray-700 rounded hover:bg-gray-50 transition-colors"
-             >
-                <FaFilter className="text-gray-500" /> Filters
-             </button>
 
-             {/* Sort Dropdown */}
-             <select
-                onChange={(e) => setSortType(e.target.value)}
-                className="border-2 border-gray-300 text-sm px-2 py-2 rounded outline-none cursor-pointer flex-1 sm:flex-none"
-              >
-                <option value="relavent">Sort By: Relavent</option>
-                <option value="low-high">Price: Low to High</option>
-                <option value="high-low">Price: High to Low</option>
-              </select>
+          {/* Mobile Toolbar */}
+          <div className="flex justify-between gap-4 items-center w-full sm:w-auto">
+            {/* Mobile Filter Button */}
+            <button
+              onClick={() => setShowFilter(true)}
+              className="sm:hidden flex items-center gap-2 border border-gray-300 px-4 py-2 text-sm text-gray-700 rounded hover:bg-gray-50 transition-colors"
+            >
+              <FaFilter className="text-gray-500" /> Filters
+            </button>
+
+            {/* Sort Dropdown */}
+            <select
+              onChange={(e) => setSortType(e.target.value)}
+              className="border-2 border-gray-300 text-sm px-2 py-2 rounded outline-none cursor-pointer flex-1 sm:flex-none"
+            >
+              <option value="relavent">Sort By: Relavent</option>
+              <option value="low-high">Price: Low to High</option>
+              <option value="high-low">Price: High to Low</option>
+            </select>
           </div>
         </div>
+
+        {/* Search Result Feedback */}
+        {search && (
+          <div className="mb-4 text-sm text-gray-500">
+            Showing results for{" "}
+            <span className="font-semibold text-black">"{search}"</span>
+          </div>
+        )}
 
         {/* Products Grid */}
         {filterProducts.length > 0 ? (
@@ -287,8 +307,8 @@ const Collection = () => {
                 className="border-b-2 text-black border-black hover:text-gray-600"
               >
                 Contact us
-              </Link>
-              {" "}if you need help.
+              </Link>{" "}
+              if you need help.
             </h3>
           </div>
         )}
