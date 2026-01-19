@@ -1,5 +1,6 @@
 import React from "react";
-import  richarMile  from "../assets/richardMile.png";
+import richarMile from "../assets/richardMile.png";
+import { Link } from "react-router-dom";
 
 const PromoBanner = () => {
   return (
@@ -18,15 +19,14 @@ const PromoBanner = () => {
           precision and elegance.
         </p>
         <button className="bg-[#D4AF37] text-black px-8 py-3 font-semibold uppercase tracking-wide hover:bg-white transition-all duration-300 mt-5">
-          Shop Exclusive
+          <Link to="/collection">Shop Exclusive</Link>
         </button>
       </div>
 
       {/* Image Side */}
       <div className="md:w-1/2 mt-10 md:mt-0 relative">
-        {/* একটি বড় ঘড়ির ছবি এখানে বসবে */}
         <img
-          src={richarMile} 
+          src={richarMile}
           alt="Luxury Watch"
           className="w-full max-w-md mx-auto hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
         />
