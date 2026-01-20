@@ -8,17 +8,18 @@ import SearchBar from "../components/SearchBar";
 import BrandMarquee from "../components/BrandMarquee";
 import Title from "../components/Title";
 import PromoBanner from "../components/PromoBanner";
+import NewsletterModal from "../components/NewsletterModal";
 
 const Home = () => {
   return (
     <div>
+      <NewsletterModal />
       <Hero />
       <BrandMarquee />
       <LatestCollection />
       <PromoBanner />
       <BestSeller />
       <OurPolicy />
-      {/* <NewsletterBox /> */}
     </div>
   );
 };
