@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import popUpImg from "../assets/popImg.jpg"
 
 const NewsletterModal = () => {
   const [showModal, setShowModal] = useState(false);
@@ -42,7 +43,7 @@ const NewsletterModal = () => {
 
         <Link to={'/collection'}>
         <img 
-          src="https://i.ibb.co.com/JRZzctw4/pop-Img.png"
+          src={popUpImg}
           alt="Beigelo First Visit Offer"
           className="w-full h-auto object-cover block hover:scale-105 transition-transform duration-700 "
           // চাইলে ইমেজে ক্লিক করলেও মডাল বন্ধ হওয়ার অপশন রাখতে পারেন নিচের লাইনটি আনকমেন্ট করে:
