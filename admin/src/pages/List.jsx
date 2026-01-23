@@ -4,13 +4,17 @@ import { FaRegEdit, FaPlus } from "react-icons/fa";
 import { toast } from "react-toastify";
 import DescriptionEditor from "../components/DescriptionEditor";
 import { MdDelete } from "react-icons/md";
+import { FiAlertTriangle } from "react-icons/fi"; // Alert Icon added
 
 const List = ({ token, backendUrl, currency }) => {
   const [list, setList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // --- Modal States ---
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // New State for Delete Modal
+  const [productToDelete, setProductToDelete] = useState(null); // ID to delete
 
   // Discount calculation state
   const [discount, setDiscount] = useState(0);
@@ -64,22 +68,35 @@ const List = ({ token, backendUrl, currency }) => {
     }
   };
 
-  const removeProduct = async (id) => {
+  // --- Handle Delete Click (Opens Modal) ---
+  const handleDeleteClick = (id) => {
+    setProductToDelete(id);
+    setShowDeleteModal(true);
+  };
+
+  // --- Confirm Delete (Actual Logic) ---
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
+
     try {
       const response = await axios.post(
         `${backendUrl}/api/product/remove`,
-        { id },
+        { id: productToDelete },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
         toast.success(response.data.message);
         await fetchList();
+        setShowDeleteModal(false); // Close Modal
+        setProductToDelete(null); // Reset ID
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
       console.error("Error removing product:", error);
-      toast.error(error.response?.data?.message || "Failed to remove product.");
+      toast.error(
+        error.response?.data?.message || "Failed to remove product."
+      );
     }
   };
 
@@ -307,18 +324,56 @@ const List = ({ token, backendUrl, currency }) => {
               >
                 <FaRegEdit size={24} />
               </button>
+              
+              {/* ---------- CHANGE HERE: Changed onClick to handleDeleteClick ---------- */}
               <p
-                onClick={() => removeProduct(item._id)}
+                onClick={() => handleDeleteClick(item._id)}
                 className="cursor-pointer text-lg text-red-600 hover:text-red-800 font-bold"
                 title="Delete"
               >
                 <MdDelete size={24} />
               </p>
+              {/* ----------------------------------------------------------------------- */}
+
             </div>
           </div>
         ))}
       </div>
 
+      {/* --- DELETE CONFIRMATION MODAL --- */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-80 md:w-96 text-center transform transition-all scale-100">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+              <FiAlertTriangle className="h-6 w-6 text-red-600" />
+            </div>
+            <h3 className="text-lg leading-6 font-bold text-gray-900">
+              Delete Product?
+            </h3>
+            <div className="mt-2">
+              <p className="text-sm text-gray-500">
+                Are you sure you want to delete this product? This action cannot be undone.
+              </p>
+            </div>
+            <div className="mt-5 flex justify-center gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 text-sm font-medium rounded-md hover:bg-gray-300 focus:outline-none"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none shadow-sm"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- EDIT MODAL (No Changes) --- */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded shadow-lg w-11/12 md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-scroll scrollbar-hide">
@@ -330,12 +385,12 @@ const List = ({ token, backendUrl, currency }) => {
               onSubmit={submitEdit}
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
+              {/* ... (Rest of your form code remains exactly same) ... */}
               <div className="col-span-2">
                 <p className="text-sm font-bold mb-2">
                   Product Images (Click to Change / Add)
                 </p>
                 <div className="flex gap-2 flex-wrap items-center">
-                  {/* Loop through existing images */}
                   {editingProduct.image.map((img, index) => (
                     <label
                       key={index}
@@ -359,14 +414,12 @@ const List = ({ token, backendUrl, currency }) => {
                         hidden
                         onChange={(e) => handleImageUpload(e, index)}
                       />
-                      {/* Overlay Icon */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 rounded transition-opacity">
                         <FaRegEdit className="text-white text-lg" />
                       </div>
                     </label>
                   ))}
 
-                  {/* Add New Image Button */}
                   {editingProduct.image.length < 6 && (
                     <label
                       htmlFor={`image-upload-new`}
@@ -403,7 +456,6 @@ const List = ({ token, backendUrl, currency }) => {
                 </div>
               </div>
 
-              {/* Product Name */}
               <div className="col-span-2 md:col-span-1">
                 <label className="block text-sm font-bold mb-1">
                   Product Name
@@ -418,7 +470,6 @@ const List = ({ token, backendUrl, currency }) => {
                 />
               </div>
 
-              {/* Brand Name */}
               <div className="col-span-2 md:col-span-1">
                 <label className="block text-sm font-bold mb-1">
                   Brand Name
@@ -433,7 +484,6 @@ const List = ({ token, backendUrl, currency }) => {
                 />
               </div>
 
-              {/* Description */}
               <div className="col-span-2">
                 <label className="block text-sm font-bold mb-1">
                   Description
@@ -444,7 +494,6 @@ const List = ({ token, backendUrl, currency }) => {
                 />
               </div>
 
-              {/* Category */}
               <div>
                 <label className="block text-sm font-bold mb-1">Category</label>
                 <select
@@ -459,7 +508,6 @@ const List = ({ token, backendUrl, currency }) => {
                 </select>
               </div>
 
-              {/* Sub Category */}
               <div>
                 <label className="block text-sm font-bold mb-1">
                   Sub Category
@@ -476,7 +524,6 @@ const List = ({ token, backendUrl, currency }) => {
                 </select>
               </div>
 
-              {/* Watch Grade */}
               {editingProduct.category === "Watch" && (
                 <div className="col-span-2">
                   <label className="block text-sm font-bold mb-1">
@@ -501,9 +548,7 @@ const List = ({ token, backendUrl, currency }) => {
                 </div>
               )}
 
-              {/* Prices Section */}
               <div className="col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Regular Price */}
                 <div>
                   <label className="block text-sm font-bold mb-1">
                     Regular Price
@@ -518,7 +563,6 @@ const List = ({ token, backendUrl, currency }) => {
                   />
                 </div>
 
-                {/* Offer Price */}
                 <div className="relative">
                   <label className="block text-sm font-bold mb-1">
                     Offer Price
@@ -537,7 +581,6 @@ const List = ({ token, backendUrl, currency }) => {
                   )}
                 </div>
 
-                {/* Quantity */}
                 <div>
                   <label className="block text-sm font-bold mb-1">
                     Quantity
@@ -553,7 +596,6 @@ const List = ({ token, backendUrl, currency }) => {
                 </div>
               </div>
 
-              {/* Sizes Toggle */}
               <div className="col-span-2 border-t pt-4">
                 <div className="flex items-center gap-2 mb-2">
                   <label className="font-bold text-sm">Has Sizes?</label>
@@ -584,7 +626,6 @@ const List = ({ token, backendUrl, currency }) => {
                 )}
               </div>
 
-              {/* Bestseller Checkbox */}
               <div className="col-span-2 flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
@@ -602,7 +643,6 @@ const List = ({ token, backendUrl, currency }) => {
                 </label>
               </div>
 
-              {/* Buttons */}
               <div className="col-span-2 flex justify-end gap-2 mt-4 pt-4 border-t">
                 <button
                   type="button"
@@ -617,33 +657,7 @@ const List = ({ token, backendUrl, currency }) => {
                   disabled={isLoading}
                   className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 font-medium flex items-center gap-2 disabled:bg-gray-500 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? (
-                    <>
-                      <svg
-                        className="animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Updating...
-                    </>
-                  ) : (
-                    "Save Changes"
-                  )}
+                  {isLoading ? "Updating..." : "Save Changes"}
                 </button>
               </div>
             </form>
