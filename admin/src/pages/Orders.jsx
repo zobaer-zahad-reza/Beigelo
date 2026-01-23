@@ -77,7 +77,6 @@ const Orders = ({ token, backendUrl, currency }) => {
                       key={itemIndex}
                       className="flex items-start gap-3 border-b border-gray-100 pb-3 last:border-0 last:pb-0"
                     >
-                      {/* PRODUCT IMAGE ADDED HERE */}
                       <img
                         src={item.image[0]}
                         alt={item.name}
@@ -89,16 +88,17 @@ const Orders = ({ token, backendUrl, currency }) => {
                         <div className="flex items-center gap-2 mt-1 text-gray-500 text-xs">
                           <span>Qty: {item.quantity}</span>
 
-                          {item.size === "default"
-                            ? null
-                            : (
-                                <div>
-                                  <span>|</span>
-                                  <div className="text-sm text-gray-500 border border-gray-300 px-2 py-1 rounded-md">
-                                    Size: {item.size.toUpperCase()}
-                                  </div>
-                                </div>
-                              ) || null}
+                          {/* ---------------- FIX APPLIED BELOW ---------------- */}
+                          {item.size && item.size !== "default" ? (
+                            <div className="flex items-center gap-2">
+                              <span>|</span>
+                              <div className="text-sm text-gray-500 border border-gray-300 px-2 py-1 rounded-md">
+                                Size: {item.size.toUpperCase()}
+                              </div>
+                            </div>
+                          ) : null}
+                          {/* ---------------- FIX APPLIED ABOVE ---------------- */}
+                          
                         </div>
                       </div>
                     </div>

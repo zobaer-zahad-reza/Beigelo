@@ -1,37 +1,19 @@
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
-import dotenv from "dotenv";
-import pkg from "multer-storage-cloudinary";
+import { createRequire } from "module";
 
-dotenv.config();
+// লাইব্রেরি ইমপোর্ট করার জন্য সবচেয়ে নিরাপদ পদ্ধতি (Node v22 fix)
+const require = createRequire(import.meta.url);
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-// --- DEBUGGING BLOCK ---
-// This safely finds the CloudinaryStorage class, wherever it is hiding.
-const CloudinaryStorage =
-  pkg.CloudinaryStorage || pkg.default?.CloudinaryStorage || pkg.default || pkg;
-
-// Check if we actually found it
-if (typeof CloudinaryStorage !== "function") {
-  console.error("❌ LIBRARY ERROR: Could not find CloudinaryStorage.");
-  console.log("📦 What we got instead:", pkg);
-  process.exit(1); // Stop the server so you can see the log
-}
-// -----------------------
-
-// Check if keys are loaded
-if (!process.env.CLOUDINARY_CLOUD_NAME) {
-  console.error(
-    "❌ ENV ERROR: Cloudinary keys are missing! Check your .env file."
-  );
-  process.exit(1);
-}
-
+// Cloudinary কনফিগারেশন
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// স্টোরেজ সেটআপ
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -40,6 +22,6 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
 export default upload;
