@@ -19,6 +19,49 @@ const Navbar = () => {
   const location = useLocation();
   const [query, setQuery] = useState("");
 
+  const [placeholder, setPlaceholder] = useState("");
+  const phrases = [
+    "Search Watches...",
+    "Search for Caps...",
+    "Find Best Collections...",
+    "Beigelo's best items...",
+  ];
+
+  useEffect(() => {
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 100;
+
+    const type = () => {
+      const currentPhrase = phrases[phraseIndex];
+
+      if (isDeleting) {
+        setPlaceholder(currentPhrase.substring(0, charIndex - 1));
+        charIndex--;
+        typingSpeed = 50;
+      } else {
+        setPlaceholder(currentPhrase.substring(0, charIndex + 1));
+        charIndex++;
+        typingSpeed = 100;
+      }
+
+      if (!isDeleting && charIndex === currentPhrase.length) {
+        isDeleting = true;
+        typingSpeed = 2000;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        typingSpeed = 500;
+      }
+
+      setTimeout(type, typingSpeed);
+    };
+
+    const timeoutId = setTimeout(type, typingSpeed);
+    return () => clearTimeout(timeoutId);
+  }, []);
+
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (setSearch) {
@@ -101,11 +144,10 @@ const Navbar = () => {
 
         {/* Right Side Icons */}
         <div className="flex items-center gap-4 sm:gap-6">
-          {/* Advanced Search Bar */}
           <div className="hidden md:flex items-center bg-gray-100 rounded-full px-3 py-1.5 border border-transparent focus-within:border-black focus-within:bg-white transition-all duration-300 w-60">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={placeholder}
               className="bg-transparent outline-none w-full text-sm text-gray-700 placeholder-gray-400"
               onChange={handleSearchInput}
               value={query}
@@ -184,13 +226,14 @@ const Navbar = () => {
         </div>
       </div>
 
+      {/* Mobile Search Animation */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${mobileSearchOpen ? "max-h-16 py-2 px-4 border-b" : "max-h-0"}`}
       >
         <div className="flex items-center bg-gray-100 rounded-full px-3 py-2">
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder={placeholder}
             className="bg-transparent outline-none w-full text-sm text-gray-700"
             onChange={handleSearchInput}
             value={query}
@@ -264,7 +307,7 @@ const Navbar = () => {
                 My Profile
               </div>
               <div
-                onClick={() => (token ? navigate("/orders") : null)}
+                onClick={() => navigate("/orders")}
                 className="py-3 pl-6 border-b cursor-pointer hover:bg-gray-50"
               >
                 Orders
