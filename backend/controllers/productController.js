@@ -67,7 +67,7 @@ const addProduct = async (req, res) => {
   }
 };
 
-// --- Function For List Product ---
+// Function For List Product
 const listProducts = async (req, res) => {
   try {
     const products = await productModel.find({});
@@ -78,7 +78,7 @@ const listProducts = async (req, res) => {
   }
 };
 
-// --- Function For Remove Product ---
+// Function For Remove Product
 const removeProduct = async (req, res) => {
   try {
     await productModel.findByIdAndDelete(req.body.id);
@@ -153,7 +153,6 @@ const updateProduct = async (req, res) => {
       : [];
 
     if (req.files && req.files.length > 0) {
-
       const newImagesUrls = req.files.map((item) => item.path);
 
       newImagesUrls.forEach((url, i) => {
@@ -191,6 +190,28 @@ const updateProduct = async (req, res) => {
   }
 };
 
+// Function For Remove Specific Image
+const removeImage = async (req, res) => {
+  try {
+    const { productId, imageUrl } = req.body;
+
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.json({ success: false, message: "Product not found" });
+    }
+
+    const updatedImages = product.image.filter((img) => img !== imageUrl);
+
+    // Database e update kora
+    await productModel.findByIdAndUpdate(productId, { image: updatedImages });
+
+    res.json({ success: true, message: "Image Removed Successfully" });
+  } catch (error) {
+    console.log("Error in removeImage:", error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export {
   listProducts,
   addProduct,
@@ -198,4 +219,5 @@ export {
   singleProduct,
   updateQuantity,
   updateProduct,
+  removeImage,
 };

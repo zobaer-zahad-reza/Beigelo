@@ -100,6 +100,47 @@ const List = ({ token, backendUrl, currency }) => {
     }
   };
 
+  // --- Handle Specific Image Delete (NEW FEATURE ADDED HERE) ---
+  const handleDeleteImage = async (productId, imageUrl, index) => {
+    // Jodi keu notun chobi upload kore kintu save na korar agei delete korte chay
+    if (editingProduct.newImages[index]) {
+      setEditingProduct((prev) => {
+        const updatedNewImages = { ...prev.newImages };
+        delete updatedNewImages[index];
+        return { ...prev, newImages: updatedNewImages };
+      });
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to delete this image?")) return;
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/product/remove-image`,
+        { productId, imageUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        toast.success("Image deleted successfully");
+
+        // Update local state to remove the image immediately
+        setEditingProduct((prev) => {
+          const updatedImages = prev.image.filter((_, i) => i !== index);
+          return { ...prev, image: updatedImages };
+        });
+
+        // Update the main list so changes reflect in the background table
+        await fetchList();
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      toast.error("Failed to delete image.");
+    }
+  };
+
   const updateQuantity = async (productId, currentQuantity, action) => {
     let newQuantity =
       action === "increment" ? currentQuantity + 1 : currentQuantity - 1;
@@ -325,7 +366,6 @@ const List = ({ token, backendUrl, currency }) => {
                 <FaRegEdit size={24} />
               </button>
               
-              {/* ---------- CHANGE HERE: Changed onClick to handleDeleteClick ---------- */}
               <p
                 onClick={() => handleDeleteClick(item._id)}
                 className="cursor-pointer text-lg text-red-600 hover:text-red-800 font-bold"
@@ -333,8 +373,6 @@ const List = ({ token, backendUrl, currency }) => {
               >
                 <MdDelete size={24} />
               </p>
-              {/* ----------------------------------------------------------------------- */}
-
             </div>
           </div>
         ))}
@@ -373,7 +411,7 @@ const List = ({ token, backendUrl, currency }) => {
         </div>
       )}
 
-      {/* --- EDIT MODAL (No Changes) --- */}
+      {/* --- EDIT MODAL --- */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 overflow-y-auto">
           <div className="bg-white p-6 rounded shadow-lg w-11/12 md:w-2/3 lg:w-1/2 max-h-[90vh] overflow-y-scroll scrollbar-hide">
@@ -385,18 +423,15 @@ const List = ({ token, backendUrl, currency }) => {
               onSubmit={submitEdit}
               className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              {/* ... (Rest of your form code remains exactly same) ... */}
               <div className="col-span-2">
                 <p className="text-sm font-bold mb-2">
-                  Product Images (Click to Change / Add)
+                  Product Images (Hover to Edit/Delete)
                 </p>
                 <div className="flex gap-2 flex-wrap items-center">
+                  
+                  {/* CHANGED SECTION: Image rendering in Edit Modal */}
                   {editingProduct.image.map((img, index) => (
-                    <label
-                      key={index}
-                      htmlFor={`image-upload-${index}`}
-                      className="cursor-pointer relative group"
-                    >
+                    <div key={index} className="relative group w-20 h-20">
                       <img
                         src={
                           editingProduct.newImages[index]
@@ -406,20 +441,45 @@ const List = ({ token, backendUrl, currency }) => {
                             : img
                         }
                         alt={`Product ${index + 1}`}
-                        className="w-20 h-20 object-cover border rounded hover:opacity-75 transition-opacity"
+                        className="w-full h-full object-cover border rounded"
                       />
+                      
+                      {/* Hidden File Input for Edit */}
                       <input
                         type="file"
                         id={`image-upload-${index}`}
                         hidden
                         onChange={(e) => handleImageUpload(e, index)}
                       />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 rounded transition-opacity">
-                        <FaRegEdit className="text-white text-lg" />
-                      </div>
-                    </label>
-                  ))}
 
+                      {/* Hover Actions: Edit and Delete */}
+                      <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 rounded transition-opacity">
+                        
+                        {/* Edit Icon */}
+                        <label
+                          htmlFor={`image-upload-${index}`}
+                          className="cursor-pointer text-white hover:text-blue-300 transition-colors"
+                          title="Change Image"
+                        >
+                          <FaRegEdit size={20} />
+                        </label>
+
+                        {/* Delete Icon */}
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteImage(editingProduct.id, img, index)}
+                          className="cursor-pointer text-white hover:text-red-500 transition-colors focus:outline-none"
+                          title="Delete Image"
+                        >
+                          <MdDelete size={22} />
+                        </button>
+
+                      </div>
+                    </div>
+                  ))}
+                  {/* END OF CHANGED SECTION */}
+
+                  {/* Add New Image Button */}
                   {editingProduct.image.length < 6 && (
                     <label
                       htmlFor={`image-upload-new`}

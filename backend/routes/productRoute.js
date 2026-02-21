@@ -6,6 +6,7 @@ import {
   singleProduct,
   updateQuantity,
   updateProduct,
+  removeImage, 
 } from "../controllers/productController.js";
 import upload from "../middleware/multer.js";
 import adminAuth from "../middleware/adminAuth.js";
@@ -29,6 +30,9 @@ productRouter.post(
 
 // Remove Product Route
 productRouter.post("/remove", adminAuth, removeProduct);
+
+// Remove Specific Image Route
+productRouter.post("/remove-image", adminAuth, removeImage);
 
 // Single Product Info Route
 productRouter.post("/single", singleProduct);
