@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify";
 import AddBrand from "./pages/AddBrand";
 import DashboardHome from "./pages/DashboardHome";
 import FraudCheck from "./pages/FraudCheck";
+import VisitorTracking from "./pages/VisitorTracking";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export const currency = "৳ ";
@@ -79,6 +80,8 @@ const App = () => {
                   path="/add-brand"
                   element={<AddBrand token={token} backendUrl={backendUrl} />}
                 />
+
+                <Route path="/visitor-tracking" element={<VisitorTracking token={token} backendUrl={backendUrl} />} />
               </Routes>
             </div>
           </div>

@@ -3,12 +3,13 @@ import mongoose from "mongoose";
 const visitorSchema = new mongoose.Schema({
   ip: String,
   country: String,
+  city: String,      
 
-  source: String, // facebook, google, direct
-  medium: String, // cpc, social
-  campaign: String, // eid_sale, sale2026
+  source: String,     
+  medium: String,    
+  campaign: String,   
 
-  page: String, // /product/iphone-15
+  page: String,   
   userAgent: String,
 
   createdAt: {
