@@ -1,244 +1,269 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   AreaChart,
   Area,
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from "recharts";
 
-/* ─── Google Fonts inject ─────────────────────────────────────────────────── */
-const FontLoader = () => (
+/* ─── STYLE ─────────────────────────────────────────────────────────────── */
+const GlobalStyle = () => (
   <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-    * { box-sizing: border-box; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;1,400&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:        #F7F6F3;
-      --surface:   #FFFFFF;
-      --border:    #E8E5DF;
-      --border2:   #F0EDE7;
-      --text1:     #1C1917;
-      --text2:     #57534E;
-      --text3:     #A8A29E;
-      --accent:    #D4522A;
-      --accent2:   #2563EB;
-      --accent3:   #059669;
-      --accent4:   #7C3AED;
+      --bg:      #F5F4F1;
+      --surface: #FFFFFF;
+      --border:  #E6E3DC;
+      --text1:   #1A1816;
+      --text2:   #5C5752;
+      --text3:   #9C9690;
+      --red:     #C84B2F;
+      --blue:    #2156C8;
+      --green:   #1A7A52;
+      --purple:  #6B30B8;
+      --amber:   #C07B18;
     }
-    body { background: var(--bg); }
+    body { background: var(--bg); font-family: 'Inter', sans-serif; }
 
     @keyframes fadeUp {
-      from { opacity:0; transform:translateY(14px); }
+      from { opacity:0; transform:translateY(12px); }
       to   { opacity:1; transform:translateY(0); }
     }
-    @keyframes shimmer {
-      0%  { background-position: -600px 0; }
-      100%{ background-position:  600px 0; }
-    }
-    .fade-up { animation: fadeUp 0.45s cubic-bezier(.22,1,.36,1) both; }
-    .fade-up-1 { animation-delay:.05s }
-    .fade-up-2 { animation-delay:.10s }
-    .fade-up-3 { animation-delay:.15s }
-    .fade-up-4 { animation-delay:.20s }
-    .fade-up-5 { animation-delay:.25s }
-    .fade-up-6 { animation-delay:.30s }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+
+    .fade-up { animation: fadeUp 0.4s cubic-bezier(.22,1,.36,1) both; }
+    .fade-1 { animation-delay: .04s }
+    .fade-2 { animation-delay: .08s }
+    .fade-3 { animation-delay: .12s }
+    .fade-4 { animation-delay: .16s }
+    .fade-5 { animation-delay: .20s }
+    .fade-6 { animation-delay: .24s }
+
+    .spin { animation: spin .9s linear infinite; }
+    .live-dot { animation: pulse 2s ease-in-out infinite; }
 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
-    }
-    .card:hover { box-shadow: 0 2px 6px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06); }
-
-    .stat-card {
-      background: var(--surface);
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      padding: 22px 24px;
-      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      border-radius: 14px;
       transition: box-shadow .2s;
-      position: relative;
-      overflow: hidden;
     }
-    .stat-card::before {
-      content:'';
-      position:absolute;
-      top:0; left:0;
-      width:4px; height:100%;
-      border-radius:16px 0 0 16px;
-    }
-
-    .btn-primary {
-      background: var(--text1);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 8px 16px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display:inline-flex; align-items:center; gap:6px;
-      transition: background .15s, transform .1s;
-    }
-    .btn-primary:hover { background:#292524; }
-    .btn-primary:active { transform:scale(.97); }
-    .btn-primary:disabled { opacity:.55; cursor:not-allowed; }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 7px 14px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display:inline-flex; align-items:center; gap:6px;
-      transition: background .15s, border-color .15s;
-    }
-    .btn-ghost:hover { background: var(--border2); border-color: #D6D0C8; }
-    .btn-ghost:disabled { opacity:.45; cursor:not-allowed; }
-
-    .btn-danger {
-      background: transparent;
-      color: #DC2626;
-      border: 1px solid #FCA5A5;
-      border-radius: 10px;
-      padding: 7px 14px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      display:inline-flex; align-items:center; gap:6px;
-      transition: background .15s;
-    }
-    .btn-danger:hover { background: #FEF2F2; }
+    .card:hover { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
 
     .tab-btn {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
       font-size: 13px;
       font-weight: 600;
-      padding: 8px 18px;
-      border-radius: 10px;
+      padding: 7px 16px;
+      border-radius: 9px;
       border: none;
       background: transparent;
       cursor: pointer;
       color: var(--text3);
       transition: all .15s;
+      white-space: nowrap;
     }
-    .tab-btn.active {
-      background: var(--text1);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    .tab-btn.active { background: var(--text1); color: #fff; }
+    .tab-btn:not(.active):hover { background: var(--border); color: var(--text2); }
+
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 9px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text2);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .15s;
     }
-    .tab-btn:not(.active):hover { background: var(--border2); color: var(--text2); }
+    .btn:hover { background: var(--bg); }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary { background: var(--text1); color: #fff; border-color: var(--text1); }
+    .btn-primary:hover { background: #2d2925; }
+    .btn-danger { color: #b91c1c; border-color: #fca5a5; background: transparent; }
+    .btn-danger:hover { background: #fef2f2; }
+    .btn-demo { color: var(--purple); border-color: #c4b5fd; background: #faf5ff; }
+    .btn-demo.active { background: var(--purple); color: #fff; border-color: var(--purple); }
 
-    .table-row:hover { background:#FAFAF8; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .badge-blue   { background: #eff6ff; color: #1d4ed8; }
+    .badge-amber  { background: #fffbeb; color: #92400e; }
+    .badge-slate  { background: #f1f5f9; color: #475569; }
+    .badge-green  { background: #ecfdf5; color: #065f46; }
+    .badge-red    { background: #fef2f2; color: #991b1b; }
+    .badge-purple { background: #faf5ff; color: #6b21a8; }
 
-    input[type=text] {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+    .search-input {
+      font-family: 'Inter', sans-serif;
       font-size: 13px;
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 7px 13px;
+      border-radius: 9px;
+      padding: 7px 12px 7px 32px;
       outline: none;
       background: var(--bg);
       color: var(--text1);
       transition: border-color .15s, box-shadow .15s;
-      width: 220px;
+      width: 240px;
     }
-    input[type=text]:focus {
-      border-color: #D4522A;
-      box-shadow: 0 0 0 3px rgba(212,82,42,.1);
+    .search-input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(200,75,47,.08);
     }
-    input[type=text]::placeholder { color: var(--text3); }
+    .search-input::placeholder { color: var(--text3); }
 
-    .badge {
-      display:inline-flex; align-items:center; gap:4px;
-      font-size:11px; font-weight:700;
-      padding:3px 9px; border-radius:20px;
+    .progress-bar {
+      height: 5px;
+      border-radius: 99px;
+      background: var(--border);
+      overflow: hidden;
     }
-    .badge-blue   { background:#EFF6FF; color:#1D4ED8; }
-    .badge-amber  { background:#FFFBEB; color:#B45309; }
-    .badge-slate  { background:#F1F5F9; color:#475569; }
-    .badge-green  { background:#ECFDF5; color:#065F46; }
-    .badge-red    { background:#FEF2F2; color:#991B1B; }
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width .4s ease;
+    }
 
-    .progress-bar { height:6px; border-radius:99px; background:#F0EDE7; overflow:hidden; }
-    .progress-fill { height:100%; border-radius:99px; transition: width .4s ease; }
+    .tr:hover td { background: #fafaf8; }
+    .tr td { transition: background .1s; }
 
     .modal-backdrop {
-      position:fixed; inset:0; z-index:60;
-      background:rgba(0,0,0,.3);
-      backdrop-filter:blur(6px);
-      display:flex; align-items:center; justify-content:center;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .modal {
       background: var(--surface);
-      border-radius: 20px;
+      border-radius: 18px;
       padding: 28px;
-      max-width: 380px;
+      max-width: 360px;
       width: calc(100% - 32px);
-      box-shadow: 0 24px 64px rgba(0,0,0,.18);
       border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,.15);
     }
 
-    .spin { animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
-    .chart-tooltip {
+    .tooltip-box {
       background: var(--text1) !important;
       border: none !important;
-      border-radius: 10px !important;
-      padding: 8px 14px !important;
-      font-family: 'Plus Jakarta Sans', sans-serif !important;
+      border-radius: 9px !important;
+      padding: 7px 12px !important;
+      font-family: 'Inter', sans-serif !important;
       font-size: 12px !important;
       color: #fff !important;
-      box-shadow: 0 8px 24px rgba(0,0,0,.2) !important;
+    }
+
+    @media (max-width: 900px) {
+      .three-col { grid-template-columns: 1fr !important; }
+      .two-col   { grid-template-columns: 1fr !important; }
     }
   `}</style>
 );
 
-/* ─── constants ───────────────────────────────────────────────────────────── */
-const BACKEND_URL =
-  (typeof import.meta !== "undefined" && import.meta.env?.VITE_BACKEND_URL) ||
-  "http://localhost:4000";
-const API_BASE = `${BACKEND_URL}/api/visitors`;
-
-const CHART_COLORS = [
-  "#D4522A",
-  "#2563EB",
-  "#059669",
-  "#7C3AED",
-  "#D97706",
-  "#DB2777",
+/* ─── CONSTANTS ──────────────────────────────────────────────────────────── */
+const BACKEND = "http://localhost:4000/api/visitors";
+const COLORS = [
+  "#C84B2F",
+  "#2156C8",
+  "#1A7A52",
+  "#6B30B8",
+  "#C07B18",
+  "#C02680",
 ];
+const PER_PAGE = 12;
 
-const SOURCE_ICONS = {
-  Google: "🔍",
-  Facebook: "👥",
-  Instagram: "📸",
-  YouTube: "▶️",
-  Twitter: "🐦",
-  LinkedIn: "💼",
-  Direct: "🎯",
-  Bing: "🔎",
-};
+/* ─── MOCK DATA GENERATOR ────────────────────────────────────────────────── */
+const SOURCES = [
+  "Google",
+  "Facebook",
+  "Instagram",
+  "Direct",
+  "LinkedIn",
+  "Bing",
+  "YouTube",
+];
+const COUNTRIES = [
+  "Bangladesh",
+  "India",
+  "USA",
+  "UK",
+  "Canada",
+  "Germany",
+  "Australia",
+  "Japan",
+  "Brazil",
+  "France",
+];
+const PAGES = [
+  "/home",
+  "/products",
+  "/about",
+  "/contact",
+  "/blog",
+  "/pricing",
+  "/demo",
+  "/signup",
+];
+const UAS = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
+  "Mozilla/5.0 (iPhone; CPU iPhone OS 17) Safari/604",
+  "Mozilla/5.0 (iPad; CPU OS 16) Safari/604",
+  "Mozilla/5.0 (Linux; Android 13) Chrome/120",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X) Safari/537",
+];
+const FAKE_IPS = Array.from(
+  { length: 30 },
+  (_, i) => `192.168.${Math.floor(i / 10)}.${(i % 10) + 1}`,
+);
 
-/* ─── helpers ─────────────────────────────────────────────────────────────── */
+function generateMockData() {
+  const now = Date.now();
+  return Array.from({ length: 120 }, (_, i) => {
+    const daysAgo = Math.floor(Math.random() * 14);
+    const hoursAgo = Math.floor(Math.random() * 24);
+    const ts = new Date(
+      now - daysAgo * 86400000 - hoursAgo * 3600000,
+    ).toISOString();
+    return {
+      _id: `mock_${i}`,
+      ip: FAKE_IPS[i % FAKE_IPS.length],
+      page: PAGES[i % PAGES.length],
+      source: SOURCES[i % SOURCES.length],
+      country: COUNTRIES[i % COUNTRIES.length],
+      userAgent: UAS[i % UAS.length],
+      createdAt: ts,
+    };
+  });
+}
+
+/* ─── HELPERS ────────────────────────────────────────────────────────────── */
 const fmtDate = (str) => {
   if (!str) return "—";
   return new Date(str).toLocaleString("en-BD", {
@@ -249,22 +274,22 @@ const fmtDate = (str) => {
     minute: "2-digit",
   });
 };
-
 const getDevice = (ua = "") => {
   const u = ua.toLowerCase();
   if (/ipad|tablet/.test(u)) return "Tablet";
   if (/mobile|android|iphone/.test(u)) return "Mobile";
   return "Desktop";
 };
+const rnd = (n) => Math.round(n);
 
-/* ─── custom chart tooltip ────────────────────────────────────────────────── */
+/* ─── CUSTOM TOOLTIP ─────────────────────────────────────────────────────── */
 const ChartTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div className="chart-tooltip">
-      <p style={{ color: "#A8A29E", marginBottom: 4, fontSize: 11 }}>{label}</p>
+    <div className="tooltip-box">
+      <p style={{ color: "#888", fontSize: 11, marginBottom: 3 }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ color: "#fff", fontWeight: 700 }}>
+        <p key={i} style={{ fontWeight: 700 }}>
           {p.value} {p.name}
         </p>
       ))}
@@ -272,13 +297,12 @@ const ChartTooltip = ({ active, payload, label }) => {
   );
 };
 
-/* ─── stat card ───────────────────────────────────────────────────────────── */
-const StatCard = ({ title, value, sub, icon, accentColor, delay }) => (
+/* ─── STAT CARD ──────────────────────────────────────────────────────────── */
+const StatCard = ({ title, value, sub, icon, color, delay }) => (
   <div
-    className={`stat-card fade-up fade-up-${delay}`}
-    style={{ "--accent-c": accentColor }}
+    className={`card fade-up fade-${delay}`}
+    style={{ padding: "20px 22px", position: "relative", overflow: "hidden" }}
   >
-    <style>{`.stat-card:nth-child(${delay})::before { background: ${accentColor}; }`}</style>
     <div
       style={{
         position: "absolute",
@@ -286,86 +310,175 @@ const StatCard = ({ title, value, sub, icon, accentColor, delay }) => (
         left: 0,
         width: 4,
         height: "100%",
-        background: accentColor,
-        borderRadius: "16px 0 0 16px",
+        background: color,
+        borderRadius: "14px 0 0 14px",
       }}
     />
     <div
       style={{
         display: "flex",
-        alignItems: "flex-start",
         justifyContent: "space-between",
+        alignItems: "flex-start",
         marginBottom: 12,
       }}
     >
       <span
         style={{
-          fontFamily: "'Plus Jakarta Sans'",
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: 700,
           color: "var(--text3)",
           textTransform: "uppercase",
-          letterSpacing: "0.07em",
+          letterSpacing: ".07em",
         }}
       >
         {title}
       </span>
-      <span style={{ fontSize: 20, lineHeight: 1 }}>{icon}</span>
+      <span style={{ fontSize: 18, lineHeight: 1 }}>{icon}</span>
     </div>
     <p
       style={{
-        fontFamily: "'Instrument Serif', serif",
-        fontSize: 38,
-        fontWeight: 400,
+        fontFamily: "'Playfair Display', serif",
+        fontSize: 36,
+        fontWeight: 500,
         color: "var(--text1)",
         lineHeight: 1,
-        margin: "0 0 6px 0",
+        marginBottom: 5,
       }}
     >
       {value ?? "—"}
     </p>
-    {sub && (
-      <p
-        style={{
-          fontFamily: "'Plus Jakarta Sans'",
-          fontSize: 12,
-          color: "var(--text3)",
-          margin: 0,
-        }}
-      >
-        {sub}
-      </p>
-    )}
+    {sub && <p style={{ fontSize: 12, color: "var(--text3)" }}>{sub}</p>}
   </div>
 );
 
-/* ─── section header ──────────────────────────────────────────────────────── */
-const SectionHeader = ({ title, right }) => (
+/* ─── SECTION HEADER ─────────────────────────────────────────────────────── */
+const SecHead = ({ title, right }) => (
   <div
     style={{
       display: "flex",
-      alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 18,
+      alignItems: "center",
+      marginBottom: 16,
     }}
   >
-    <h2
-      style={{
-        fontFamily: "'Plus Jakarta Sans'",
-        fontSize: 14,
-        fontWeight: 800,
-        color: "var(--text1)",
-        margin: 0,
-      }}
-    >
+    <h3 style={{ fontSize: 13, fontWeight: 700, color: "var(--text1)" }}>
       {title}
-    </h2>
+    </h3>
     {right}
   </div>
 );
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-export default function VisitorTracking() {
+/* ─── SVG ICONS ──────────────────────────────────────────────────────────── */
+const Ico = {
+  refresh: (cls) => (
+    <svg
+      className={cls}
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 4v5h5M20 20v-5h-5M4.09 9A8 8 0 0118 7.8M19.91 15A8 8 0 016 16.2"
+      />
+    </svg>
+  ),
+  eye: () => (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z"
+      />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ),
+  trash: () => (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <polyline points="3 6 5 6 21 6" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"
+      />
+    </svg>
+  ),
+  search: () => (
+    <svg
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+  ),
+  spark: () => (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"
+      />
+    </svg>
+  ),
+  x: () => (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  ),
+};
+
+const SourceIcons = {
+  Google: "🔍",
+  Facebook: "👥",
+  Instagram: "📸",
+  YouTube: "▶️",
+  LinkedIn: "💼",
+  Direct: "🎯",
+  Bing: "🔎",
+  Twitter: "🐦",
+};
+const DeviceIcons = { Desktop: "🖥", Mobile: "📱", Tablet: "📟" };
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+export default function VisitorAnalytics() {
   const [visitors, setVisitors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -376,43 +489,71 @@ export default function VisitorTracking() {
   const [tab, setTab] = useState("overview");
   const [deletingId, setDeletingId] = useState(null);
   const [confirmClear, setConfirmClear] = useState(false);
-  const PER_PAGE = 12;
+  const [demoMode, setDemoMode] = useState(false);
+  const timerRef = useRef(null);
 
   /* ── fetch ── */
   const fetchVisitors = useCallback(async () => {
+    if (demoMode) {
+      setVisitors(generateMockData());
+      setLoading(false);
+      setError(null);
+      return;
+    }
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/all`);
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const res = await fetch(`${BACKEND}/all`, {
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!res.ok) throw new Error(`Server ${res.status}`);
       const data = await res.json();
       setVisitors(Array.isArray(data) ? data : (data.visitors ?? []));
       setError(null);
     } catch (e) {
-      setError(e.message);
+      if (e.name !== "AbortError") setError(e.message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [demoMode]);
 
   useEffect(() => {
     fetchVisitors();
-    const t = setInterval(fetchVisitors, 30000);
-    return () => clearInterval(t);
+    timerRef.current = setInterval(fetchVisitors, 30000);
+    return () => clearInterval(timerRef.current);
   }, [fetchVisitors]);
+
+  /* ── demo toggle ── */
+  const toggleDemo = () => {
+    setDemoMode((v) => !v);
+    setSearch("");
+    setPage(1);
+    setTab("overview");
+  };
 
   /* ── track ── */
   const handleTrack = async () => {
+    if (demoMode) {
+      setTrackMsg({ type: "success", text: "(Demo) Visit recorded!" });
+      setVisitors((v) => [generateMockData()[0], ...v]);
+      setTimeout(() => setTrackMsg(null), 3000);
+      return;
+    }
     setTracking(true);
-    setTrackMsg(null);
     try {
-      const params = new URLSearchParams(window.location.search);
-      const res = await fetch(`${API_BASE}/track`, {
+      const params = new URLSearchParams(
+        typeof window !== "undefined" ? window.location.search : "",
+      );
+      const res = await fetch(`${BACKEND}/track`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          page: window.location.pathname,
-          userAgent: navigator.userAgent,
-          referrer: document.referrer || "direct",
+          page: typeof window !== "undefined" ? window.location.pathname : "/",
+          userAgent:
+            typeof navigator !== "undefined" ? navigator.userAgent : "",
+          referrer:
+            typeof document !== "undefined"
+              ? document.referrer || "direct"
+              : "direct",
           utm_source: params.get("utm_source") || undefined,
           utm_medium: params.get("utm_medium") || undefined,
           utm_campaign: params.get("utm_campaign") || undefined,
@@ -432,9 +573,13 @@ export default function VisitorTracking() {
 
   /* ── delete ── */
   const handleDelete = async (id) => {
+    if (demoMode) {
+      setVisitors((v) => v.filter((x) => x._id !== id));
+      return;
+    }
     setDeletingId(id);
     try {
-      await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+      await fetch(`${BACKEND}/${id}`, { method: "DELETE" });
       setVisitors((v) => v.filter((x) => x._id !== id));
     } catch {
       alert("Delete failed");
@@ -445,15 +590,19 @@ export default function VisitorTracking() {
 
   const handleDeleteAll = async () => {
     setConfirmClear(false);
+    if (demoMode) {
+      setVisitors([]);
+      return;
+    }
     try {
-      await fetch(`${API_BASE}/all`, { method: "DELETE" });
+      await fetch(`${BACKEND}/all`, { method: "DELETE" });
       setVisitors([]);
     } catch {
       alert("Delete all failed");
     }
   };
 
-  /* ── derived ── */
+  /* ── derived stats ── */
   const total = visitors.length;
   const todayKey = new Date().toISOString().slice(0, 10);
   const todayCount = visitors.filter(
@@ -465,12 +614,8 @@ export default function VisitorTracking() {
     const d = new Date();
     d.setDate(d.getDate() - (13 - i));
     const key = d.toISOString().slice(0, 10);
-    const label = d.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    });
     return {
-      day: label,
+      day: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
       visits: visitors.filter(
         (v) => (v.createdAt || v.timestamp || "").slice(0, 10) === key,
       ).length,
@@ -485,24 +630,25 @@ export default function VisitorTracking() {
     }).length,
   }));
 
-  const pageCounts = visitors.reduce((a, v) => {
-    const p = v.page || v.url || "/";
-    a[p] = (a[p] || 0) + 1;
-    return a;
-  }, {});
+  const countByKey = (arr, key) =>
+    arr.reduce((a, v) => {
+      const k = v[key] || "Unknown";
+      a[k] = (a[k] || 0) + 1;
+      return a;
+    }, {});
+
+  const pageCounts = countByKey(visitors, "page");
+  const sourceCounts = countByKey(visitors, "source");
+  const countryCounts = countByKey(visitors, "country");
+
   const topPages = Object.entries(pageCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
-    .map(([page, count]) => ({
-      page: page.length > 30 ? page.slice(0, 30) + "…" : page,
-      count,
+    .map(([p, c]) => ({
+      page: p.length > 28 ? p.slice(0, 28) + "…" : p,
+      count: c,
     }));
 
-  const sourceCounts = visitors.reduce((a, v) => {
-    const s = v.source || "Direct";
-    a[s] = (a[s] || 0) + 1;
-    return a;
-  }, {});
   const sourceData = Object.entries(sourceCounts)
     .sort((a, b) => b[1] - a[1])
     .map(([name, value]) => ({ name, value }));
@@ -512,65 +658,73 @@ export default function VisitorTracking() {
     a[d] = (a[d] || 0) + 1;
     return a;
   }, {});
-  const deviceData = Object.entries(deviceCounts).map(([name, value]) => ({
-    name,
-    value,
-  }));
 
-  const countryCounts = visitors.reduce((a, v) => {
-    const c = v.country || "Unknown";
-    a[c] = (a[c] || 0) + 1;
-    return a;
-  }, {});
   const topCountries = Object.entries(countryCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
     .map(([name, value]) => ({ name, value }));
 
+  const peakVisits = Math.max(...last14.map((d) => d.visits), 1);
+  const avgDaily = total > 0 ? rnd(total / 14) : 0;
+
+  /* ── filtered + paginated ── */
   const filtered = visitors.filter((v) => {
     const q = search.toLowerCase();
     return (
+      !q ||
       (v.ip || "").includes(q) ||
       (v.page || "").toLowerCase().includes(q) ||
       (v.country || "").toLowerCase().includes(q) ||
       (v.source || "").toLowerCase().includes(q)
     );
   });
-  const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-  const peakVisits = Math.max(...last14.map((d) => d.visits), 1);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice(
+    (safePage - 1) * PER_PAGE,
+    safePage * PER_PAGE,
+  );
+
+  /* ── pagination buttons ── */
+  const buildPages = () => {
+    const btns = [];
+    const start = Math.max(1, safePage - 2);
+    const end = Math.min(totalPages, start + 4);
+    for (let i = start; i <= end; i++) btns.push(i);
+    return btns;
+  };
 
   /* ── render ── */
   return (
     <>
-      <FontLoader />
+      <GlobalStyle />
       <div
         style={{
           minHeight: "100vh",
           background: "var(--bg)",
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-          padding: "32px 24px",
+          padding: "28px 20px",
+          fontFamily: "'Inter',sans-serif",
         }}
       >
-        <div style={{ maxWidth: 1300, margin: "0 auto" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto" }}>
           {/* ══ HEADER ══ */}
           <div
             className="fade-up"
             style={{
               display: "flex",
               flexWrap: "wrap",
+              gap: 14,
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 16,
-              marginBottom: 36,
+              marginBottom: 32,
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div
                 style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 12,
+                  width: 42,
+                  height: 42,
+                  borderRadius: 11,
                   background: "var(--text1)",
                   display: "flex",
                   alignItems: "center",
@@ -583,113 +737,144 @@ export default function VisitorTracking() {
               <div>
                 <h1
                   style={{
-                    fontFamily: "'Instrument Serif', serif",
-                    fontSize: 26,
-                    fontWeight: 400,
+                    fontFamily: "'Playfair Display',serif",
+                    fontSize: 24,
+                    fontWeight: 500,
                     color: "var(--text1)",
-                    margin: 0,
                     lineHeight: 1.1,
                   }}
                 >
                   Visitor Analytics
                 </h1>
-                <p
+                <div
                   style={{
-                    fontSize: 12,
-                    color: "var(--text3)",
-                    margin: "3px 0 0",
-                    fontWeight: 500,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    marginTop: 3,
                   }}
                 >
-                  Live · auto-refreshes every 30s
-                </p>
+                  <span
+                    className="live-dot"
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: "#22c55e",
+                      display: "inline-block",
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: "var(--text3)",
+                    }}
+                  >
+                    Live — auto-refreshes every 30s
+                  </span>
+                  {demoMode && (
+                    <span
+                      className="badge badge-purple"
+                      style={{ marginLeft: 4 }}
+                    >
+                      DEMO MODE
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
             <div
               style={{
                 display: "flex",
+                flexWrap: "wrap",
                 alignItems: "center",
                 gap: 8,
-                flexWrap: "wrap",
               }}
             >
               {trackMsg && (
                 <span
                   className={`badge ${trackMsg.type === "success" ? "badge-green" : "badge-red"}`}
-                  style={{ fontSize: 12 }}
+                  style={{ fontSize: 12, padding: "4px 10px" }}
                 >
                   {trackMsg.type === "success" ? "✓" : "✗"} {trackMsg.text}
                 </span>
               )}
               <button
-                className="btn-ghost"
+                className={`btn btn-demo${demoMode ? " active" : ""}`}
+                onClick={toggleDemo}
+              >
+                {Ico.spark()} {demoMode ? "Exit Demo" : "Demo Mode"}
+              </button>
+              <button
+                className="btn"
                 onClick={fetchVisitors}
                 disabled={loading}
               >
-                <svg
-                  className={loading ? "spin" : ""}
-                  width="13"
-                  height="13"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                Refresh
+                {Ico.refresh(loading ? "spin" : "")} Refresh
               </button>
               <button
-                className="btn-primary"
+                className="btn btn-primary"
                 onClick={handleTrack}
                 disabled={tracking}
               >
                 {tracking ? (
                   <span
+                    className="spin"
                     style={{
                       width: 12,
                       height: 12,
-                      border: "2px solid rgba(255,255,255,.35)",
+                      border: "2px solid rgba(255,255,255,.3)",
                       borderTopColor: "#fff",
                       borderRadius: "50%",
                       display: "inline-block",
                     }}
-                    className="spin"
                   />
                 ) : (
-                  "👁"
+                  Ico.eye()
                 )}
                 {tracking ? "Tracking…" : "Track Visit"}
               </button>
               <button
-                className="btn-danger"
+                className="btn btn-danger"
                 onClick={() => setConfirmClear(true)}
               >
-                🗑 Clear All
+                {Ico.trash()} Clear All
               </button>
             </div>
           </div>
 
-          {/* error */}
-          {error && (
+          {/* error banner */}
+          {error && !demoMode && (
             <div
               className="fade-up"
               style={{
-                marginBottom: 20,
-                background: "#FEF2F2",
-                border: "1px solid #FECACA",
-                color: "#991B1B",
-                borderRadius: 12,
-                padding: "12px 16px",
+                marginBottom: 18,
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                color: "#991b1b",
+                borderRadius: 10,
+                padding: "11px 15px",
                 fontSize: 13,
               }}
             >
-              ⚠ Failed to load: <strong>{error}</strong> — check your backend.
+              ⚠ Backend unreachable: <strong>{error}</strong> — enable{" "}
+              <button
+                onClick={toggleDemo}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#6b30b8",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  textDecoration: "underline",
+                  padding: 0,
+                }}
+              >
+                Demo Mode
+              </button>{" "}
+              to preview.
             </div>
           )}
 
@@ -702,10 +887,10 @@ export default function VisitorTracking() {
               <div className="modal" onClick={(e) => e.stopPropagation()}>
                 <p
                   style={{
-                    fontFamily: "'Instrument Serif'",
+                    fontFamily: "'Playfair Display',serif",
                     fontSize: 22,
-                    margin: "0 0 8px",
                     color: "var(--text1)",
+                    marginBottom: 8,
                   }}
                 >
                   Delete all visitors?
@@ -714,17 +899,17 @@ export default function VisitorTracking() {
                   style={{
                     fontSize: 13,
                     color: "var(--text2)",
-                    margin: "0 0 24px",
                     lineHeight: 1.6,
+                    marginBottom: 22,
                   }}
                 >
                   This will permanently remove all{" "}
-                  <strong>{total.toLocaleString()}</strong> visitor records.
-                  This action cannot be undone.
+                  <strong>{total.toLocaleString()}</strong> records. This cannot
+                  be undone.
                 </p>
                 <div style={{ display: "flex", gap: 10 }}>
                   <button
-                    className="btn-ghost"
+                    className="btn"
                     style={{ flex: 1, justifyContent: "center" }}
                     onClick={() => setConfirmClear(false)}
                   >
@@ -736,11 +921,11 @@ export default function VisitorTracking() {
                       flex: 1,
                       justifyContent: "center",
                       padding: "9px 0",
-                      borderRadius: 10,
-                      background: "#DC2626",
+                      borderRadius: 9,
+                      background: "#dc2626",
                       color: "#fff",
                       border: "none",
-                      fontFamily: "'Plus Jakarta Sans'",
+                      fontFamily: "'Inter'",
                       fontSize: 13,
                       fontWeight: 700,
                       cursor: "pointer",
@@ -757,9 +942,9 @@ export default function VisitorTracking() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))",
-              gap: 16,
-              marginBottom: 28,
+              gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))",
+              gap: 14,
+              marginBottom: 24,
             }}
           >
             <StatCard
@@ -767,7 +952,7 @@ export default function VisitorTracking() {
               value={total.toLocaleString()}
               icon="👥"
               sub="All time"
-              accentColor="#D4522A"
+              color="var(--red)"
               delay={1}
             />
             <StatCard
@@ -778,7 +963,7 @@ export default function VisitorTracking() {
                 day: "2-digit",
                 month: "long",
               })}
-              accentColor="#2563EB"
+              color="var(--blue)"
               delay={2}
             />
             <StatCard
@@ -786,7 +971,7 @@ export default function VisitorTracking() {
               value={uniqueIPs.toLocaleString()}
               icon="🌐"
               sub="Distinct addresses"
-              accentColor="#059669"
+              color="var(--green)"
               delay={3}
             />
             <StatCard
@@ -794,48 +979,67 @@ export default function VisitorTracking() {
               value={Object.keys(countryCounts).length}
               icon="🗺"
               sub="Unique locations"
-              accentColor="#7C3AED"
+              color="var(--purple)"
               delay={4}
+            />
+            <StatCard
+              title="Avg / Day"
+              value={avgDaily}
+              icon="📊"
+              sub="Last 14 days"
+              color="var(--amber)"
+              delay={5}
+            />
+            <StatCard
+              title="Peak Day"
+              value={peakVisits}
+              icon="🏆"
+              sub="Best single day"
+              color="var(--red)"
+              delay={6}
             />
           </div>
 
           {/* ══ TABS ══ */}
           <div
-            className="fade-up fade-up-5"
+            className="fade-up fade-5"
             style={{
               display: "flex",
-              gap: 6,
-              marginBottom: 24,
+              gap: 5,
+              marginBottom: 20,
               background: "var(--surface)",
               border: "1px solid var(--border)",
-              borderRadius: 14,
-              padding: 5,
+              borderRadius: 12,
+              padding: 4,
               width: "fit-content",
             }}
           >
             {[
               ["overview", "📈 Overview"],
               ["table", "📋 All Visitors"],
-            ].map(([key, label]) => (
+            ].map(([k, l]) => (
               <button
-                key={key}
-                className={`tab-btn${tab === key ? " active" : ""}`}
-                onClick={() => setTab(key)}
+                key={k}
+                className={`tab-btn${tab === k ? " active" : ""}`}
+                onClick={() => {
+                  setTab(k);
+                  setPage(1);
+                }}
               >
-                {label}
+                {l}
               </button>
             ))}
           </div>
 
-          {/* ══ OVERVIEW TAB ══ */}
+          {/* ══ OVERVIEW ══ */}
           {tab === "overview" && (
             <>
-              {/* area chart 14d */}
+              {/* 14-day area */}
               <div
-                className="card fade-up fade-up-5"
-                style={{ padding: 24, marginBottom: 20 }}
+                className="card fade-up fade-5"
+                style={{ padding: 22, marginBottom: 16 }}
               >
-                <SectionHeader
+                <SecHead
                   title="Visits — Last 14 Days"
                   right={
                     <span
@@ -845,25 +1049,25 @@ export default function VisitorTracking() {
                         fontWeight: 600,
                       }}
                     >
-                      Peak: {peakVisits} visits
+                      Peak: {peakVisits} · Avg: {avgDaily}/day
                     </span>
                   }
                 />
-                <ResponsiveContainer width="100%" height={210}>
+                <ResponsiveContainer width="100%" height={200}>
                   <AreaChart
                     data={last14}
-                    margin={{ top: 5, right: 5, bottom: 0, left: -10 }}
+                    margin={{ top: 5, right: 5, bottom: 0, left: -15 }}
                   >
                     <defs>
-                      <linearGradient id="grad1" x1="0" y1="0" x2="0" y2="1">
+                      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop
                           offset="5%"
-                          stopColor="#D4522A"
-                          stopOpacity={0.15}
+                          stopColor="#C84B2F"
+                          stopOpacity={0.12}
                         />
                         <stop
                           offset="95%"
-                          stopColor="#D4522A"
+                          stopColor="#C84B2F"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -873,29 +1077,29 @@ export default function VisitorTracking() {
                       dataKey="day"
                       tick={{
                         fontSize: 11,
-                        fill: "#A8A29E",
-                        fontFamily: "Plus Jakarta Sans",
+                        fill: "#9C9690",
+                        fontFamily: "Inter",
                       }}
                     />
                     <YAxis
                       allowDecimals={false}
                       tick={{
                         fontSize: 11,
-                        fill: "#A8A29E",
-                        fontFamily: "Plus Jakarta Sans",
+                        fill: "#9C9690",
+                        fontFamily: "Inter",
                       }}
                     />
                     <Tooltip content={<ChartTooltip />} />
                     <Area
                       type="monotone"
                       dataKey="visits"
-                      stroke="#D4522A"
+                      stroke="#C84B2F"
                       strokeWidth={2.5}
-                      fill="url(#grad1)"
+                      fill="url(#areaGrad)"
                       dot={false}
                       activeDot={{
                         r: 5,
-                        fill: "#D4522A",
+                        fill: "#C84B2F",
                         stroke: "#fff",
                         strokeWidth: 2,
                       }}
@@ -904,16 +1108,16 @@ export default function VisitorTracking() {
                 </ResponsiveContainer>
               </div>
 
-              {/* hourly */}
+              {/* hourly bar */}
               <div
-                className="card fade-up fade-up-5"
-                style={{ padding: 24, marginBottom: 20 }}
+                className="card fade-up fade-5"
+                style={{ padding: 22, marginBottom: 16 }}
               >
-                <SectionHeader title="Today — Hourly Breakdown" />
-                <ResponsiveContainer width="100%" height={130}>
+                <SecHead title="Today — Hourly Breakdown" />
+                <ResponsiveContainer width="100%" height={120}>
                   <BarChart
                     data={hourly}
-                    margin={{ top: 4, right: 5, bottom: 0, left: -10 }}
+                    margin={{ top: 4, right: 5, bottom: 0, left: -15 }}
                   >
                     <CartesianGrid
                       strokeDasharray="3 3"
@@ -922,138 +1126,126 @@ export default function VisitorTracking() {
                     />
                     <XAxis
                       dataKey="hour"
-                      tick={{ fontSize: 10, fill: "#A8A29E" }}
+                      tick={{ fontSize: 10, fill: "#9C9690" }}
                       interval={3}
                     />
                     <YAxis
                       allowDecimals={false}
-                      tick={{ fontSize: 10, fill: "#A8A29E" }}
+                      tick={{ fontSize: 10, fill: "#9C9690" }}
                     />
                     <Tooltip content={<ChartTooltip />} />
                     <Bar
                       dataKey="visits"
-                      fill="#2563EB"
+                      fill="#2156C8"
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
 
-              {/* 3 col */}
+              {/* 3-col */}
               <div
+                className="three-col"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr 1fr",
-                  gap: 16,
-                  marginBottom: 20,
+                  gap: 14,
+                  marginBottom: 16,
                 }}
               >
                 {/* top pages */}
-                <div className="card fade-up fade-up-6" style={{ padding: 24 }}>
-                  <SectionHeader title="Top Pages" />
+                <div className="card" style={{ padding: 22 }}>
+                  <SecHead title="Top Pages" />
                   {topPages.length === 0 ? (
                     <p
                       style={{
-                        textAlign: "center",
                         color: "var(--text3)",
                         fontSize: 13,
-                        padding: "24px 0",
+                        padding: "20px 0",
+                        textAlign: "center",
                       }}
                     >
-                      No data yet
+                      No data
                     </p>
                   ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 14,
-                      }}
-                    >
-                      {topPages.map((p, i) => (
-                        <div key={i}>
-                          <div
+                    topPages.map((p, i) => (
+                      <div key={i} style={{ marginBottom: 14 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            marginBottom: 5,
+                            fontSize: 12,
+                          }}
+                        >
+                          <span
                             style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              marginBottom: 5,
+                              color: "var(--text2)",
+                              fontWeight: 600,
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              maxWidth: 150,
                             }}
                           >
-                            <span
-                              style={{
-                                fontSize: 12,
-                                color: "var(--text2)",
-                                fontWeight: 600,
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                                whiteSpace: "nowrap",
-                                maxWidth: 160,
-                              }}
-                            >
-                              {p.page}
-                            </span>
-                            <span
-                              style={{
-                                fontSize: 12,
-                                fontWeight: 800,
-                                color: "var(--text1)",
-                                flexShrink: 0,
-                                marginLeft: 8,
-                              }}
-                            >
-                              {p.count}
-                            </span>
-                          </div>
-                          <div className="progress-bar">
-                            <div
-                              className="progress-fill"
-                              style={{
-                                width: `${(p.count / topPages[0].count) * 100}%`,
-                                background:
-                                  CHART_COLORS[i % CHART_COLORS.length],
-                              }}
-                            />
-                          </div>
+                            {p.page}
+                          </span>
+                          <span
+                            style={{
+                              fontWeight: 800,
+                              color: "var(--text1)",
+                              flexShrink: 0,
+                              marginLeft: 8,
+                            }}
+                          >
+                            {p.count}
+                          </span>
                         </div>
-                      ))}
-                    </div>
+                        <div className="progress-bar">
+                          <div
+                            className="progress-fill"
+                            style={{
+                              width: `${rnd((p.count / topPages[0].count) * 100)}%`,
+                              background: COLORS[i % COLORS.length],
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))
                   )}
                 </div>
 
-                {/* traffic source */}
-                <div className="card fade-up fade-up-6" style={{ padding: 24 }}>
-                  <SectionHeader title="Traffic Source" />
+                {/* traffic source — donut */}
+                <div className="card" style={{ padding: 22 }}>
+                  <SecHead title="Traffic Source" />
                   {sourceData.length === 0 ? (
                     <p
                       style={{
-                        textAlign: "center",
                         color: "var(--text3)",
                         fontSize: 13,
-                        padding: "24px 0",
+                        padding: "20px 0",
+                        textAlign: "center",
                       }}
                     >
-                      No data yet
+                      No data
                     </p>
                   ) : (
                     <>
-                      <ResponsiveContainer width="100%" height={140}>
+                      <ResponsiveContainer width="100%" height={130}>
                         <PieChart>
                           <Pie
                             data={sourceData}
                             cx="50%"
                             cy="50%"
-                            innerRadius={42}
-                            outerRadius={62}
+                            innerRadius={40}
+                            outerRadius={58}
                             paddingAngle={3}
                             dataKey="value"
                             startAngle={90}
                             endAngle={-270}
                           >
                             {sourceData.map((_, i) => (
-                              <Cell
-                                key={i}
-                                fill={CHART_COLORS[i % CHART_COLORS.length]}
-                              />
+                              <Cell key={i} fill={COLORS[i % COLORS.length]} />
                             ))}
                           </Pie>
                           <Tooltip content={<ChartTooltip />} />
@@ -1072,8 +1264,8 @@ export default function VisitorTracking() {
                             key={i}
                             style={{
                               display: "flex",
-                              alignItems: "center",
                               justifyContent: "space-between",
+                              alignItems: "center",
                               fontSize: 12,
                             }}
                           >
@@ -1089,10 +1281,9 @@ export default function VisitorTracking() {
                                   width: 8,
                                   height: 8,
                                   borderRadius: "50%",
-                                  background:
-                                    CHART_COLORS[i % CHART_COLORS.length],
-                                  flexShrink: 0,
+                                  background: COLORS[i % COLORS.length],
                                   display: "inline-block",
+                                  flexShrink: 0,
                                 }}
                               />
                               <span
@@ -1101,7 +1292,7 @@ export default function VisitorTracking() {
                                   fontWeight: 500,
                                 }}
                               >
-                                {SOURCE_ICONS[s.name] || "🌐"} {s.name}
+                                {SourceIcons[s.name] || "🌐"} {s.name}
                               </span>
                             </div>
                             <span
@@ -1117,84 +1308,68 @@ export default function VisitorTracking() {
                 </div>
 
                 {/* device + countries */}
-                <div
-                  className="card fade-up fade-up-6"
-                  style={{
-                    padding: 24,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 24,
-                  }}
-                >
-                  <div>
-                    <SectionHeader title="Device Type" />
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 10,
-                      }}
-                    >
-                      {deviceData.map((d, i) => (
-                        <div key={i}>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              fontSize: 12,
-                              marginBottom: 5,
-                              fontWeight: 600,
-                              color: "var(--text2)",
-                            }}
+                <div className="card" style={{ padding: 22 }}>
+                  <SecHead title="Device Type" />
+                  {Object.entries(deviceCounts).length === 0 ? (
+                    <p style={{ color: "var(--text3)", fontSize: 13 }}>
+                      No data
+                    </p>
+                  ) : (
+                    Object.entries(deviceCounts).map(([d, cnt], i) => (
+                      <div key={i} style={{ marginBottom: 12 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            fontSize: 12,
+                            marginBottom: 5,
+                            fontWeight: 600,
+                            color: "var(--text2)",
+                          }}
+                        >
+                          <span>
+                            {DeviceIcons[d] || "💻"} {d}
+                          </span>
+                          <span
+                            style={{ color: "var(--text1)", fontWeight: 800 }}
                           >
-                            <span>
-                              {{
-                                Desktop: "🖥 Desktop",
-                                Mobile: "📱 Mobile",
-                                Tablet: "📟 Tablet",
-                              }[d.name] || d.name}
-                            </span>
-                            <span
-                              style={{ color: "var(--text1)", fontWeight: 800 }}
-                            >
-                              {total ? Math.round((d.value / total) * 100) : 0}%
-                            </span>
-                          </div>
-                          <div className="progress-bar">
-                            <div
-                              className="progress-fill"
-                              style={{
-                                width: `${total ? (d.value / total) * 100 : 0}%`,
-                                background: CHART_COLORS[i],
-                              }}
-                            />
-                          </div>
+                            {total ? rnd((cnt / total) * 100) : 0}%
+                          </span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                        <div className="progress-bar">
+                          <div
+                            className="progress-fill"
+                            style={{
+                              width: `${total ? rnd((cnt / total) * 100) : 0}%`,
+                              background: COLORS[i],
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  )}
                   <div
                     style={{
-                      borderTop: "1px solid var(--border2)",
-                      paddingTop: 20,
+                      borderTop: "1px solid var(--border)",
+                      paddingTop: 18,
+                      marginTop: 18,
                     }}
                   >
-                    <SectionHeader title="Top Countries" />
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 8,
-                      }}
-                    >
-                      {topCountries.slice(0, 5).map((c, i) => (
+                    <SecHead title="Top Countries" />
+                    {topCountries.length === 0 ? (
+                      <p style={{ color: "var(--text3)", fontSize: 12 }}>
+                        No data
+                      </p>
+                    ) : (
+                      topCountries.slice(0, 5).map((c, i) => (
                         <div
                           key={i}
                           style={{
                             display: "flex",
-                            alignItems: "center",
                             justifyContent: "space-between",
+                            alignItems: "center",
                             fontSize: 12,
+                            marginBottom: 9,
                           }}
                         >
                           <div
@@ -1208,15 +1383,14 @@ export default function VisitorTracking() {
                               style={{
                                 width: 20,
                                 height: 20,
-                                borderRadius: 4,
-                                background:
-                                  CHART_COLORS[i % CHART_COLORS.length] + "20",
+                                borderRadius: 5,
+                                background: COLORS[i % COLORS.length] + "22",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                                 fontSize: 10,
                                 fontWeight: 800,
-                                color: CHART_COLORS[i % CHART_COLORS.length],
+                                color: COLORS[i % COLORS.length],
                               }}
                             >
                               {i + 1}
@@ -1233,13 +1407,8 @@ export default function VisitorTracking() {
                             {c.value}
                           </span>
                         </div>
-                      ))}
-                      {topCountries.length === 0 && (
-                        <p style={{ color: "var(--text3)", fontSize: 12 }}>
-                          No data yet
-                        </p>
-                      )}
-                    </div>
+                      ))
+                    )}
                   </div>
                 </div>
               </div>
@@ -1249,21 +1418,23 @@ export default function VisitorTracking() {
           {/* ══ TABLE TAB ══ */}
           {tab === "table" && (
             <div className="card fade-up" style={{ overflow: "hidden" }}>
+              {/* toolbar */}
               <div
                 style={{
                   display: "flex",
+                  flexWrap: "wrap",
                   alignItems: "center",
                   justifyContent: "space-between",
-                  padding: "18px 24px",
-                  borderBottom: "1px solid var(--border2)",
+                  gap: 12,
+                  padding: "16px 20px",
+                  borderBottom: "1px solid var(--border)",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                   <h2
                     style={{
-                      margin: 0,
                       fontSize: 14,
-                      fontWeight: 800,
+                      fontWeight: 700,
                       color: "var(--text1)",
                     }}
                   >
@@ -1283,48 +1454,61 @@ export default function VisitorTracking() {
                     {filtered.length}
                   </span>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search IP, page, country, source…"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setPage(1);
-                  }}
-                />
+                <div style={{ position: "relative" }}>
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: 10,
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      color: "var(--text3)",
+                    }}
+                  >
+                    {Ico.search()}
+                  </span>
+                  <input
+                    className="search-input"
+                    type="text"
+                    placeholder="Search IP, page, country…"
+                    value={search}
+                    onChange={(e) => {
+                      setSearch(e.target.value);
+                      setPage(1);
+                    }}
+                  />
+                </div>
               </div>
 
               {loading ? (
                 <div
                   style={{
                     display: "flex",
-                    alignItems: "center",
                     justifyContent: "center",
-                    padding: "64px 0",
+                    padding: "60px 0",
                   }}
                 >
                   <div
+                    className="spin"
                     style={{
                       width: 32,
                       height: 32,
                       border: "3px solid var(--border)",
-                      borderTopColor: "var(--accent)",
+                      borderTopColor: "var(--red)",
                       borderRadius: "50%",
                     }}
-                    className="spin"
                   />
                 </div>
               ) : paginated.length === 0 ? (
                 <div
                   style={{
                     textAlign: "center",
-                    padding: "64px 0",
+                    padding: "60px 0",
                     color: "var(--text3)",
                     fontSize: 14,
                   }}
                 >
                   {visitors.length === 0
-                    ? "No visitor data yet. Track a visit first!"
+                    ? "No visitor data yet. Track a visit or enable Demo Mode."
                     : "Nothing matches your search."}
                 </div>
               ) : (
@@ -1341,7 +1525,7 @@ export default function VisitorTracking() {
                         <tr
                           style={{
                             background: "var(--bg)",
-                            borderBottom: "1px solid var(--border2)",
+                            borderBottom: "1px solid var(--border)",
                           }}
                         >
                           {[
@@ -1358,12 +1542,12 @@ export default function VisitorTracking() {
                               key={h}
                               style={{
                                 textAlign: "left",
-                                padding: "10px 20px",
-                                fontSize: 11,
+                                padding: "9px 18px",
+                                fontSize: 10,
                                 fontWeight: 700,
                                 color: "var(--text3)",
                                 textTransform: "uppercase",
-                                letterSpacing: "0.07em",
+                                letterSpacing: ".07em",
                                 whiteSpace: "nowrap",
                               }}
                             >
@@ -1375,19 +1559,18 @@ export default function VisitorTracking() {
                       <tbody>
                         {paginated.map((v, i) => {
                           const device = getDevice(v.userAgent);
-                          const idx = (page - 1) * PER_PAGE + i + 1;
+                          const idx = (safePage - 1) * PER_PAGE + i + 1;
                           return (
                             <tr
                               key={v._id || i}
-                              className="table-row"
+                              className="tr"
                               style={{
-                                borderBottom: "1px solid var(--border2)",
-                                transition: "background .12s",
+                                borderBottom: "1px solid var(--border)",
                               }}
                             >
                               <td
                                 style={{
-                                  padding: "13px 20px",
+                                  padding: "12px 18px",
                                   color: "var(--text3)",
                                   fontWeight: 600,
                                 }}
@@ -1396,7 +1579,7 @@ export default function VisitorTracking() {
                               </td>
                               <td
                                 style={{
-                                  padding: "13px 20px",
+                                  padding: "12px 18px",
                                   fontFamily: "monospace",
                                   fontSize: 12,
                                   color: "var(--text2)",
@@ -1406,16 +1589,16 @@ export default function VisitorTracking() {
                                 {v.ip || v.ipAddress || "—"}
                               </td>
                               <td
-                                style={{ padding: "13px 20px", maxWidth: 180 }}
+                                style={{ padding: "12px 18px", maxWidth: 160 }}
                               >
                                 <span
                                   style={{
-                                    color: "#D4522A",
+                                    color: "var(--red)",
                                     fontWeight: 600,
+                                    display: "block",
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
                                     whiteSpace: "nowrap",
-                                    display: "block",
                                   }}
                                 >
                                   {v.page || v.url || "/"}
@@ -1423,66 +1606,59 @@ export default function VisitorTracking() {
                               </td>
                               <td
                                 style={{
-                                  padding: "13px 20px",
+                                  padding: "12px 18px",
                                   color: "var(--text2)",
                                   fontWeight: 500,
                                 }}
                               >
                                 {v.country || "—"}
                               </td>
-                              <td style={{ padding: "13px 20px" }}>
+                              <td style={{ padding: "12px 18px" }}>
                                 <span className="badge badge-blue">
-                                  {SOURCE_ICONS[v.source || "Direct"] || "🌐"}{" "}
+                                  {SourceIcons[v.source || "Direct"] || "🌐"}{" "}
                                   {v.source || "Direct"}
                                 </span>
                               </td>
-                              <td style={{ padding: "13px 20px" }}>
+                              <td style={{ padding: "12px 18px" }}>
                                 <span
                                   className={`badge ${{ Desktop: "badge-slate", Mobile: "badge-amber", Tablet: "badge-green" }[device]}`}
                                 >
-                                  {
-                                    {
-                                      Desktop: "🖥",
-                                      Mobile: "📱",
-                                      Tablet: "📟",
-                                    }[device]
-                                  }{" "}
-                                  {device}
+                                  {DeviceIcons[device] || "💻"} {device}
                                 </span>
                               </td>
                               <td
                                 style={{
-                                  padding: "13px 20px",
+                                  padding: "12px 18px",
                                   color: "var(--text3)",
                                   whiteSpace: "nowrap",
                                 }}
                               >
                                 {fmtDate(v.createdAt || v.timestamp)}
                               </td>
-                              <td style={{ padding: "13px 20px" }}>
+                              <td style={{ padding: "12px 18px" }}>
                                 <button
                                   onClick={() => handleDelete(v._id)}
                                   disabled={deletingId === v._id}
-                                  title="Delete"
+                                  title="Delete record"
                                   style={{
                                     background: "none",
                                     border: "none",
                                     cursor: "pointer",
-                                    color: "#FCA5A5",
-                                    fontSize: 14,
+                                    color: "#fca5a5",
                                     padding: 4,
-                                    lineHeight: 1,
                                     borderRadius: 6,
+                                    display: "flex",
+                                    alignItems: "center",
                                     transition: "color .15s",
                                   }}
                                   onMouseEnter={(e) =>
-                                    (e.currentTarget.style.color = "#DC2626")
+                                    (e.currentTarget.style.color = "#dc2626")
                                   }
                                   onMouseLeave={(e) =>
-                                    (e.currentTarget.style.color = "#FCA5A5")
+                                    (e.currentTarget.style.color = "#fca5a5")
                                   }
                                 >
-                                  {deletingId === v._id ? "…" : "✕"}
+                                  {deletingId === v._id ? "…" : Ico.x()}
                                 </button>
                               </td>
                             </tr>
@@ -1497,39 +1673,38 @@ export default function VisitorTracking() {
                     <div
                       style={{
                         display: "flex",
+                        flexWrap: "wrap",
                         alignItems: "center",
                         justifyContent: "space-between",
-                        padding: "13px 24px",
-                        borderTop: "1px solid var(--border2)",
+                        gap: 10,
+                        padding: "12px 20px",
+                        borderTop: "1px solid var(--border)",
                         fontSize: 12,
                       }}
                     >
                       <span style={{ color: "var(--text3)", fontWeight: 500 }}>
-                        {(page - 1) * PER_PAGE + 1}–
-                        {Math.min(page * PER_PAGE, filtered.length)} of{" "}
+                        {(safePage - 1) * PER_PAGE + 1}–
+                        {Math.min(safePage * PER_PAGE, filtered.length)} of{" "}
                         {filtered.length}
                       </span>
-                      <div style={{ display: "flex", gap: 5 }}>
+                      <div style={{ display: "flex", gap: 4 }}>
                         {[
                           {
                             label: "‹",
                             fn: () => setPage((p) => Math.max(1, p - 1)),
-                            dis: page === 1,
+                            dis: safePage === 1,
                           },
-                          ...Array.from(
-                            { length: Math.min(5, totalPages) },
-                            (_, i) => ({
-                              label: i + 1,
-                              fn: () => setPage(i + 1),
-                              dis: false,
-                              active: page === i + 1,
-                            }),
-                          ),
+                          ...buildPages().map((n) => ({
+                            label: n,
+                            fn: () => setPage(n),
+                            dis: false,
+                            active: safePage === n,
+                          })),
                           {
                             label: "›",
                             fn: () =>
                               setPage((p) => Math.min(totalPages, p + 1)),
-                            dis: page === totalPages,
+                            dis: safePage === totalPages,
                           },
                         ].map((b, i) => (
                           <button
@@ -1539,7 +1714,7 @@ export default function VisitorTracking() {
                             style={{
                               minWidth: 30,
                               height: 30,
-                              borderRadius: 8,
+                              borderRadius: 7,
                               border: `1px solid ${b.active ? "transparent" : "var(--border)"}`,
                               background: b.active
                                 ? "var(--text1)"
@@ -1549,7 +1724,7 @@ export default function VisitorTracking() {
                               fontSize: 12,
                               cursor: b.dis ? "not-allowed" : "pointer",
                               opacity: b.dis ? 0.4 : 1,
-                              fontFamily: "'Plus Jakarta Sans'",
+                              fontFamily: "'Inter'",
                               transition: "all .15s",
                             }}
                           >
@@ -1563,6 +1738,21 @@ export default function VisitorTracking() {
               )}
             </div>
           )}
+
+          {/* ── footer note ── */}
+          <div
+            className="fade-up fade-6"
+            style={{
+              marginTop: 20,
+              fontSize: 11,
+              color: "var(--text3)",
+              textAlign: "center",
+              fontWeight: 500,
+            }}
+          >
+            Visitor Analytics Admin Panel · Data refreshes every 30s · Backend:{" "}
+            {BACKEND}
+          </div>
         </div>
       </div>
     </>

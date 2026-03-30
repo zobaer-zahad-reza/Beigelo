@@ -28,25 +28,19 @@ const App = () => {
   useEffect(() => {
     const trackUser = async () => {
       try {
-        // ১. URL থেকে UTM প্যারামিটার বের করা
         const queryParams = new URLSearchParams(window.location.search);
 
-        // ২. ডাটা অবজেক্ট তৈরি করা
         const trackingData = {
           utm_source: queryParams.get("utm_source"),
           utm_medium: queryParams.get("utm_medium"),
           utm_campaign: queryParams.get("utm_campaign"),
           page: window.location.pathname,
-          referrer: document.referrer, // ব্যবহারকারী কোন সাইট থেকে এসেছে
+          referrer: document.referrer,
         };
 
-        // ৩. ব্যাকএন্ড লিংক সেট করা (Environment Variable থেকে)
         const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-        // ৪. ব্যাকএন্ডে পাঠানো (একবারই)
-        // সেশন স্টোরেজ চেক করা যাতে পেজ রিফ্রেশে বারবার কাউন্ট না হয়
         if (!sessionStorage.getItem("visited")) {
-          // যদি backendUrl না পাওয়া যায়, তবে কনসোলে ওয়ার্নিং দেখাবে
           if (!backendUrl) {
             console.warn("Backend URL is missing in .env file");
             return;
