@@ -1,49 +1,29 @@
 import Visitor from "../models/Visitor.js";
 import geoip from "geoip-lite";
 
-// ==========================================
-// 1. Track New Visitor
-// ==========================================
-// ==========================================
-// 1. Track New Visitor (Fixed Localhost IP Logic)
-// ==========================================
 export const trackVisitor = async (req, res) => {
   try {
-    // 1. Extract Raw IP
-    const forwarded = req.headers["x-forwarded-for"];
-    let rawIp = forwarded
-      ? forwarded.split(",")[0].trim()
-      : req.socket.remoteAddress;
+    // 1. Get Real IP (trust proxy true thakay req.ip ekhon perfectly ashol IP dibe)
+    let realIp = req.headers["x-forwarded-for"]?.split(",")[0].trim() || req.ip;
 
-    // Fix: Clean "IPv4 mapped IPv6" format (e.g., ::ffff:127.0.0.1 -> 127.0.0.1)
-    if (rawIp && rawIp.startsWith("::ffff:")) {
-      rawIp = rawIp.replace("::ffff:", "");
-    }
-    // Fix: Convert pure IPv6 localhost to IPv4
-    if (rawIp === "::1") {
-      rawIp = "127.0.0.1";
+    // Localhost IPv6 fix (shudhu local testing er jonno)
+    if (realIp === "::1" || realIp === "::ffff:127.0.0.1") {
+      realIp = "127.0.0.1";
     }
 
-    // 2. Mock IP for Localhost Testing
-    const isLocalhost = rawIp === "127.0.0.1" || rawIp === "localhost";
-    const lookupIp = isLocalhost ? "103.155.22.10" : rawIp; // Localhost hole BD IP dhorbo
+    // 2. GeoIP Lookup (Real IP theke desh ber korbe)
+    const geo = geoip.lookup(realIp);
 
-    // 3. GeoIP Lookup
-    const geo = geoip.lookup(lookupIp);
-
-    // 👉 TERMINAL E CHECK KORAR JONNO LOG (Khub important!)
     console.log(
-      `[Tracking Check] Raw IP: ${rawIp} | Lookup IP: ${lookupIp} | Country: ${geo?.country || "Not Found"}`,
+      `[New Visitor] IP: ${realIp} | Country: ${geo?.country || "Local/Unknown"}`,
     );
 
-    // 4. Extract body data
     const { page, userAgent, referrer, utm_source, utm_medium, utm_campaign } =
       req.body;
 
-    // 5. Save to Database
+    // 3. Database-e Save
     const newVisitor = await Visitor.create({
-      // Database e bujhar subidharthe Local IP hole "127.0.0.1 (Local)" save korbo
-      ip: isLocalhost ? "127.0.0.1 (Local)" : rawIp,
+      ip: realIp,
       country: geo?.country || "Unknown",
       city: geo?.city || "Unknown",
       source: utm_source || "Direct",
