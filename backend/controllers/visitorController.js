@@ -4,25 +4,46 @@ import geoip from "geoip-lite";
 // ==========================================
 // 1. Track New Visitor
 // ==========================================
+// ==========================================
+// 1. Track New Visitor (Fixed Localhost IP Logic)
+// ==========================================
 export const trackVisitor = async (req, res) => {
   try {
+    // 1. Extract Raw IP
     const forwarded = req.headers["x-forwarded-for"];
     let rawIp = forwarded
       ? forwarded.split(",")[0].trim()
       : req.socket.remoteAddress;
 
-    // IPv6 localhost formatting fix
-    if (rawIp === "::1") rawIp = "127.0.0.1";
+    // Fix: Clean "IPv4 mapped IPv6" format (e.g., ::ffff:127.0.0.1 -> 127.0.0.1)
+    if (rawIp && rawIp.startsWith("::ffff:")) {
+      rawIp = rawIp.replace("::ffff:", "");
+    }
+    // Fix: Convert pure IPv6 localhost to IPv4
+    if (rawIp === "::1") {
+      rawIp = "127.0.0.1";
+    }
 
-    // Lookup er jonno localhost e default BD IP dhora hocche
-    const lookupIp = rawIp === "127.0.0.1" ? "103.155.22.10" : rawIp;
+    // 2. Mock IP for Localhost Testing
+    const isLocalhost = rawIp === "127.0.0.1" || rawIp === "localhost";
+    const lookupIp = isLocalhost ? "103.155.22.10" : rawIp; // Localhost hole BD IP dhorbo
+
+    // 3. GeoIP Lookup
     const geo = geoip.lookup(lookupIp);
 
+    // 👉 TERMINAL E CHECK KORAR JONNO LOG (Khub important!)
+    console.log(
+      `[Tracking Check] Raw IP: ${rawIp} | Lookup IP: ${lookupIp} | Country: ${geo?.country || "Not Found"}`,
+    );
+
+    // 4. Extract body data
     const { page, userAgent, referrer, utm_source, utm_medium, utm_campaign } =
       req.body;
 
+    // 5. Save to Database
     const newVisitor = await Visitor.create({
-      ip: rawIp,
+      // Database e bujhar subidharthe Local IP hole "127.0.0.1 (Local)" save korbo
+      ip: isLocalhost ? "127.0.0.1 (Local)" : rawIp,
       country: geo?.country || "Unknown",
       city: geo?.city || "Unknown",
       source: utm_source || "Direct",
